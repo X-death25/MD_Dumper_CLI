@@ -29,6 +29,7 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 // USB Special Command
 #define WAKEUP          0x10	// WakeUP for first STM32 Communication
 #define READ_MD         0x11
+#define READ_SMS   		0x16
 #define MAPPER_SSF2     0x20
 
 
@@ -244,9 +245,11 @@ int main(int argc, char *argv[])
 	int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
 	int dump_mode=0; 						/* 0=Auto, 1=Manual */
 	int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
+	int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
 	int game_size=0;
 	int manual_game_size=0;
-	unsigned long save_size = 0;
+	int manual_game_cart_mode=0;
+	unsigned long save_size=0;
 	unsigned char *BufferROM;
 	FILE *myfile;
 	unsigned char NumberOfBank=0;
@@ -260,7 +263,7 @@ int main(int argc, char *argv[])
 		printf("CLI Mode:\n");
 		printf("  %s -read a  -  Auto Mode\n", argv[0]);
 		printf("  %s -read b  -  Bankswitch Mode\n", argv[0]);
-		printf("  %s -read m (32|64|128|256|512|1024|2048|4096) -  Manual Mode\n", argv[0]);
+		printf("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
 		printf("\n");
 		return 1;
 		}
@@ -285,8 +288,9 @@ int main(int argc, char *argv[])
 		while (quit==0)
 			{    		
 			SDL_GetMouseState(&mouse_x, &mouse_y);
-			SDL_Surface * opts_mode;			SDL_Texture * texture2;
-			SDL_Surface * opts_manual_size;		SDL_Texture * texture3;
+			SDL_Surface * opts_mode;				SDL_Texture * texture2;
+			SDL_Surface * opts_manual_size;			SDL_Texture * texture3;
+			SDL_Surface * opts_manual_cart_mode;	SDL_Texture * texture4;
 			
 			switch(dump_mode)				//Create Mode Texture
 				{
@@ -348,10 +352,25 @@ int main(int argc, char *argv[])
 					break;
 				}
 			
+			switch(dump_manual_cart_mode_opts)	//Create Manual Cartridge Mode Texture
+				{
+				case 0:						//Mega Drive Mode
+					opts_manual_size = IMG_Load("./images/opts_dump_manual_md.png");
+					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					manual_game_cart_mode = 0;
+					break;
+				case 1:						//Master System Mode
+					opts_manual_size = IMG_Load("./images/opts_dump_manual_sms.png");
+					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					manual_game_cart_mode = 1;
+					break;
+				}
+			
 			//Display Texture	
 			SDL_RenderCopy(renderer, texture, NULL, NULL);
 			SDL_RenderCopy(renderer, texture2, NULL, NULL);
 			SDL_RenderCopy(renderer, texture3, NULL, NULL);
+			SDL_RenderCopy(renderer, texture4, NULL, NULL);
 			SDL_RenderPresent(renderer);
 		
 			SDL_WaitEvent(&event);
@@ -377,11 +396,13 @@ int main(int argc, char *argv[])
 						{
 						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 0; }	//Manual Size : 32KB
 						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 4; }	//Manual Size : 512KB
+						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 0; }	//Manual Cart Mode : Mega Drive
 						}
 					else if(mouse_x>=335 && mouse_x<=340)
 						{
 						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 1; }	//Manual Size : 64KB
 						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 5; }	//Manual Size : 1024KB
+						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 1; }	//Manual Cart Mode : Master System
 						}
 					else if(mouse_x>=455 && mouse_x<=460)
 						{
@@ -393,7 +414,7 @@ int main(int argc, char *argv[])
 						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 3; }	//Manual Size : 286KB
 						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 7; }	//Manual Size : 4096KB
 						}
-					if(mouse_x>=16 && mouse_x<=199)
+					else if(mouse_x>=16 && mouse_x<=199)
 						{
 						if(mouse_y>=183 && mouse_y<=214)			//Exit
 							{
@@ -406,7 +427,7 @@ int main(int argc, char *argv[])
 							return 1;
 							}
 						}
-					if(mouse_x>=228 && mouse_x<=411)
+					else if(mouse_x>=228 && mouse_x<=411)
 						{
 						if(mouse_y>=183 && mouse_y<=214)			//Launch the dump
 							{
@@ -414,7 +435,7 @@ int main(int argc, char *argv[])
 							break;
 							}
 						}
-					if(mouse_x>=440 && mouse_x<=623)
+					else if(mouse_x>=440 && mouse_x<=623)
 						{
 						if(mouse_y>=183 && mouse_y<=214)			//Manual / PDF
 							{
@@ -652,6 +673,13 @@ int main(int argc, char *argv[])
 				{
 				printf("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
 				return 1;
+				}
+			if (strcmp(argv[4], "md") == 0) 		{ manual_game_cart_mode = 0; 	}
+			else if (strcmp(argv[4], "sms") == 0) 	{ manual_game_cart_mode = 1; 	}
+			else
+				{
+				printf("Vous devez écrire une des valeurs suivantes : md, sms.\n");
+				return 1;
 				}	
 			}
 		else { dump_mode=2; }								//Mode Bankswitch
@@ -702,7 +730,6 @@ int main(int argc, char *argv[])
 		printf("Sending command Dump ROM \n");
 		printf("Dumping please wait ...\n");
 		timer_start();
-		address=0;
 		game_size = manual_game_size * 1024;
 		printf("\nRom Size (Manual Mode) : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
@@ -711,27 +738,56 @@ int main(int argc, char *argv[])
 			{
 			BufferROM[i]=0x00;
 			}
-
-		usb_buffer_out[0] = READ_MD;
-		usb_buffer_out[1]=address & 0xFF;
-		usb_buffer_out[2]=(address & 0xFF00)>>8;
-		usb_buffer_out[3]=(address & 0xFF0000)>>16;
-		usb_buffer_out[4]=1;
-
-		libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-		printf("ROM dump in progress...\n");
-		res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
-		if (res != 0)
+		
+		if(manual_game_cart_mode==0)						//Mega Drive Mode
 			{
-			printf("Error \n");
-			return 1;
+			address = 0;
+			usb_buffer_out[0] = READ_MD;
+			usb_buffer_out[1]=address & 0xFF;
+			usb_buffer_out[2]=(address & 0xFF00)>>8;
+			usb_buffer_out[3]=(address & 0xFF0000)>>16;
+			usb_buffer_out[4]=1;
+			
+			libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+			printf("Mega Drive Mode : ROM dump in progress...\n");
+			res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+			if (res != 0)
+				{
+				printf("Error \n");
+				return 1;
+				}
+			printf("\nDump ROM completed !\n");
+			timer_end();
+			timer_show();
+			myfile = fopen("dump_smd.bin","wb");
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
 			}
-		printf("\nDump ROM completed !\n");
-		timer_end();
-		timer_show();
-		myfile = fopen("dump_smd.bin","wb");
-		fwrite(BufferROM, 1,game_size, myfile);
-		fclose(myfile);
+		else if(manual_game_cart_mode==1)					//Master System Mode
+			{
+			address = 0;		
+			int i=0;
+			printf("Master System Mode : ROM dump in progress...\n");
+			while (i<game_size)
+				{
+				usb_buffer_out[0] = READ_SMS;
+				usb_buffer_out[1] = address&0xFF ;
+				usb_buffer_out[2] = (address&0xFF00)>>8;
+				usb_buffer_out[3] = (address & 0xFF0000)>>16;
+				usb_buffer_out[4] = 0; // Slow Mode
+				usb_buffer_out[5] = 0; 
+				libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+				libusb_bulk_transfer(handle, 0x82,(BufferROM+i),64, &numBytes, 60000);
+				address +=64;
+				i+=64;
+				}
+			printf("\nDump ROM completed !\n");
+			timer_end();
+			timer_show();
+			myfile = fopen("dump_sms.sms","wb");
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
+			}
 		}
     else if ( dump_mode==2 )								//Mode Bankswitch
 		{
