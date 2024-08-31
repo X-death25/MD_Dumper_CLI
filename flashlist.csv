@@ -1,0 +1,17 @@
+chipid(4);chip_size(3);Erase_Algo(2);Write_Algo(2);chip_name(11);chip_VCC(2);man_name(18)
+BFB7;001;01;01;SST39SF040 ;05;SST               
+BF53;004;02;01;SST36VF3204;03;SST               
+BF5A;004;02;01;SST39VF3202;03;SST               
+BF5B;004;02;01;SST39VF3201;03;SST               
+BF6B;008;02;01;SST38VF6401;03;SST               
+2056;004;02;02;M29W320ET  ;03;STMicroelectronics
+2057;004;02;02;M29W320EB  ;03;STMicroelectronics
+20ED;008;02;02;M29W640D   ;03;STMicroelectronics
+C2CB;008;02;03;MX29LV640EB;03;Macronix          
+C2C9;008;02;03;MX29LV640  ;03;Macronix          
+C2A7;004;02;03;MX29LV320  ;03;Macronix          
+C2A8;004;02;03;MX29LV320  ;03;Macronix          
+C2F9;004;02;05;MX29L3211  ;03;Macronix          
+C2FC;008;02;02;MX26L6420  ;03;Macronix          
+017E;008;03;04;S29GL064N90;03;Spansion          
+98C2;002;02;02;TC58FVT160F;03;Toshiba           

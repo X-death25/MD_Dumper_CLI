@@ -1,0 +1,14 @@
+chksm(4);rom_size(4);mapper_num;save_type;save_size;game_name;mapper_name
+345D;0002;1;0;00;Virtua Racing EUR;Sega Virtual Processor
+95AB;0002;1;0;00;Virtua Racing USA;Sega Virtual Processor
+3B99;0002;1;0;00;Virtua Racing JAP;Sega Virtual Processor
+E41D;0005;2;0;00;Super Street Fighter 2 EUR;Sega SSF2 mapper
+E017;0005;2;0;00;Super Street Fighter 2 USA;Sega SSF2 mapper
+CE25;0005;2;0;00;Super Street Fighter 2 JAP;Sega SSF2 mapper
+CF50;0005;2;0;00;Super Street Fighter 2 USA color hack;Sega SSF2 mapper
+DFB3;0002;3;0;00;Sonic & Knuckles;Sega Lock-on
+AAAA;0008;4;0;00;Titan Overdrive 2;Extended Sega SSF2 mapper
+63D2;0008;5;4;08;Pier Solar Reprint EUR;WaterMelon T-5740
+6E1E;0016;4;1;16;Demons Of Asterborg;Extended Sega SSF2 mapper
+A5FB;0008;6;4;16;Paprium Collector EUR;WaterMelon T-5741
+BCF1;0005;2;0;00;Real Bout Fatal Fury Lite;Sega SSF2 mapper
