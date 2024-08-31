@@ -35,27 +35,54 @@ add_executable(MD_Dumper ${SRCS})
 find_package(PkgConfig REQUIRED)
 pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
 include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
+pkg_search_module(SDL2 REQUIRED sdl2)
+include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
+pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
+include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
 find_package(Libusb1 QUIET)
 
 # Une fois la dépendance trouvée, nous l'incluons au projet
 
 if (LIBUSB1_FOUND)
-message("libusb found")
-set(_includes ${LIBUSB1_INCLUDE_DIRS})
-set(_libs ${LIBUSB1_LIBRARIES})
-target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
-target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
-include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
-
+	message("libusb found")
+	set(_includes ${LIBUSB1_INCLUDE_DIRS})
+	set(_libs ${LIBUSB1_LIBRARIES})
+	target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
+	target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
+	include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
 else ()
-  # Sinon, nous affichons un message d'erreur
-  message("libusb not found")
-
+	# Sinon, nous affichons un message d'erreur
+	message("libusb not found")
 endif ()
 
 
+find_package(SDL2 QUIET)
 
+if (SDL2_FOUND)
+    message("SDL2 found")
+	set(_includes ${SDL2_INCLUDE_DIRS})
+	set(_libs ${SDL2_LIBRARIES})
+	target_include_directories(MD_Dumper PUBLIC ${SDL2_INCLUDE_DIRS}})
+	target_link_libraries (MD_Dumper ${SDL2_LIBRARIES})
+	include_directories(MD_Dumper ${SDL2_INCLUDE_DIRS})
+else()
+	# Sinon, nous affichons un message d'erreur
+    message("SDL2 not found")
+endif()
 
+find_package(SDL2_IMAGE QUIET)
+
+if (SDL2_IMAGE_FOUND)
+    message("SDL2Image found")
+	set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
+	set(_libs ${SDL2IMAGE_LIBRARIES})
+	target_include_directories(MD_Dumper PUBLIC ${SDL2_IMAGE_INCLUDE_DIRS}})
+	target_link_libraries (MD_Dumper ${SDL2_IMAGE_LIBRARIES})
+	include_directories(MD_Dumper ${SDL2_IMAGE_INCLUDE_DIRS})
+else()
+	# Sinon, nous affichons un message d'erreur
+    message("SDL2_image not found")
+endif()
 
 
 
