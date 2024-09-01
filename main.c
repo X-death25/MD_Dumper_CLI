@@ -556,14 +556,13 @@ int main(int argc, char *argv[])
 
    if(libusb_kernel_driver_active(handle, 0) == 1)
 	{
-	    printf("\nKernel Driver Active");
+	    SDL_Log("Kernel Driver Active");
 	    if(libusb_detach_kernel_driver(handle, 0) == 0)
-	        printf("\nKernel Driver Detached!");
+	        SDL_Log("Kernel Driver Detached!");
 	    else
 	    {
-	        printf("\nCouldn't detach kernel driver!\n");
+	        SDL_Log("Couldn't detach kernel driver!\n");
 	        libusb_close(handle);
-	        return -1;
 	    }
 	}
 	    
@@ -573,14 +572,13 @@ int main(int argc, char *argv[])
     {
 	if(libusb_kernel_driver_active(handle, 1) == 1)
 	{
-	    SDL_Log("\nKernel Driver Active");
+	    SDL_Log("Kernel Driver Active");
 	    if(libusb_detach_kernel_driver(handle, 1) == 0)
-	        SDL_Log("\nKernel Driver Detached!");
+	        SDL_Log("Kernel Driver Detached!");
 	    else
 	    {
-	        SDL_Log("\nCouldn't detach kernel driver!\n");
+	        SDL_Log("Couldn't detach kernel driver!\n");
 	        libusb_close(handle);
-	        return -1;
 	    }
 	}
         res = libusb_claim_interface(handle, 1);
