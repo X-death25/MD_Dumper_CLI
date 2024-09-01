@@ -36,6 +36,7 @@ find_package(PkgConfig REQUIRED)
 
 if(INCLUDE_EXTRA_CMAKELISTS)
     message("Windows Mode")
+    
     find_path(LIBUSB1_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES "include" "libusb" "libusb-1.0")
     find_library(LIBUSB1_LIBRARIES NAMES usb PATH_SUFFIXES "lib" "lib32" "lib64")
     set(_includes ${LIBUSB1_INCLUDE_DIRS})
@@ -43,6 +44,16 @@ if(INCLUDE_EXTRA_CMAKELISTS)
     target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
     target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
     include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
+
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
+
+    # Add SDL2 library
+    find_package(SDL2 REQUIRED)
+    target_link_libraries(MD_Dumper SDL2::Main)
+    
+    # Add SDL2_image library
+    find_package(SDL2_image REQUIRED)
+    target_link_libraries(MD_Dumper SDL2::Image)
 else ()
     message("Linux Mode")
     pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
@@ -54,23 +65,20 @@ else ()
     pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
     include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
 
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
+ 
     find_package(Libusb1 REQUIRED)
     set(_includes ${LIBUSB1_INCLUDE_DIRS})
     set(_libs ${LIBUSB1_LIBRARIES})
     target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
     target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
     include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
+
+    # Add SDL2 library
+    find_package(SDL2 REQUIRED)
+    target_link_libraries(MD_Dumper SDL2::Main)
+    
+    # Add SDL2_image library
+    find_package(SDL2_image REQUIRED)
+    target_link_libraries(MD_Dumper SDL2::Image)
 endif ()
-
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
-
-
-
-# Add SDL2 library
-find_package(SDL2 REQUIRED)
-target_link_libraries(MD_Dumper SDL2::Main)
-
-# Add SDL2_image library
-find_package(SDL2_image REQUIRED)
-target_link_libraries(MD_Dumper SDL2::Image)
