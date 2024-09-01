@@ -23,11 +23,11 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest]
+        os: [debian-latest]
         build_type: [Release]
         c_compiler: [gcc]
         include:
-          - os: ubuntu-latest
+          - os: debian-latest
             c_compiler: gcc
             cpp_compiler: g++
 
