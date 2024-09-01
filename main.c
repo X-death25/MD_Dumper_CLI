@@ -260,9 +260,12 @@ int main(int argc, char *argv[])
 
 	
 	if (strcmp(argv[1], "-help") == 0) {
-		SDL_Log("How to use the program:\n\n");
+		SDL_Log("\n");
+		SDL_Log("How to use the program:\n");
+		SDL_Log("\n");
 		SDL_Log("GUI Mode:\n");
-		SDL_Log("  %s -gui\n\n", argv[0]);
+		SDL_Log("  %s -gui\n", argv[0]);
+		SDL_Log("\n");
 		SDL_Log("CLI Mode:\n");
 		SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
 		SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
@@ -511,13 +514,15 @@ int main(int argc, char *argv[])
 		}
 	else
 		{
+		SDL_Log("\n");
 		SDL_Log("----------------------------------------------------------------------------\n");
 		SDL_Log("8b   d8 888b.      888b. 8    8 8b   d8 888b. 8888 888b.      .d88b 8    888\n"); 
 		SDL_Log("8YbmdP8 8   8      8   8 8    8 8YbmdP8 8  .8 8www 8  .8      8P    8     8\n");  
 		SDL_Log("8     8 8   8 wwww 8   8 8b..d8 8     8 8wwP' 8    8wwK'      8b    8     8\n");  
 		SDL_Log("8     8 888P'      888P' `Y88P' 8     8 8     8888 8  Yb wwww `Y88P 8888 888\n");
 		SDL_Log("----------------------------------------------------------------------------\n");
-		SDL_Log("\nRelease : 1.0 alpha \n\n");
+		SDL_Log("\nRelease : 1.0 alpha \n");
+		SDL_Log("\n");
 		}
 	
     /* Initialise libusb. */
@@ -568,10 +573,11 @@ int main(int argc, char *argv[])
     }
     i=0;
 
-	usb_buffer_out[0] = WAKEUP;// Affect request to  WakeUP Command
+    usb_buffer_out[0] = WAKEUP;// Affect request to  WakeUP Command
     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0); // Send Packets to Sega Dumper
     libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 0);
-	SDL_Log("\nMD Dumper %.*s",6, (char *)usb_buffer_in);
+    SDL_Log("\n");
+    SDL_Log("\nMD Dumper %.*s",6, (char *)usb_buffer_in);
     SDL_Log("\n");
 	md_dumper_type = usb_buffer_in[24];
 	if ( md_dumper_type == 0 )
@@ -590,14 +596,15 @@ int main(int argc, char *argv[])
 		{
         SDL_Log("MD Dumper type : SMD ARM TQFP100 Aligned  \n");
 		}
-	SDL_Log("Hardware Firmware version : %d", usb_buffer_in[20]);
-    SDL_Log(".%d\n", usb_buffer_in[21]);
+	SDL_Log("Hardware Firmware version : %d.%d\n", usb_buffer_in[20],usb_buffer_in[21]);
 
 	//Init Lib CSV
 
     if (csv_init(&p, options) != 0)
 		{
-        SDL_Log("\n\n ERROR Failed to init CSV Parser for Gamelist ...\n");
+		SDL_Log("\n");
+		SDL_Log("\n");
+        SDL_Log("ERROR Failed to init CSV Parser for Gamelist ...\n");
         exit(EXIT_FAILURE);
 		}
     csv_set_quote(&p,';');
@@ -605,7 +612,9 @@ int main(int argc, char *argv[])
     FILE *fp = fopen("gameslist.csv", "r");
     if (!fp)
 		{
-        SDL_Log("\n\n ERROR Can't find gamelist.csv ...\n");
+		SDL_Log("\n");
+		SDL_Log("\n");
+        SDL_Log("ERROR Can't find gamelist.csv ...\n");
         return EXIT_FAILURE;
 		}
 
@@ -616,7 +625,9 @@ int main(int argc, char *argv[])
         if (csv_parse(&p, buffer, bytes_read, cb1, cb2, NULL) != bytes_read)
 			{
             buffer_header[i]=0x00;
-            SDL_Log("\n\n ERROR while parsing file ...\n");
+		SDL_Log("\n");
+		SDL_Log("\n");
+            SDL_Log("ERROR while parsing file ...\n");
             return EXIT_FAILURE;
 			}
 		}
@@ -626,7 +637,8 @@ int main(int argc, char *argv[])
     csv_free(&p);
     fclose(fp);
 
-    SDL_Log("\nCSV Gamelist file opened sucessfully\n");
+    SDL_Log("\n");
+    SDL_Log("CSV Gamelist file opened sucessfully\n");
 	//Afficher le nombre de cellules non vides en colonne A
     SDL_Log("Add : %d Special Games into MD Dumper Database \n", non_empty_cells_in_col_A);
 
@@ -660,8 +672,10 @@ int main(int argc, char *argv[])
 
 	if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
         {
-        SDL_Log("\nMegadrive/Genesis/32X cartridge detected!\n");
-        SDL_Log("\n --- HEADER ---\n");
+        SDL_Log("\n");
+        SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
+        SDL_Log("\n");
+	SDL_Log(" --- HEADER ---\n");
         memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
         trim((unsigned char *)dump_name, 0);
         SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
@@ -745,14 +759,16 @@ int main(int argc, char *argv[])
 	
     if ( dump_mode==0 )										//Mode Automatique
 		{
-		SDL_Log("\nRead ROM in automatic mode\n");
+                SDL_Log("\n");
+		SDL_Log("Read ROM in automatic mode\n");
 
 		SDL_Log("Sending command Dump ROM \n");
 		SDL_Log("Dumping please wait ...\n");
 		timer_start();
 		address=0;
 		game_size *= 1024;		//game_size=4096*1024;
-		SDL_Log("\nRom Size : %ld Ko \n",game_size/1024);
+		SDL_Log("\n");
+		SDL_Log("Rom Size : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
 		for (i=0; i<game_size; i++)
@@ -774,7 +790,8 @@ int main(int argc, char *argv[])
 			SDL_Log("Error \n");
 			return 1;
 			}
-		SDL_Log("\nDump ROM completed !\n");
+		SDL_Log("\n");
+		SDL_Log("Dump ROM completed !\n");
 		timer_end();
 		timer_show();
 		myfile = fopen("dump_smd.bin","wb");
@@ -783,13 +800,15 @@ int main(int argc, char *argv[])
 		}
     else if ( dump_mode==1 )								//Mode Manuel
 		{
-        SDL_Log("Read ROM in manual mode\n");
+                SDL_Log("\n");
+        	SDL_Log("Read ROM in manual mode\n");
         
 		SDL_Log("Sending command Dump ROM \n");
 		SDL_Log("Dumping please wait ...\n");
 		timer_start();
 		game_size = manual_game_size * 1024;
-		SDL_Log("\nRom Size (Manual Mode) : %ld Ko \n",game_size/1024);
+		SDL_Log("\n");
+		SDL_Log("Rom Size (Manual Mode) : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
 		for (i=0; i<game_size; i++)
@@ -814,7 +833,8 @@ int main(int argc, char *argv[])
 				SDL_Log("Error \n");
 				return 1;
 				}
-			SDL_Log("\nDump ROM completed !\n");
+			SDL_Log("\n");
+			SDL_Log("Dump ROM completed !\n");
 			timer_end();
 			timer_show();
 			myfile = fopen("dump_smd.bin","wb");
@@ -839,7 +859,8 @@ int main(int argc, char *argv[])
 				address +=64;
 				i+=64;
 				}
-			SDL_Log("\nDump ROM completed !\n");
+			SDL_Log("\n");
+			SDL_Log("Dump ROM completed !\n");
 			timer_end();
 			timer_show();
 			myfile = fopen("dump_sms.sms","wb");
@@ -849,6 +870,7 @@ int main(int argc, char *argv[])
 		}
     else if ( dump_mode==2 )								//Mode Bankswitch
 		{
+		SDL_Log("\n");
         SDL_Log("Read ROM in mode : Bankswitch SSF2 \n");
 		i=0;
 		while (i<8)
@@ -867,8 +889,10 @@ int main(int argc, char *argv[])
 
         if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
 			{
-            SDL_Log("\nMegadrive/Genesis/32X cartridge detected!\n");
-            SDL_Log("\n --- HEADER ---\n");
+	    SDL_Log("\n");
+            SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
+            SDL_Log("\n");
+	    SDL_Log(" --- HEADER ---\n");
             memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
             trim((unsigned char *)dump_name, 0);
             SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
@@ -908,13 +932,14 @@ int main(int argc, char *argv[])
 		for (i = 0; i < chksm_text_values_count ; i++)
 			{
 			strncpy(txt_csv_chksm,chksm_text_values[i],4);
-			//SDL_Log(" \n txt chksm value : %s \n",txt_csv_chksm);
+			//SDL_Log(" txt chksm value : %s \n",txt_csv_chksm);
 			csv_chksm = (unsigned short)strtol(txt_csv_chksm, NULL, 16);
 
             if ( checksum_header == csv_chksm  )
 				{
 				Index_chksm = i;
-				SDL_Log("\nFound game in extra CSV Gamelist  \n");
+                                SDL_Log("\n");
+				SDL_Log("Found game in extra CSV Gamelist  \n");
 				SDL_Log("Position in csv table %d \n",i);
 				strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
 				txt_csv_game_size[4] = '\0'; // Null-terminate the output string
@@ -1020,8 +1045,8 @@ int main(int argc, char *argv[])
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
             res = libusb_bulk_transfer(handle, 0x82,BufferROM+offset*1024,1024*1024, &numBytes, 60000);
 			}
-
-		SDL_Log("\nDump ROM completed !\n");
+    		SDL_Log("\n");
+		SDL_Log("Dump ROM completed !\n");
 		timer_end();
         timer_show();
         myfile = fopen("dump_smd.bin","wb");
