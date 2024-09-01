@@ -43,6 +43,7 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install libusb-1.0-0-dev
         sudo apt-get -y install libsdl2-dev libsdl2-image-dev
+        pkg-config --libs sdl2 SDL2_image
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
