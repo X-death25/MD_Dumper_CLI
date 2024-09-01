@@ -53,8 +53,6 @@ if(INCLUDE_EXTRA_CMAKELISTS)
     # Add SDL2_image library
     find_package(SDL2_image REQUIRED)
     target_link_libraries(MD_Dumper SDL2::Image)
-
-    target_link_options(MD_Dumper PRIVATE "-mwindows")
 else ()
     message("Linux Mode")
     pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
