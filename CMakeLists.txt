@@ -45,19 +45,12 @@ include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
 
-find_package(Libusb1 QUIET)
-
-if (LIBUSB1_FOUND)
-	message("libusb found")
-	set(_includes ${LIBUSB1_INCLUDE_DIRS})
-	set(_libs ${LIBUSB1_LIBRARIES})
-	target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
-	target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
-	include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
-else ()
-	# Sinon, nous affichons un message d'erreur
-	message("libusb not found !")
-endif ()
+find_package(Libusb1 REQUIRED)
+set(_includes ${LIBUSB1_INCLUDE_DIRS})
+set(_libs ${LIBUSB1_LIBRARIES})
+target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
+target_link_libraries (MD_Dumper ${LIBUSB1_LIBRARIES})
+include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
 
 # Add SDL2 library
 find_package(SDL2 REQUIRED)
