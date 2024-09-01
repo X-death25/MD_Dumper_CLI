@@ -125,7 +125,7 @@ void cb2(int c, void *data)
 		printf("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000);
 		printf(" (%ldms)\n", (microsec_end - microsec_start));
 		}
-#else 					//Others
+#else 				//Others
 	struct timeval ostime;
 	long microsec_start = 0;
 	long microsec_end = 0;
@@ -282,28 +282,43 @@ int main(int argc, char *argv[])
 		SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
 		//Create Background Texture
+#if defined(_WIN32)
+		SDL_Surface * image = IMG_Load(".\\images\\opts_background.png");
+#else
 		SDL_Surface * image = IMG_Load("./images/opts_background.png");
+#endif
 		SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
-
 		while (quit==0)
 			{    		
 			SDL_GetMouseState(&mouse_x, &mouse_y);
-			SDL_Surface * opts_mode;				SDL_Texture * texture2;
-			SDL_Surface * opts_manual_size;			SDL_Texture * texture3;
+			SDL_Surface * opts_mode;		SDL_Texture * texture2;
+			SDL_Surface * opts_manual_size;		SDL_Texture * texture3;
 			SDL_Surface * opts_manual_cart_mode;	SDL_Texture * texture4;
 			
 			switch(dump_mode)				//Create Mode Texture
 				{
 				case 0:						//Auto Mode
+#if defined(_WIN32)
+					opts_mode = IMG_Load(".\\images\\opts_dump_auto.png");
+#else
 					opts_mode = IMG_Load("./images/opts_dump_auto.png");
+#endif
 					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
 					break;
 				case 1:						//Manual Mode
+#if defined(_WIN32)
+					opts_mode = IMG_Load(".\\images\\opts_dump_manual.png");
+#else
 					opts_mode = IMG_Load("./images/opts_dump_manual.png");
+#endif
 					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
 					break;
 				case 2:						//Bankswitch Mode
+#if defined(_WIN32)
+					opts_mode = IMG_Load(".\\images\\opts_dump_bankswitch.png");
+#else
 					opts_mode = IMG_Load("./images/opts_dump_bankswitch.png");
+#endif
 					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
 					break;
 				}
@@ -311,43 +326,73 @@ int main(int argc, char *argv[])
 			switch(dump_manual_size_opts)	//Create Manual Size Texture
 				{
 				case 0:						//32KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_32.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_32.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 32;
 					break;
 				case 1:						//64KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_64.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_64.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 64;
 					break;
 				case 2:						//128KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_128.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_128.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 128;
 					break;
 				case 3:						//256KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_256.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_256.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 256;
 					break;
 				case 4:						//512KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_512.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_512.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 512;
 					break;
 				case 5:						//1024KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_1024.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_1024.png");
+#endif
 					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 1024;
 					break;
 				case 6:						//2048KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_2048.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_2048.png");
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#endif					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 2048;
 					break;
 				case 7:						//4096KB
+#if defined(_WIN32)
+					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_4096.png");
+#else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_4096.png");
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#endif					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 4096;
 					break;
 				}
@@ -355,13 +400,21 @@ int main(int argc, char *argv[])
 			switch(dump_manual_cart_mode_opts)	//Create Manual Cartridge Mode Texture
 				{
 				case 0:						//Mega Drive Mode
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_md.png");
-					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#if defined(_WIN32)
+					opts_manual_cart_mode = IMG_Load(".\\images\\opts_dump_manual_md.png");
+#else
+					opts_manual_cart_mode = IMG_Load("./images/opts_dump_manual_md.png");
+#endif
+					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_cart_mode);
 					manual_game_cart_mode = 0;
 					break;
 				case 1:						//Master System Mode
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_sms.png");
-					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#if defined(_WIN32)
+					opts_manual_cart_mode = IMG_Load(".\\images\\opts_dump_manual_sms.png");
+#else
+					opts_manual_cart_mode = IMG_Load("./images/opts_dump_manual_sms.png");
+#endif
+					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_cart_mode);
 					manual_game_cart_mode = 1;
 					break;
 				}
