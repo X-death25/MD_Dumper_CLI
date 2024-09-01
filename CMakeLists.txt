@@ -86,6 +86,8 @@ else()
     message("SDL2Image not found - Maybe are we Ubuntu-like systems ? We will check that.")
 endif()
 
+find_package(SDL2IMAGE QUIET)
+
 if (SDL2IMAGE_FOUND)
     message("SDL2Image found")
 	set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
