@@ -7,6 +7,7 @@ mkdir Windows_Build
 cp *.csv ./Windows_Build/
 cp MD_Dumper.exe ./Windows_Build/
 cp -dR images ./Windows_Build/
+cp ./windows_deps/files/bin/*.dll ./Windows_Build
 rm -rf CMakeFiles
 rm CMakeCache.txt
 rm cmake_install.cmake
