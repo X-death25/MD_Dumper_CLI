@@ -122,8 +122,8 @@ void cb2(int c, void *data)
 	void timer_end()	{ microsec_end = clock();		}
 	void timer_show()
 		{
-		printf("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000);
-		printf(" (%ldms)\n", (microsec_end - microsec_start));
+		SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000);
+		SDL_Log(" (%ldms)\n", (microsec_end - microsec_start));
 		}
 #else 				//Others
 	struct timeval ostime;
@@ -144,8 +144,8 @@ void cb2(int c, void *data)
 
 	void timer_show()
 		{
-		printf("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000000);
-		printf(" (%ldms)\n", (microsec_end - microsec_start)/1000);
+		SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000000);
+		SDL_Log(" (%ldms)\n", (microsec_end - microsec_start)/1000);
 		}
 #endif
 
@@ -261,13 +261,13 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(argv[1], "-help") == 0) {
 		SDL_Log("\nHow to use the program:\n\n");
-		printf("GUI Mode:\n");
-		printf("  %s -gui\n\n", argv[0]);
-		printf("CLI Mode:\n");
-		printf("  %s -read a  -  Auto Mode\n", argv[0]);
-		printf("  %s -read b  -  Bankswitch Mode\n", argv[0]);
-		printf("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
-		printf("\n");
+		SDL_Log("GUI Mode:\n");
+		SDL_Log("  %s -gui\n\n", argv[0]);
+		SDL_Log("CLI Mode:\n");
+		SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
+		SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
+		SDL_Log("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
+		SDL_Log("\n");
 		return 1;
 		}
 	    
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
 						{
 						if(mouse_y>=183 && mouse_y<=214)			//Manual / PDF
 							{
-							printf("Open Manual : TODO\n");
+							SDL_Log("Open Manual : TODO\n");
 							}
 						}
 					break;
@@ -511,28 +511,28 @@ int main(int argc, char *argv[])
 		}
 	else
 		{
-		printf("----------------------------------------------------------------------------\n");
-		printf("8b   d8 888b.      888b. 8    8 8b   d8 888b. 8888 888b.      .d88b 8    888\n"); 
-		printf("8YbmdP8 8   8      8   8 8    8 8YbmdP8 8  .8 8www 8  .8      8P    8     8\n");  
-		printf("8     8 8   8 wwww 8   8 8b..d8 8     8 8wwP' 8    8wwK'      8b    8     8\n");  
-		printf("8     8 888P'      888P' `Y88P' 8     8 8     8888 8  Yb wwww `Y88P 8888 888\n");
-		printf("----------------------------------------------------------------------------\n");
-		printf("\nRelease : 1.0 alpha \n\n");
+		SDL_Log("----------------------------------------------------------------------------\n");
+		SDL_Log("8b   d8 888b.      888b. 8    8 8b   d8 888b. 8888 888b.      .d88b 8    888\n"); 
+		SDL_Log("8YbmdP8 8   8      8   8 8    8 8YbmdP8 8  .8 8www 8  .8      8P    8     8\n");  
+		SDL_Log("8     8 8   8 wwww 8   8 8b..d8 8     8 8wwP' 8    8wwK'      8b    8     8\n");  
+		SDL_Log("8     8 888P'      888P' `Y88P' 8     8 8     8888 8  Yb wwww `Y88P 8888 888\n");
+		SDL_Log("----------------------------------------------------------------------------\n");
+		SDL_Log("\nRelease : 1.0 alpha \n\n");
 		}
 	
     /* Initialise libusb. */
-	printf("Init LibUSB... \n");
+	SDL_Log("Init LibUSB... \n");
     res = libusb_init(0);
     if (res != 0)
     {
-        fprintf(stderr, "Error initialising libusb.\n");
+        fSDL_Log(stderr, "Error initialising libusb.\n");
         return 1;
     }
 
-    printf("LibUSB Init Sucessfully ! \n");
+    SDL_Log("LibUSB Init Sucessfully ! \n");
 
 
-    printf("Detecting MD Dumper... \n");
+    SDL_Log("Detecting MD Dumper... \n");
 
     /* Get the first device with the matching Vendor ID and Product ID. If
      * intending to allow multiple demo boards to be connected at once, you
@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
 
     if (!handle)
     {
-        fprintf(stderr, "Unable to open device.\n");
+        fSDL_Log(stderr, "Unable to open device.\n");
         return 1;
     }
 
@@ -555,7 +555,7 @@ int main(int argc, char *argv[])
         res = libusb_claim_interface(handle, 1);
         if (res != 0)
         {
-            printf("Error claiming interface.\n");
+            SDL_Log("Error claiming interface.\n");
             return 1;
         }
     }
@@ -571,33 +571,33 @@ int main(int argc, char *argv[])
 	usb_buffer_out[0] = WAKEUP;// Affect request to  WakeUP Command
     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0); // Send Packets to Sega Dumper
     libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 0);
-	printf("\nMD Dumper %.*s",6, (char *)usb_buffer_in);
-    printf("\n");
+	SDL_Log("\nMD Dumper %.*s",6, (char *)usb_buffer_in);
+    SDL_Log("\n");
 	md_dumper_type = usb_buffer_in[24];
 	if ( md_dumper_type == 0 )
 		{
-        printf("MD Dumper type : Old Version \n");
+        SDL_Log("MD Dumper type : Old Version \n");
 		}
 	if ( md_dumper_type == 1 )
 		{
-        printf("MD Dumper type : BluePill non aligned \n");
+        SDL_Log("MD Dumper type : BluePill non aligned \n");
 		}
 	if ( md_dumper_type == 2 )
 		{
-        printf("MD Dumper type : BluePill aligned \n");
+        SDL_Log("MD Dumper type : BluePill aligned \n");
 		}
 	if ( md_dumper_type == 3 )
 		{
-        printf("MD Dumper type : SMD ARM TQFP100 Aligned  \n");
+        SDL_Log("MD Dumper type : SMD ARM TQFP100 Aligned  \n");
 		}
-	printf("Hardware Firmware version : %d", usb_buffer_in[20]);
-    printf(".%d\n", usb_buffer_in[21]);
+	SDL_Log("Hardware Firmware version : %d", usb_buffer_in[20]);
+    SDL_Log(".%d\n", usb_buffer_in[21]);
 
 	//Init Lib CSV
 
     if (csv_init(&p, options) != 0)
 		{
-        printf("\n\n ERROR Failed to init CSV Parser for Gamelist ...\n");
+        SDL_Log("\n\n ERROR Failed to init CSV Parser for Gamelist ...\n");
         exit(EXIT_FAILURE);
 		}
     csv_set_quote(&p,';');
@@ -605,7 +605,7 @@ int main(int argc, char *argv[])
     FILE *fp = fopen("gameslist.csv", "r");
     if (!fp)
 		{
-        printf("\n\n ERROR Can't find gamelist.csv ...\n");
+        SDL_Log("\n\n ERROR Can't find gamelist.csv ...\n");
         return EXIT_FAILURE;
 		}
 
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
         if (csv_parse(&p, buffer, bytes_read, cb1, cb2, NULL) != bytes_read)
 			{
             buffer_header[i]=0x00;
-            printf("\n\n ERROR while parsing file ...\n");
+            SDL_Log("\n\n ERROR while parsing file ...\n");
             return EXIT_FAILURE;
 			}
 		}
@@ -626,9 +626,9 @@ int main(int argc, char *argv[])
     csv_free(&p);
     fclose(fp);
 
-    printf("\nCSV Gamelist file opened sucessfully\n");
+    SDL_Log("\nCSV Gamelist file opened sucessfully\n");
 	//Afficher le nombre de cellules non vides en colonne A
-    printf("Add : %d Special Games into MD Dumper Database \n", non_empty_cells_in_col_A);
+    SDL_Log("Add : %d Special Games into MD Dumper Database \n", non_empty_cells_in_col_A);
 
 	//First try to read ROM MD Header
 
@@ -660,17 +660,17 @@ int main(int argc, char *argv[])
 
 	if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
         {
-        printf("\nMegadrive/Genesis/32X cartridge detected!\n");
-        printf("\n --- HEADER ---\n");
+        SDL_Log("\nMegadrive/Genesis/32X cartridge detected!\n");
+        SDL_Log("\n --- HEADER ---\n");
         memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
         trim((unsigned char *)dump_name, 0);
-        printf(" Domestic: %.*s\n", 48, (char *)game_name);
+        SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
         memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
         trim((unsigned char *)dump_name, 0);
 
-        printf(" International: %.*s\n", 48, game_name);
-        printf(" Release date: %.*s\n", 16, buffer_header+0x10);
-        printf(" Version: %.*s\n", 14, buffer_header+0x80);
+        SDL_Log(" International: %.*s\n", 48, game_name);
+        SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
+        SDL_Log(" Version: %.*s\n", 14, buffer_header+0x80);
         memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
         for(i=0; i<4; i++)
             {
@@ -690,13 +690,13 @@ int main(int argc, char *argv[])
             game_region[3] = '\0';
             }
 
-        printf(" Region: %s\n", game_region);
+        SDL_Log(" Region: %s\n", game_region);
 
         checksum_header = (buffer_header[0x8E]<<8) | buffer_header[0x8F];
-        printf(" Checksum: %X\n", checksum_header);
+        SDL_Log(" Checksum: %X\n", checksum_header);
 
         game_size = 1 + ((buffer_header[0xA4]<<24) | (buffer_header[0xA5]<<16) | (buffer_header[0xA6]<<8) | buffer_header[0xA7])/1024;
-        printf(" Game size: %dKB\n", game_size);
+        SDL_Log(" Game size: %dKB\n", game_size);
 		}
 
 	// Vérifier le nombre d'arguments
@@ -704,13 +704,13 @@ int main(int argc, char *argv[])
 		{
 		// Vérifier le premier argument
 		if (strcmp(argv[1], "-read") != 0) {
-			printf("Premier argument doit être '-read'.\n");
+			SDL_Log("Premier argument doit être '-read'.\n");
 			return 1;
 			}
 
 		// Vérifier le deuxième argument
 		if (strcmp(argv[2], "a") != 0 && strcmp(argv[2], "b") != 0 && strcmp(argv[2], "m") != 0) {
-			printf("Le mode doit être 'a' (Automatique), 'b' (Bankswitch) ou 'm' (Manuel).\n");
+			SDL_Log("Le mode doit être 'a' (Automatique), 'b' (Bankswitch) ou 'm' (Manuel).\n");
 			return 1;
 			}
 		
@@ -729,14 +729,14 @@ int main(int argc, char *argv[])
 			else if (strcmp(argv[3], "4096") == 0) 	{ manual_game_size = 4096; 	}
 			else
 				{
-				printf("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
+				SDL_Log("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
 				return 1;
 				}
 			if (strcmp(argv[4], "md") == 0) 		{ manual_game_cart_mode = 0; 	}
 			else if (strcmp(argv[4], "sms") == 0) 	{ manual_game_cart_mode = 1; 	}
 			else
 				{
-				printf("Vous devez écrire une des valeurs suivantes : md, sms.\n");
+				SDL_Log("Vous devez écrire une des valeurs suivantes : md, sms.\n");
 				return 1;
 				}	
 			}
@@ -745,14 +745,14 @@ int main(int argc, char *argv[])
 	
     if ( dump_mode==0 )										//Mode Automatique
 		{
-		printf("\nRead ROM in automatic mode\n");
+		SDL_Log("\nRead ROM in automatic mode\n");
 
-		printf("Sending command Dump ROM \n");
-		printf("Dumping please wait ...\n");
+		SDL_Log("Sending command Dump ROM \n");
+		SDL_Log("Dumping please wait ...\n");
 		timer_start();
 		address=0;
 		game_size *= 1024;		//game_size=4096*1024;
-		printf("\nRom Size : %ld Ko \n",game_size/1024);
+		SDL_Log("\nRom Size : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
 		for (i=0; i<game_size; i++)
@@ -767,14 +767,14 @@ int main(int argc, char *argv[])
 		usb_buffer_out[4]=1;
 
 		libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-		printf("ROM dump in progress...\n");
+		SDL_Log("ROM dump in progress...\n");
 		res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
 		if (res != 0)
 			{
-			printf("Error \n");
+			SDL_Log("Error \n");
 			return 1;
 			}
-		printf("\nDump ROM completed !\n");
+		SDL_Log("\nDump ROM completed !\n");
 		timer_end();
 		timer_show();
 		myfile = fopen("dump_smd.bin","wb");
@@ -783,13 +783,13 @@ int main(int argc, char *argv[])
 		}
     else if ( dump_mode==1 )								//Mode Manuel
 		{
-        printf("Read ROM in manual mode\n");
+        SDL_Log("Read ROM in manual mode\n");
         
-		printf("Sending command Dump ROM \n");
-		printf("Dumping please wait ...\n");
+		SDL_Log("Sending command Dump ROM \n");
+		SDL_Log("Dumping please wait ...\n");
 		timer_start();
 		game_size = manual_game_size * 1024;
-		printf("\nRom Size (Manual Mode) : %ld Ko \n",game_size/1024);
+		SDL_Log("\nRom Size (Manual Mode) : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
 		for (i=0; i<game_size; i++)
@@ -807,14 +807,14 @@ int main(int argc, char *argv[])
 			usb_buffer_out[4]=1;
 			
 			libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-			printf("Mega Drive Mode : ROM dump in progress...\n");
+			SDL_Log("Mega Drive Mode : ROM dump in progress...\n");
 			res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
 			if (res != 0)
 				{
-				printf("Error \n");
+				SDL_Log("Error \n");
 				return 1;
 				}
-			printf("\nDump ROM completed !\n");
+			SDL_Log("\nDump ROM completed !\n");
 			timer_end();
 			timer_show();
 			myfile = fopen("dump_smd.bin","wb");
@@ -825,7 +825,7 @@ int main(int argc, char *argv[])
 			{
 			address = 0;		
 			int i=0;
-			printf("Master System Mode : ROM dump in progress...\n");
+			SDL_Log("Master System Mode : ROM dump in progress...\n");
 			while (i<game_size)
 				{
 				usb_buffer_out[0] = READ_SMS;
@@ -839,7 +839,7 @@ int main(int argc, char *argv[])
 				address +=64;
 				i+=64;
 				}
-			printf("\nDump ROM completed !\n");
+			SDL_Log("\nDump ROM completed !\n");
 			timer_end();
 			timer_show();
 			myfile = fopen("dump_sms.sms","wb");
@@ -849,7 +849,7 @@ int main(int argc, char *argv[])
 		}
     else if ( dump_mode==2 )								//Mode Bankswitch
 		{
-        printf("Read ROM in mode : Bankswitch SSF2 \n");
+        SDL_Log("Read ROM in mode : Bankswitch SSF2 \n");
 		i=0;
 		while (i<8)
 			{
@@ -867,17 +867,17 @@ int main(int argc, char *argv[])
 
         if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
 			{
-            printf("\nMegadrive/Genesis/32X cartridge detected!\n");
-            printf("\n --- HEADER ---\n");
+            SDL_Log("\nMegadrive/Genesis/32X cartridge detected!\n");
+            SDL_Log("\n --- HEADER ---\n");
             memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
             trim((unsigned char *)dump_name, 0);
-            printf(" Domestic: %.*s\n", 48, (char *)game_name);
+            SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
             memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
             trim((unsigned char *)dump_name, 0);
 
-            printf(" International: %.*s\n", 48, game_name);
-            printf(" Release date: %.*s\n", 16, buffer_header+0x10);
-            printf(" Version: %.*s\n", 14, buffer_header+0x80);
+            SDL_Log(" International: %.*s\n", 48, game_name);
+            SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
+            SDL_Log(" Version: %.*s\n", 14, buffer_header+0x80);
             memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
             for(i=0; i<4; i++)
 				{
@@ -896,11 +896,11 @@ int main(int argc, char *argv[])
                 memcpy((char *)game_region, (char *)unk, 3);
                 game_region[3] = '\0';
 				}
-            printf(" Region: %s\n", game_region);
+            SDL_Log(" Region: %s\n", game_region);
             checksum_header = (buffer_header[0x8E]<<8) | buffer_header[0x8F];
-            printf(" Checksum: %X\n", checksum_header);
+            SDL_Log(" Checksum: %X\n", checksum_header);
             game_size = 1 + ((buffer_header[0xA4]<<24) | (buffer_header[0xA5]<<16) | (buffer_header[0xA6]<<8) | buffer_header[0xA7])/1024;
-            printf(" Game size: %dKB\n", game_size);
+            SDL_Log(" Game size: %dKB\n", game_size);
 			}
 
 		// Search checksum cartridge in Custom Hardware games csv table
@@ -908,27 +908,27 @@ int main(int argc, char *argv[])
 		for (i = 0; i < chksm_text_values_count ; i++)
 			{
 			strncpy(txt_csv_chksm,chksm_text_values[i],4);
-			//printf(" \n txt chksm value : %s \n",txt_csv_chksm);
+			//SDL_Log(" \n txt chksm value : %s \n",txt_csv_chksm);
 			csv_chksm = (unsigned short)strtol(txt_csv_chksm, NULL, 16);
 
             if ( checksum_header == csv_chksm  )
 				{
 				Index_chksm = i;
-				printf("\nFound game in extra CSV Gamelist  \n");
-				printf("Position in csv table %d \n",i);
+				SDL_Log("\nFound game in extra CSV Gamelist  \n");
+				SDL_Log("Position in csv table %d \n",i);
 				strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
 				txt_csv_game_size[4] = '\0'; // Null-terminate the output string
-				//printf(" txt game size : %s \n",txt_csv_game_size);
+				//SDL_Log(" txt game size : %s \n",txt_csv_game_size);
 			    csv_game_size = (unsigned char)strtol(txt_csv_game_size, NULL, 10);
-				//printf(" CSV Game Size  %d \n",csv_game_size);
+				//SDL_Log(" CSV Game Size  %d \n",csv_game_size);
 				game_size=1024*csv_game_size;
-				printf("ROM Size from CSV is %ld Ko \n",game_size);		
+				SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);		
 				}
 			}
 		NumberOfBank = game_size/512;
-		//printf("Game Size is %ld Ko \n",game_size);
-		printf("Number of Banks is %d \n",NumberOfBank);
-		printf("Bank Size is 512 Ko  \n");
+		//SDL_Log("Game Size is %ld Ko \n",game_size);
+		SDL_Log("Number of Banks is %d \n",NumberOfBank);
+		SDL_Log("Bank Size is 512 Ko  \n");
 
 		game_size = game_size * 1024;
 		BufferROM = (unsigned char*)malloc(game_size);
@@ -939,9 +939,9 @@ int main(int argc, char *argv[])
             }
 
 		// Dump the first 4MB of the ROM as fast as possible
-        printf("Bankswith bank O-7 to $080000 - $3FFFFF \n");
+        SDL_Log("Bankswith bank O-7 to $080000 - $3FFFFF \n");
 
-        printf("Dumping please wait ...\n");
+        SDL_Log("Dumping please wait ...\n");
         timer_start();
         address = 0;
         i=0;
@@ -953,11 +953,11 @@ int main(int argc, char *argv[])
         usb_buffer_out[4]=1;
 
         libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        printf("ROM dump in progress...\n");
+        SDL_Log("ROM dump in progress...\n");
         res = libusb_bulk_transfer(handle, 0x82,BufferROM,4096*1024, &numBytes,0);
         if (res != 0)
 			{
-            printf("Error \n");
+            SDL_Log("Error \n");
             return 1;
             }
 
@@ -966,8 +966,8 @@ int main(int argc, char *argv[])
 
 		while ( offset != (game_size/1024)-1024)
 			{
-			printf("Bankswith bank %d - %d to $200000 - $2FFFFF \n",ActualBank,ActualBank+1);
-            printf("Dumping please wait ...\n");
+			SDL_Log("Bankswith bank %d - %d to $200000 - $2FFFFF \n",ActualBank,ActualBank+1);
+            SDL_Log("Dumping please wait ...\n");
 			
 			address = 0xA130F9/2; // bank 4
             usb_buffer_out[0] = MAPPER_SSF2;
@@ -1021,7 +1021,7 @@ int main(int argc, char *argv[])
             res = libusb_bulk_transfer(handle, 0x82,BufferROM+offset*1024,1024*1024, &numBytes, 60000);
 			}
 
-		printf("\nDump ROM completed !\n");
+		SDL_Log("\nDump ROM completed !\n");
 		timer_end();
         timer_show();
         myfile = fopen("dump_smd.bin","wb");
