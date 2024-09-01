@@ -554,8 +554,8 @@ int main(int argc, char *argv[])
 
     /* Claim interface #0. */
 
-    /*res = libusb_claim_interface(handle, 0);
-    if (res != 0)
+    res = libusb_claim_interface(handle, 0);
+    /*if (res != 0)
     {
         res = libusb_claim_interface(handle, 1);
         if (res != 0)
