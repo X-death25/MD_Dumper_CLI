@@ -525,7 +525,7 @@ int main(int argc, char *argv[])
     res = libusb_init(0);
     if (res != 0)
     {
-        fSDL_Log(stderr, "Error initialising libusb.\n");
+        SDL_Log("Error initialising libusb.\n");
         return 1;
     }
 
@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
 
     if (!handle)
     {
-        fSDL_Log(stderr, "Unable to open device.\n");
+        SDL_Log("Unable to open device.\n");
         return 1;
     }
 
