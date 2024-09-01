@@ -39,6 +39,8 @@ if(INCLUDE_EXTRA_CMAKELISTS)
     
     find_path(LIBUSB1_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES "include" "libusb" "libusb-1.0")
     find_library(LIBUSB1_LIBRARIES NAMES usb PATH_SUFFIXES "lib" "lib32" "lib64")
+
+    find_package(Libusb1 REQUIRED)
     set(_includes ${LIBUSB1_INCLUDE_DIRS})
     set(_libs ${LIBUSB1_LIBRARIES})
     target_include_directories(MD_Dumper PUBLIC ${LIBUSB1_INCLUDE_DIRS}})
