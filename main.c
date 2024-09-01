@@ -564,7 +564,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	res = libusb_claim_interface(handle, 0);
-    SDL_Log("Test 1 : %d\n",res);
+    //SDL_Log("Test 1 : %d\n",res);
     if (res != 0)
 		{
 		if(libusb_kernel_driver_active(handle, 1) == 1)
@@ -579,7 +579,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			res = libusb_claim_interface(handle, 1);
-			SDL_Log("Test 2 : %d\n",res);
+			//SDL_Log("Test 2 : %d\n",res);
 			if (res != 0)
 				{
 				SDL_Log("Error claiming interface.\n");
