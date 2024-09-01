@@ -384,7 +384,8 @@ int main(int argc, char *argv[])
 					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_2048.png");
 #else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_2048.png");
-#endif					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#endif				
+					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 2048;
 					break;
 				case 7:						//4096KB
@@ -392,7 +393,8 @@ int main(int argc, char *argv[])
 					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_4096.png");
 #else
 					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_4096.png");
-#endif					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+#endif				
+					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
 					manual_game_size = 4096;
 					break;
 				}
@@ -427,7 +429,7 @@ int main(int argc, char *argv[])
 			SDL_RenderPresent(renderer);
 		
 			SDL_WaitEvent(&event);
-	 
+				 
 			switch (event.type)		//Window Events according to mouse positions and left click on this Window
 				{
 				case SDL_QUIT:
