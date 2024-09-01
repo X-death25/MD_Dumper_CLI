@@ -23,18 +23,18 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [debian-latest]
+        os: [ubuntu-22.04]
         build_type: [Release]
         c_compiler: [gcc]
         include:
-          - os: debian-latest
+          - os: ubuntu-22.04
             c_compiler: gcc
             cpp_compiler: g++
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set reusable strings
+    - name: Set reusable strings & set deps
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
       id: strings
       shell: bash
