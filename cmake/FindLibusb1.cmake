@@ -26,30 +26,30 @@ else (LIBUSB1_INCLUDE_DIRS AND LIBUSB1_LIBRARIES)
 
   FIND_PATH(LIBUSB1_INCLUDE_DIRS libusb.h
     NAMES
-	  libusb.h
-  	PATHS
-	  ${PC_LIBUSB1_INCLUDE_DIRS}
-	  ${PC_LIBUSB1_INCLUDEDIR}
-	  ${_dirs}
-	  HINTS
-	  "${LIBUSB1_ROOT_DIR}"
-	  PATH_SUFFIXES
-	  include/libusb-1.0
-	  include
-	  libusb-1.0))
+    libusb.h
+    PATHS
+    ${PC_LIBUSB1_INCLUDE_DIRS}
+    ${PC_LIBUSB1_INCLUDEDIR}
+    ${_dirs}
+    HINTS
+    "${LIBUSB1_ROOT_DIR}"
+    PATH_SUFFIXES
+    include/libusb-1.0
+    include
+    libusb-1.0)
 
-  FIND_LIBRARY(LIBUSB1_LIBRARIES NAMES usb-1.0
+  FIND_LIBRARY(LIBUSB1_LIBRARIES NAMES libusb-1.0
     NAMES
-  	libusb-1.0
-  	usb-1.0
-  	PATHS
-  	${PC_LIBUSB1_LIBRARY_DIRS}
-  	${PC_LIBUSB1_LIBDIR}
-  	${_dirs}
-  	HINTS
-  	"${LIBUSB1_ROOT_DIR}"
-  	PATH_SUFFIXES
-  	${_lib_suffixes})
+    libusb-1.0
+    usb-1.0
+    PATHS
+    ${PC_LIBUSB1_LIBRARY_DIRS}
+    ${PC_LIBUSB1_LIBDIR}
+    ${_dirs}
+    HINTS
+    "${LIBUSB1_ROOT_DIR}"
+    PATH_SUFFIXES
+    ${_lib_suffixes})
 
   include(FindPackageHandleStandardArgs)
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBUSB1 DEFAULT_MSG LIBUSB1_LIBRARIES LIBUSB1_INCLUDE_DIRS)
