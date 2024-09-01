@@ -555,14 +555,16 @@ int main(int argc, char *argv[])
     /* Claim interface #0. */
 
     res = libusb_claim_interface(handle, 0);
+    SDL_Log("Test 1 : %d\n",res);
     if (res != 0)
     {
         res = libusb_claim_interface(handle, 1);
-        /*if (res != 0)
+	SDL_Log("Test 2 : %d\n",res);
+	if (res != 0)
         {
             SDL_Log("Error claiming interface.\n");
             return 1;
-        }*/
+        }
     }
 
 	// Clean Buffer
