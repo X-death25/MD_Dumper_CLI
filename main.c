@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0); // Send Packets to Sega Dumper
     libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 0);
     SDL_Log("\n");
-    SDL_Log("\nMD Dumper %.*s",6, (char *)usb_buffer_in);
+    SDL_Log("MD Dumper %.*s",6, (char *)usb_buffer_in);
     SDL_Log("\n");
 	md_dumper_type = usb_buffer_in[24];
 	if ( md_dumper_type == 0 )
