@@ -256,8 +256,7 @@ int main(int argc, char *argv[])
 	unsigned char ActualBank=0;
 	unsigned long offset=0;
 
-        SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
-
+    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 	
 	if (strcmp(argv[1], "-help") == 0) {
 		SDL_Log("\n");
@@ -328,7 +327,7 @@ int main(int argc, char *argv[])
 					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
 					break;
 				}
-
+				
 			switch(dump_manual_size_opts)	//Create Manual Size Texture
 				{
 				case 0:						//32KB
@@ -449,35 +448,35 @@ int main(int argc, char *argv[])
 				case SDL_MOUSEBUTTONDOWN:
 					if(mouse_x>=17 && mouse_x<=24)
 						{
-						if(mouse_y>=49 && mouse_y<=56)			{ dump_mode = 0; }	//Auto Mode Selected
-						else if(mouse_y>=67 && mouse_y<=74)		{ dump_mode = 1; }	//Manual Mode Selected
-						else if(mouse_y>=86 && mouse_y<=91)		{ dump_mode = 2; }	//Bankswitch Mode Selected
+						if(mouse_y>=49 && mouse_y<=56)			{ dump_mode = 0; }					//Auto Mode Selected
+						else if(mouse_y>=67 && mouse_y<=74)		{ dump_mode = 1; }					//Manual Mode Selected
+						else if(mouse_y>=86 && mouse_y<=91)		{ dump_mode = 2; }					//Bankswitch Mode Selected
 						}
 					else if(mouse_x>=215 && mouse_x<=221)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 0; }	//Manual Size : 32KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 4; }	//Manual Size : 512KB
+						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 0; }		//Manual Size : 32KB
+						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 4; }		//Manual Size : 512KB
 						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 0; }	//Manual Cart Mode : Mega Drive
 						}
 					else if(mouse_x>=335 && mouse_x<=340)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 1; }	//Manual Size : 64KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 5; }	//Manual Size : 1024KB
+						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 1; }		//Manual Size : 64KB
+						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 5; }		//Manual Size : 1024KB
 						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 1; }	//Manual Cart Mode : Master System
 						}
 					else if(mouse_x>=455 && mouse_x<=460)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 2; }	//Manual Size : 128KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 6; }	//Manual Size : 2048KB
+						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 2; }		//Manual Size : 128KB
+						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 6; }		//Manual Size : 2048KB
 						}
 					else if(mouse_x>=575 && mouse_x<=580)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 3; }	//Manual Size : 286KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 7; }	//Manual Size : 4096KB
+						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 3; }		//Manual Size : 286KB
+						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 7; }		//Manual Size : 4096KB
 						}
 					else if(mouse_x>=16 && mouse_x<=199)
 						{
-						if(mouse_y>=183 && mouse_y<=214)			//Exit
+						if(mouse_y>=183 && mouse_y<=214)	//Exit
 							{
 							quit = 1;
 							SDL_DestroyTexture(texture);
@@ -490,7 +489,7 @@ int main(int argc, char *argv[])
 						}
 					else if(mouse_x>=228 && mouse_x<=411)
 						{
-						if(mouse_y>=183 && mouse_y<=214)			//Launch the dump
+						if(mouse_y>=183 && mouse_y<=214)	//Launch the dump
 							{
 							quit = 1;
 							break;
@@ -498,7 +497,7 @@ int main(int argc, char *argv[])
 						}
 					else if(mouse_x>=440 && mouse_x<=623)
 						{
-						if(mouse_y>=183 && mouse_y<=214)			//Manual / PDF
+						if(mouse_y>=183 && mouse_y<=214)	//Manual / PDF
 							{
 							SDL_Log("Open Manual : TODO\n");
 							}
@@ -529,13 +528,12 @@ int main(int argc, char *argv[])
 	SDL_Log("Init LibUSB... \n");
     res = libusb_init(0);
     if (res != 0)
-    {
+		{
         SDL_Log("Error initialising libusb.\n");
         return 1;
-    }
+		}
 
     SDL_Log("LibUSB Init Sucessfully ! \n");
-
 
     SDL_Log("Detecting MD Dumper... \n");
 
@@ -547,55 +545,54 @@ int main(int argc, char *argv[])
     handle = libusb_open_device_with_vid_pid(0, 0x0483, 0x5740);
 
     if (!handle)
-    {
+		{
         SDL_Log("Unable to open device.\n");
         return 1;
-    }
+		}
 
     /* Claim interface #0. */
 
-   if(libusb_kernel_driver_active(handle, 0) == 1)
-	{
+	if(libusb_kernel_driver_active(handle, 0) == 1)
+		{
 	    SDL_Log("Kernel Driver Active");
 	    if(libusb_detach_kernel_driver(handle, 0) == 0)
 	        SDL_Log("Kernel Driver Detached!");
 	    else
-	    {
+			{
 	        SDL_Log("Couldn't detach kernel driver!\n");
 	        libusb_close(handle);
-	    }
-	}
-	    
-    res = libusb_claim_interface(handle, 0);
+			}
+		}
+	res = libusb_claim_interface(handle, 0);
     SDL_Log("Test 1 : %d\n",res);
     if (res != 0)
-    {
-	if(libusb_kernel_driver_active(handle, 1) == 1)
-	{
-	    SDL_Log("Kernel Driver Active");
-	    if(libusb_detach_kernel_driver(handle, 1) == 0)
-	        SDL_Log("Kernel Driver Detached!");
-	    else
-	    {
-	        SDL_Log("Couldn't detach kernel driver!\n");
-	        libusb_close(handle);
-	    }
-	}
-        res = libusb_claim_interface(handle, 1);
-	SDL_Log("Test 2 : %d\n",res);
-	if (res != 0)
-        {
-            SDL_Log("Error claiming interface.\n");
-            return 1;
-        }
-    }
+		{
+		if(libusb_kernel_driver_active(handle, 1) == 1)
+			{
+			SDL_Log("Kernel Driver Active");
+			if(libusb_detach_kernel_driver(handle, 1) == 0)
+				SDL_Log("Kernel Driver Detached!");
+			else
+				{
+				SDL_Log("Couldn't detach kernel driver!\n");
+				libusb_close(handle);
+				}
+			}
+			res = libusb_claim_interface(handle, 1);
+			SDL_Log("Test 2 : %d\n",res);
+			if (res != 0)
+				{
+				SDL_Log("Error claiming interface.\n");
+				return 1;
+			}
+		}
 
 	// Clean Buffer
     for (i = 0; i < 64; i++)
-    {
+		{
         usb_buffer_in[i]=0x00;
         usb_buffer_out[i]=0x00;
-    }
+		}
     i=0;
 
     usb_buffer_out[0] = WAKEUP;// Affect request to  WakeUP Command
@@ -700,7 +697,7 @@ int main(int argc, char *argv[])
         SDL_Log("\n");
         SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
         SDL_Log("\n");
-	SDL_Log(" --- HEADER ---\n");
+		SDL_Log(" --- HEADER ---\n");
         memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
         trim((unsigned char *)dump_name, 0);
         SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
@@ -784,7 +781,7 @@ int main(int argc, char *argv[])
 	
     if ( dump_mode==0 )										//Mode Automatique
 		{
-                SDL_Log("\n");
+		SDL_Log("\n");
 		SDL_Log("Read ROM in automatic mode\n");
 
 		SDL_Log("Sending command Dump ROM \n");
@@ -825,8 +822,8 @@ int main(int argc, char *argv[])
 		}
     else if ( dump_mode==1 )								//Mode Manuel
 		{
-                SDL_Log("\n");
-        	SDL_Log("Read ROM in manual mode\n");
+        SDL_Log("\n");
+        SDL_Log("Read ROM in manual mode\n");
         
 		SDL_Log("Sending command Dump ROM \n");
 		SDL_Log("Dumping please wait ...\n");
@@ -914,10 +911,10 @@ int main(int argc, char *argv[])
 
         if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
 			{
-	    SDL_Log("\n");
+			SDL_Log("\n");
             SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
             SDL_Log("\n");
-	    SDL_Log(" --- HEADER ---\n");
+			SDL_Log(" --- HEADER ---\n");
             memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
             trim((unsigned char *)dump_name, 0);
             SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
@@ -963,7 +960,7 @@ int main(int argc, char *argv[])
             if ( checksum_header == csv_chksm  )
 				{
 				Index_chksm = i;
-                                SDL_Log("\n");
+				SDL_Log("\n");
 				SDL_Log("Found game in extra CSV Gamelist  \n");
 				SDL_Log("Position in csv table %d \n",i);
 				strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
@@ -1070,7 +1067,7 @@ int main(int argc, char *argv[])
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
             res = libusb_bulk_transfer(handle, 0x82,BufferROM+offset*1024,1024*1024, &numBytes, 60000);
 			}
-    		SDL_Log("\n");
+    	SDL_Log("\n");
 		SDL_Log("Dump ROM completed !\n");
 		timer_end();
         timer_show();
