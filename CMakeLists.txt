@@ -43,11 +43,15 @@ if (INCLUDE_EXTRA_CMAKELISTS)
 
 	pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
 	include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
+
+ 	find_package(Libusb1 QUIET)
+else ()
+	find_path(LIBUSB_INCLUDE_DIR NAMES libusb.h PATH_SUFFIXES "include" "libusb" "libusb-1.0")
+	find_library(LIBUSB_LIBRARY NAMES usb PATH_SUFFIXES "lib" "lib32" "lib64")
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
 
-find_package(Libusb1 QUIET)
 if (LIBUSB1_FOUND)
 	message("libusb found")
 	set(_includes ${LIBUSB1_INCLUDE_DIRS})
