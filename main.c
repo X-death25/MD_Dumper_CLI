@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 	unsigned long offset=0;
 
 	if (strcmp(argv[1], "-help") == 0) {
-		printf("\nHow to use the program:\n\n");
+		printf("\nHow to use the program:\n\n"); fflush(stdout);
 		printf("GUI Mode:\n");
 		printf("  %s -gui\n\n", argv[0]);
 		printf("CLI Mode:\n");
@@ -265,6 +265,7 @@ int main(int argc, char *argv[])
 		printf("  %s -read b  -  Bankswitch Mode\n", argv[0]);
 		printf("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
 		printf("\n");
+		fflush(stdout);
 		return 1;
 		}
 
