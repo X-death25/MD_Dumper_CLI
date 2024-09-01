@@ -33,14 +33,24 @@ add_executable(MD_Dumper ${SRCS})
 # On recherche la présence de la lib externe
 
 find_package(PkgConfig REQUIRED)
+
 pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
 include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
+
 pkg_search_module(SDL2 REQUIRED sdl2)
 include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
+
+set(prefix "/usr") 
+set(exec_prefix "${prefix}")
+set(libdir "${prefix}/lib/x86_64-linux-gnu")
+set(SDL2_IMAGE_PREFIX "/usr")
+set(SDL2_IMAGE_EXEC_PREFIX "/usr")
+set(SDL2_IMAGE_INCLUDE_DIRS "${prefix}/include/SDL2_image")
+set(SDL2_IMAGE_LIBRARIES "-lSDL2_image")
 pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
 include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
-pkg_search_module(SDL2IMAGE REQUIRED SDL2_image)
-include_directories(SYSTEM ${SDL2IMAGE_INCLUDE_DIRS})
+
+
 find_package(Libusb1 QUIET)
 
 # Une fois la dépendance trouvée, nous l'incluons au projet
@@ -85,19 +95,3 @@ else()
 	# Sinon, nous affichons un message d'erreur
     message("SDL2Image not found - Maybe are we Ubuntu-like systems ? We will check that.")
 endif()
-
-find_package(SDL2IMAGE QUIET)
-
-if (SDL2IMAGE_FOUND)
-    message("SDL2Image found")
-	set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
-	set(_libs ${SDL2IMAGE_LIBRARIES})
-	target_include_directories(MD_Dumper PUBLIC ${SDL2IMAGE_INCLUDE_DIRS}})
-	target_link_libraries (MD_Dumper ${SDL2IMAGE_LIBRARIES})
-	include_directories(MD_Dumper ${SDL2IMAGE_INCLUDE_DIRS})
-else()
-	# Sinon, nous affichons un message d'erreur
-    message("SDL2Image not found !")
-endif()
-
-
