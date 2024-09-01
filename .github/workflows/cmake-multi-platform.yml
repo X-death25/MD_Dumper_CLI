@@ -57,11 +57,8 @@ jobs:
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: |
-        cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-        mkdir Linux
-        cp -dR images ./Linux/
-        cp -dR *.csv ./Linux/
-        cp -dR MD_Dumper ./Linux/
+        chmod +x ./Build_Linux.sh
+        ./Build_Linux.sh
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
