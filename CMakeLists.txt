@@ -34,11 +34,11 @@ add_executable(MD_Dumper ${SRCS})
 
 find_package(PkgConfig REQUIRED)
 
-pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
-include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
-
 if (INCLUDE_EXTRA_CMAKELISTS)
-	pkg_search_module(SDL2 REQUIRED sdl2)
+	pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
+	include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
+
+ 	pkg_search_module(SDL2 REQUIRED sdl2)
 	include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
 
 	pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
