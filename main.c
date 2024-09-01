@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
 
 	
 	if (strcmp(argv[1], "-help") == 0) {
-		SDL_Log("\nHow to use the program:\n\n");
+		SDL_Log("How to use the program:\n\n");
 		SDL_Log("GUI Mode:\n");
 		SDL_Log("  %s -gui\n\n", argv[0]);
 		SDL_Log("CLI Mode:\n");
