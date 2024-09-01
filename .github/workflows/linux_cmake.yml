@@ -39,7 +39,6 @@ jobs:
       id: strings
       shell: bash
       run: |
-        sudo apt update
         sudo apt-get update
         sudo apt-get -y install libusb-1.0-0-dev libsdl2-dev libsdl2-image-dev libsdl2-2.0-0 libsdl2-image-2.0-0 
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
