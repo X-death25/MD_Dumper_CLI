@@ -50,7 +50,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DINCLUDE_EXTRA_CMAKELISTS=ON
+        -DINCLUDE_EXTRA_CMAKELISTS=OFF
         -DCMAKE_TOOLCHAIN_FILE=../Toolchain-Ubuntu-mingw64.cmake
         -S ${{ github.workspace }}
 
