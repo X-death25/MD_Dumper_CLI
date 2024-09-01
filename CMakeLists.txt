@@ -57,29 +57,10 @@ else ()
 	message("libusb not found !")
 endif ()
 
+# Add SDL2 library
+find_package(SDL2 REQUIRED)
+target_link_libraries(MD_Dumper SDL2::Main)
 
-find_package(SDL2 QUIET)
-if (SDL2_FOUND)
-    message("SDL2 found")
-	set(_includes ${SDL2_INCLUDE_DIRS})
-	set(_libs ${SDL2_LIBRARIES})
-	target_include_directories(MD_Dumper PUBLIC ${SDL2_INCLUDE_DIRS}})
-	target_link_libraries (MD_Dumper ${SDL2_LIBRARIES})
-	include_directories(MD_Dumper ${SDL2_INCLUDE_DIRS})
-else()
-	# Sinon, nous affichons un message d'erreur
-    message("SDL2 not found !")
-endif()
-
-find_package(SDL2_IMAGE QUIET)
-if (SDL2_IMAGE_FOUND)
-    message("SDL2Image found")
-	set(_includes ${SDL2_IMAGE_INCLUDE_DIRS})
-	set(_libs ${SDL2_IMAGE_LIBRARIES})
-	target_include_directories(MD_Dumper PUBLIC ${SDL2_IMAGE_INCLUDE_DIRS}})
-	target_link_libraries (MD_Dumper ${SDL2_IMAGE_LIBRARIES})
-	include_directories(MD_Dumper ${SDL2_IMAGE_INCLUDE_DIRS})
-else()
-	# Sinon, nous affichons un message d'erreur
-    message("SDL2Image not found !")
-endif()
+# Add SDL2_image library
+find_package(SDL2_image REQUIRED)
+target_link_libraries(MD_Dumper SDL2::Image)
