@@ -43,7 +43,7 @@ include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
 pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
 include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${project_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./cmake")
 
 find_package(Libusb1 QUIET)
 if (LIBUSB1_FOUND)
