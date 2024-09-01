@@ -59,6 +59,11 @@ jobs:
       run: |
         cd build
         make
+        cd ..
+        mkdir Windows_Build
+        cp *.csv ./Windows_Build
+        cp -dR images ./Windows_Build
+        cp -dR ./build/MD_Dumper ./Windows_Build
 
     - uses: actions/upload-artifact@v4
       with:
