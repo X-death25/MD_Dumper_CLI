@@ -41,8 +41,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install gcc-mingw-w64 g++-mingw-w64
-        sudo apt-get -y install libusb-1.0-0-dev libsdl2-dev libsdl2-image-dev libsdl2-2.0-0 libsdl2-image-2.0-0 
-        cp -dR windows_deps/files/* /usr/i686-w64-mingw32/
+        sudo apt-get -y install libusb-1.0-0-dev
+        sudo cp -dR windows_deps/files/* /usr/i686-w64-mingw32/
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
