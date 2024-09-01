@@ -39,6 +39,8 @@ pkg_search_module(SDL2 REQUIRED sdl2)
 include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
 pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
 include_directories(SYSTEM ${SDL2_IMAGE_INCLUDE_DIRS})
+pkg_search_module(SDL2IMAGE REQUIRED SDL2_image)
+include_directories(SYSTEM ${SDL2IMAGE_INCLUDE_DIRS})
 find_package(Libusb1 QUIET)
 
 # Une fois la dépendance trouvée, nous l'incluons au projet
@@ -80,8 +82,16 @@ if (SDL2_IMAGE_FOUND)
 	target_link_libraries (MD_Dumper ${SDL2_IMAGE_LIBRARIES})
 	include_directories(MD_Dumper ${SDL2_IMAGE_INCLUDE_DIRS})
 else()
+	if (SDL2IMAGE_FOUND)
+	    	message("SDL2Image found")
+		set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
+		set(_libs ${SDL2IMAGE_LIBRARIES})
+		target_include_directories(MD_Dumper PUBLIC ${SDL2IMAGE_INCLUDE_DIRS}})
+		target_link_libraries (MD_Dumper ${SDL2IMAGE_LIBRARIES})
+		include_directories(MD_Dumper ${SDL2IMAGE_INCLUDE_DIRS})
+	else()
 	# Sinon, nous affichons un message d'erreur
-    message("SDL2_image not found")
+    message("SDL2Image not found")
 endif()
 
 
