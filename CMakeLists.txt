@@ -54,7 +54,7 @@ if (LIBUSB1_FOUND)
 	include_directories(MD_Dumper ${LIBUSB1_INCLUDE_DIRS})
 else ()
 	# Sinon, nous affichons un message d'erreur
-	message("libusb not found")
+	message("libusb not found !")
 endif ()
 
 
@@ -69,30 +69,33 @@ if (SDL2_FOUND)
 	include_directories(MD_Dumper ${SDL2_INCLUDE_DIRS})
 else()
 	# Sinon, nous affichons un message d'erreur
-    message("SDL2 not found")
+    message("SDL2 not found !")
 endif()
 
 find_package(SDL2_IMAGE QUIET)
 
 if (SDL2_IMAGE_FOUND)
     message("SDL2Image found")
-	set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
-	set(_libs ${SDL2IMAGE_LIBRARIES})
+	set(_includes ${SDL2_IMAGE_INCLUDE_DIRS})
+	set(_libs ${SDL2_IMAGE_LIBRARIES})
 	target_include_directories(MD_Dumper PUBLIC ${SDL2_IMAGE_INCLUDE_DIRS}})
 	target_link_libraries (MD_Dumper ${SDL2_IMAGE_LIBRARIES})
 	include_directories(MD_Dumper ${SDL2_IMAGE_INCLUDE_DIRS})
 else()
-	if (SDL2IMAGE_FOUND)
-	    	message("SDL2Image found")
-		set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
-		set(_libs ${SDL2IMAGE_LIBRARIES})
-		target_include_directories(MD_Dumper PUBLIC ${SDL2IMAGE_INCLUDE_DIRS}})
-		target_link_libraries (MD_Dumper ${SDL2IMAGE_LIBRARIES})
-		include_directories(MD_Dumper ${SDL2IMAGE_INCLUDE_DIRS})
-	else()
 	# Sinon, nous affichons un message d'erreur
-    message("SDL2Image not found")
+    message("SDL2Image not found - Maybe are we Ubuntu-like systems ? We will check that.")
 endif()
 
+if (SDL2IMAGE_FOUND)
+    message("SDL2Image found")
+	set(_includes ${SDL2IMAGE_INCLUDE_DIRS})
+	set(_libs ${SDL2IMAGE_LIBRARIES})
+	target_include_directories(MD_Dumper PUBLIC ${SDL2IMAGE_INCLUDE_DIRS}})
+	target_link_libraries (MD_Dumper ${SDL2IMAGE_LIBRARIES})
+	include_directories(MD_Dumper ${SDL2IMAGE_INCLUDE_DIRS})
+else()
+	# Sinon, nous affichons un message d'erreur
+    message("SDL2Image not found !")
+endif()
 
 
