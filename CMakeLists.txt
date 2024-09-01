@@ -35,9 +35,9 @@ add_executable(MD_Dumper ${SRCS})
 find_package(PkgConfig REQUIRED)
 
 if(INCLUDE_EXTRA_CMAKELISTS)
-    message("Windows Mode");
+    message("Windows Mode")
 else ()
-    message("Linux Mode");
+    message("Linux Mode")
     pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
     include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
 
