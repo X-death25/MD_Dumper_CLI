@@ -39,6 +39,7 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 #define WRITE_MD_FLASH 	0x14
 #define ERASE_MD_FLASH  0x15
 #define READ_SMS   		0x16
+#define INFOS_ID        0x18
 #define MAPPER_SSF2     0x20
 
 
@@ -267,10 +268,18 @@ int main(int argc, char *argv[])
 	unsigned long save_address = 0;	
 	unsigned char *BufferROM;
 	unsigned char *BufferSAVE;
+	char empty_flash[512];
+    char dump_flash[512];
 	FILE *myfile;
 	unsigned char NumberOfBank=0;
 	unsigned char ActualBank=0;
 	unsigned long offset=0;
+	
+	unsigned char manufacturer_id=0;
+    unsigned char chip_id=0;
+    unsigned short rom_id=0;
+    unsigned short flash_id=0;
+    unsigned char flash_algo=0;
 
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 	
@@ -1282,6 +1291,57 @@ int main(int argc, char *argv[])
 	else if (opts_choice==2 && write_flash==0)
 		{
 		SDL_Log("Write Mode : Erase Flash Data\n");
+		SDL_Log("Launch Flash Erase command ... \n");
+        SDL_Log("Detecting Flash Memory... \n");
+        usb_buffer_out[0] = INFOS_ID;
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+        manufacturer_id = usb_buffer_in[1];
+        chip_id = usb_buffer_in[3];
+        flash_id = (manufacturer_id<<8) | chip_id;
+        SDL_Log("Flash ID : %04X \n",flash_id);
+
+        switch(flash_id)
+        {
+        case 0xBFB6 :
+            SDL_Log("SST Flash use algo number 1 \n");
+            usb_buffer_out[1] = 1;
+            break;
+        case 0xBFB7 :
+            SDL_Log("SST Flash use algo number 1 \n");
+            usb_buffer_out[1] = 1;
+            break;
+        case 0xC2CB :
+            SDL_Log("Macronix Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            break;
+        case 0x20ED :
+            SDL_Log("STMicroelectronics Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            break;
+        default :
+            SDL_Log("Flash use algo number 1 \n");
+            usb_buffer_out[1] = 1;
+            break;
+        }
+
+        usb_buffer_out[0] = ERASE_MD_FLASH;
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        i=0;
+        SDL_Log("ERASE SMD flash in progress...\n");
+        while(usb_buffer_in[0]!=0xFF)
+        {
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+            fflush(stdout);
+            i++;
+            if(i==4)
+            {
+                i=0;
+            }
+        }
+        SDL_Log("\n");
+        SDL_Log("\nFlash Erased sucessfully !");
+        fflush(stdout);
 		}
 	else if (opts_choice==2 && write_flash==1)
 		{
@@ -1294,11 +1354,130 @@ int main(int argc, char *argv[])
 		const char *filename = sfd_open_dialog(&opt);
 		if (filename)
 			{
-			  SDL_Log("You selected the file: '%s'\n", filename);
-			} else {
-			  SDL_Log("Operation canceled\n");
-			  return 0;
+			SDL_Log("You selected the file: '%s'\n", filename);
+			} 
+		else 
+			{
+			SDL_Log("Operation canceled\n");
+			return 0;
 			}
+		
+		address=0;
+        i=0;
+
+        while (i<8)
+			{
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,dump_flash+(64*i),64, &numBytes, 60000);
+            address+=32;
+            i++;
+			}
+
+        SDL_Log("Detecting Flash Memory ID... \n");
+        usb_buffer_out[0] = INFOS_ID;
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+        manufacturer_id = usb_buffer_in[1];
+        chip_id = usb_buffer_in[3];
+        flash_id = (manufacturer_id<<8) | chip_id;
+        SDL_Log("Flash ID : %04X \n",flash_id);
+
+        switch(flash_id)
+        {
+        case 0xBFB6 :
+            SDL_Log(" SST Flash use algo number 1 \n");
+            usb_buffer_out[1] = 1;
+            flash_algo = 1;
+            break;
+        case 0xBFB7 :
+            SDL_Log("SST Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            flash_algo = 1;
+            break;
+        case 0x20ED :
+            SDL_Log("STMicroelectronics Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            flash_algo = 2;
+            break;
+        case 0xC2CB :
+            SDL_Log("Macronix Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            flash_algo = 2;
+            break;
+        default :
+            SDL_Log("Flash use algo number 2 \n");
+            usb_buffer_out[1] = 2;
+            flash_algo = 2;
+            break;
+        }
+        SDL_Log("Detect if Flash is empty... \n");
+        if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
+        {
+            SDL_Log("Flash is empty !\n");
+        }
+        else
+        {
+            SDL_Log("Flash Memory is not empty \n");
+
+            SDL_Log("Erasing flash with algo %d \n ",flash_algo);
+            usb_buffer_out[0] = ERASE_MD_FLASH;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            i=0;
+            SDL_Log("ERASE SMD flash in progress...");
+            while(usb_buffer_in[0]!=0xFF)
+            {
+                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                fflush(stdout);
+                i++;
+                if(i==4)
+                {
+                    i=0;
+                }
+            }
+
+            SDL_Log("Flash Erased sucessfully !\n");
+            fflush(stdout);
+        }
+        myfile = fopen(filename,"rb");
+        fseek(myfile,0,SEEK_END);
+        game_size = ftell(myfile);
+        BufferROM = (unsigned char*)malloc(game_size);
+        rewind(myfile);
+        fread(BufferROM, 1, game_size, myfile);
+        fclose(myfile);
+        i=0;
+        address = 0;
+        SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
+        while(i<game_size)
+			{
+            usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
+            usb_buffer_out[1] = address & 0xFF;
+            usb_buffer_out[2] = (address & 0xFF00)>>8;
+            usb_buffer_out[3] = (address & 0xFF0000)>>16;
+
+            if((game_size - i)<54)
+            {
+                usb_buffer_out[4] = (game_size - i); //adjust last packet
+            }
+            else
+            {
+                usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
+            }
+
+            memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)BufferROM +i, usb_buffer_out[4]);
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            i += usb_buffer_out[4];
+            address += (usb_buffer_out[4]>>1);
+            fflush(stdout);
+        }
+        printf("SMD flash completed !\n");
 		}
 	else if (opts_choice==3 && write_save==0)
 		{
