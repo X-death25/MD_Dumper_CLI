@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 	const char unk[] = {"unknown"};
 	int checksum_header = 0;
 	int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
-	int gui_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
+	int opts_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
 	int dump_mode=0; 						/* 0=Auto, 1=Manual, 2=Bankswitch */
 	int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
 	int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
@@ -269,9 +269,18 @@ int main(int argc, char *argv[])
 		SDL_Log("  %s -gui\n", argv[0]);
 		SDL_Log("\n");
 		SDL_Log("CLI Mode:\n");
+		SDL_Log("\n");
+		SDL_Log("Read Mode:\n");
 		SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
 		SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
 		SDL_Log("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
+		SDL_Log("  %s -read s -  Read Save Data\n", argv[0]);
+		SDL_Log("\n");
+		SDL_Log("Write Mode:\n");
+		SDL_Log("  %s -write f e  -  Erase Flash Memory\n", argv[0]);
+		SDL_Log("  %s -write f w \"file\"  -  Write Flash Memory\n", argv[0]);
+		SDL_Log("  %s -write s e  -  Erase Save Memory\n", argv[0]);
+		SDL_Log("  %s -write s w \"file\"  -  Write Save Memory\n", argv[0]);
 		SDL_Log("\n");
 		return 1;
 		}
@@ -302,7 +311,7 @@ int main(int argc, char *argv[])
 			SDL_RenderCopy(renderer, texture, NULL, NULL);
 
 			SDL_SetRenderDrawColor(renderer, 238, 67, 67, 255);
-			switch(gui_choice)				//Create GUI Choice Texture
+			switch(opts_choice)				//Create GUI Choice Texture
 				{
 				case 0:						//Read Mode / Game
 					for (int x = 81; x <=86; x++)
@@ -460,13 +469,13 @@ int main(int argc, char *argv[])
 				case SDL_MOUSEBUTTONDOWN:
 					if(mouse_x>=79  && mouse_x<=88) 
 						{
-						if (mouse_y>=94  && mouse_y<=103)			{ gui_choice = 0;					}	//Read Mode  / Game
-						else if (mouse_y>=273 && mouse_y<=282)		{ gui_choice = 1;					}	//Read Mode  / Save
+						if (mouse_y>=94  && mouse_y<=103)			{ opts_choice = 0;					}	//Read Mode  / Game
+						else if (mouse_y>=273 && mouse_y<=282)		{ opts_choice = 1;					}	//Read Mode  / Save
 						}				
 					else if(mouse_x>=591 && mouse_x<=600) 
 						{
-						if (mouse_y>=94  && mouse_y<=103)			{ gui_choice = 2;					}	//Write Mode / Game
-						else if (mouse_y>=140 && mouse_y<=149)		{ gui_choice = 3;					}	//Write Mode / Save
+						if (mouse_y>=94  && mouse_y<=103)			{ opts_choice = 2;					}	//Write Mode / Game
+						else if (mouse_y>=140 && mouse_y<=149)		{ opts_choice = 3;					}	//Write Mode / Save
 						}
 					else if(mouse_x>=24  && mouse_x<=33 ) 
 						{
@@ -773,51 +782,98 @@ int main(int argc, char *argv[])
 	// Vérifier le nombre d'arguments
 	if(use_gui==0)						//Vérifier que nous utilisons le mode CLI
 		{
-		// Vérifier le premier argument
-		if (strcmp(argv[1], "-read") != 0) {
-			SDL_Log("Premier argument doit être '-read'.\n");
-			return 1;
-			}
-
-		// Vérifier le deuxième argument
-		if (strcmp(argv[2], "a") != 0 && strcmp(argv[2], "b") != 0 && strcmp(argv[2], "m") != 0) {
-			SDL_Log("Le mode doit être 'a' (Automatique), 'b' (Bankswitch) ou 'm' (Manuel).\n");
-			return 1;
-			}
-		
-		if (strcmp(argv[2], "a") == 0) { dump_mode=0; }		//Mode Auto
-		else if (strcmp(argv[2], "m") == 0)					//Mode Manuel
+		//Mode Lecture
+		if (strcmp(argv[1], "-read") == 0) 
 			{
-			dump_mode=1; 
-			// Vérifier le 3ème argument
-			if (strcmp(argv[3], "32") == 0) 		{ manual_game_size = 32; 	}
-			else if (strcmp(argv[3], "64") == 0) 	{ manual_game_size = 64; 	}
-			else if (strcmp(argv[3], "128") == 0)	{ manual_game_size = 128; 	}
-			else if (strcmp(argv[3], "256") == 0) 	{ manual_game_size = 256; 	}
-			else if (strcmp(argv[3], "512") == 0) 	{ manual_game_size = 512; 	}
-			else if (strcmp(argv[3], "1024") == 0) 	{ manual_game_size = 1024; 	}
-			else if (strcmp(argv[3], "2048") == 0) 	{ manual_game_size = 2048; 	}
-			else if (strcmp(argv[3], "4096") == 0) 	{ manual_game_size = 4096; 	}
-			else
+			// Vérifier le deuxième argument
+			if (strcmp(argv[2], "a") != 0 && strcmp(argv[2], "b") != 0 && strcmp(argv[2], "m") != 0 && strcmp(argv[2], "s") != 0) 
 				{
-				SDL_Log("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
+				SDL_Log("Le mode doit être 'a' (Automatique), 'b' (Bankswitch), 'm' (Manuel) ou 's' (Lecture de la sauvegarde).\n");
 				return 1;
 				}
-			if (strcmp(argv[4], "md") == 0) 		{ manual_game_cart_mode = 0; 	}
-			else if (strcmp(argv[4], "sms") == 0) 	{ manual_game_cart_mode = 1; 	}
-			else
+		
+			if (strcmp(argv[2], "a") == 0) { opts_choice=0; dump_mode=0; }		//Mode Auto
+			else if (strcmp(argv[2], "m") == 0)					//Mode Manuel
 				{
-				SDL_Log("Vous devez écrire une des valeurs suivantes : md, sms.\n");
-				return 1;
-				}	
+				dump_mode=1; opts_choice=0;
+				// Vérifier le 3ème argument
+				if (strcmp(argv[3], "32") == 0) 		{ manual_game_size = 32; 	}
+				else if (strcmp(argv[3], "64") == 0) 	{ manual_game_size = 64; 	}
+				else if (strcmp(argv[3], "128") == 0)	{ manual_game_size = 128; 	}
+				else if (strcmp(argv[3], "256") == 0) 	{ manual_game_size = 256; 	}
+				else if (strcmp(argv[3], "512") == 0) 	{ manual_game_size = 512; 	}
+				else if (strcmp(argv[3], "1024") == 0) 	{ manual_game_size = 1024; 	}
+				else if (strcmp(argv[3], "2048") == 0) 	{ manual_game_size = 2048; 	}
+				else if (strcmp(argv[3], "4096") == 0) 	{ manual_game_size = 4096; 	}
+				else
+					{
+					SDL_Log("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
+					return 1;
+					}
+				if (strcmp(argv[4], "md") == 0) 		{ manual_game_cart_mode = 0; 	}
+				else if (strcmp(argv[4], "sms") == 0) 	{ manual_game_cart_mode = 1; 	}
+				else
+					{
+					SDL_Log("Vous devez écrire une des valeurs suivantes : md, sms.\n");
+					return 1;
+					}	
+				}
+			else if (strcmp(argv[2], "b") == 0) { dump_mode=2; opts_choice=0; }								//Mode Bankswitch
+			else if (strcmp(argv[2], "s") == 0) { opts_choice=1; }											//Lecture de la sauvegarde
 			}
-		else { dump_mode=2; }								//Mode Bankswitch
+		//Mode Ecriture
+		else if (strcmp(argv[1], "-write") == 0) 
+			{
+			// Vérifier le deuxième argument
+			if (strcmp(argv[2], "f") != 0 && strcmp(argv[2], "s") != 0 ) 
+				{
+				SDL_Log("Le mode doit être 'f' (Flash) ou 's' (Sauvegarde).\n");
+				return 1;
+				}
+			
+			if (strcmp(argv[2], "f") == 0)
+				{
+				// Vérifier le troisième argument
+				if (strcmp(argv[3], "e") == 0 ) 
+					{
+					opts_choice=2;
+					write_flash=0;
+					}
+				else if (strcmp(argv[3], "w") == 0 ) 
+					{
+					opts_choice=2;
+					write_flash=1;
+					}
+				}
+			else if (strcmp(argv[2], "s") == 0)
+				{
+				// Vérifier le troisième argument
+				if (strcmp(argv[3], "e") == 0 ) 
+					{
+					opts_choice=3;
+					write_save=0;
+					}
+				else if (strcmp(argv[3], "w") == 0 ) 
+					{
+					opts_choice=3;
+					write_save=1;
+					}
+				}
+			
+			
+			}
+		//Erreur
+		else
+			{
+			SDL_Log("Le premier argument doit être -read ou -write.\n");
+			return 1;	
+			}
 		}
 	
-    if ( dump_mode==0 )										//Mode Automatique
+    if ( dump_mode==0 && opts_choice==0 )										//Mode Automatique
 		{
 		SDL_Log("\n");
-		SDL_Log("Read ROM in automatic mode\n");
+		SDL_Log("Read Mode : Read ROM in automatic mode\n");
 
 		SDL_Log("Sending command Dump ROM \n");
 		SDL_Log("Dumping please wait ...\n");
@@ -855,10 +911,10 @@ int main(int argc, char *argv[])
 		fwrite(BufferROM, 1,game_size, myfile);
 		fclose(myfile);
 		}
-    else if ( dump_mode==1 )								//Mode Manuel
+    else if ( dump_mode==1 && opts_choice==0 )								//Mode Manuel
 		{
         SDL_Log("\n");
-        SDL_Log("Read ROM in manual mode\n");
+        SDL_Log("Read Mode : Read ROM in manual mode\n");
         
 		SDL_Log("Sending command Dump ROM \n");
 		SDL_Log("Dumping please wait ...\n");
@@ -925,10 +981,10 @@ int main(int argc, char *argv[])
 			fclose(myfile);
 			}
 		}
-    else if ( dump_mode==2 )								//Mode Bankswitch
+    else if ( dump_mode==2 && opts_choice==0 )								//Mode Bankswitch
 		{
 		SDL_Log("\n");
-        SDL_Log("Read ROM in mode : Bankswitch SSF2 \n");
+        SDL_Log("Read Mode : Read ROM in mode : Bankswitch SSF2 \n");
 		i=0;
 		while (i<8)
 			{
@@ -1109,6 +1165,26 @@ int main(int argc, char *argv[])
         myfile = fopen("dump_smd.bin","wb");
         fwrite(BufferROM,1,game_size, myfile);
         fclose(myfile);
+		}
+	else if (opts_choice==1)
+		{
+		SDL_Log("Read Mode : Read Save Data\n");
+		}
+	else if (opts_choice==2 && write_flash==0)
+		{
+		SDL_Log("Write Mode : Erase Flash Data\n");
+		}
+	else if (opts_choice==2 && write_flash==1)
+		{
+		SDL_Log("Write Mode : Write Flash Data\n");
+		}
+	else if (opts_choice==3 && write_save==0)
+		{
+		SDL_Log("Write Mode : Erase Save Data\n");
+		}
+	else if (opts_choice==3 && write_save==1)
+		{
+		SDL_Log("Write Mode : Write Save Data\n");
 		}
     return 0;
 	}
