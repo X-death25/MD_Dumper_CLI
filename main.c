@@ -243,9 +243,12 @@ int main(int argc, char *argv[])
 	const char unk[] = {"unknown"};
 	int checksum_header = 0;
 	int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
-	int dump_mode=0; 						/* 0=Auto, 1=Manual */
+	int gui_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
+	int dump_mode=0; 						/* 0=Auto, 1=Manual, 2=Bankswitch */
 	int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
 	int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
+	int write_flash=1;				 		/* 1=Write, 0=Erase */
+	int write_save=1;				 		/* 1=Write, 0=Erase */
 	int game_size=0;
 	int manual_game_size=0;
 	int manual_game_cart_mode=0;
@@ -283,7 +286,7 @@ int main(int argc, char *argv[])
 
 		//Init Window
 		SDL_Init(SDL_INIT_VIDEO);
-		SDL_Window * window = SDL_CreateWindow("MD Dumper version 1.0 alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 263, 0);
+		SDL_Window * window = SDL_CreateWindow("MD Dumper version 1.0 alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
 		SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
 		//Create Background Texture
@@ -293,113 +296,103 @@ int main(int argc, char *argv[])
 		SDL_Surface * image = IMG_Load("./images/opts_background.png");
 #endif
 		SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
+
 		while (quit==0)
 			{    		
-			SDL_GetMouseState(&mouse_x, &mouse_y);
-			SDL_Surface * opts_mode;		SDL_Texture * texture2;
-			SDL_Surface * opts_manual_size;		SDL_Texture * texture3;
-			SDL_Surface * opts_manual_cart_mode;	SDL_Texture * texture4;
-			
+			SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+			SDL_SetRenderDrawColor(renderer, 238, 67, 67, 255);
+			switch(gui_choice)				//Create GUI Choice Texture
+				{
+				case 0:						//Read Mode / Game
+					for (int x = 81; x <=86; x++)
+						for (int y = 96; y <=101; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				case 1:						//Read Mode / Save
+					for (int x = 81; x <=86; x++)
+						for (int y = 275; y <=280; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				case 2:						//Write Mode / Game
+					for (int x = 593; x <=598; x++)
+						for (int y = 96; y <=101; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				case 3:						//Write Mode / Save
+					for (int x = 593; x <=598; x++)
+						for (int y = 142; y <=147; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				}
+					
+			SDL_SetRenderDrawColor(renderer, 250, 173, 5, 255);
 			switch(dump_mode)				//Create Mode Texture
 				{
 				case 0:						//Auto Mode
-#if defined(_WIN32)
-					opts_mode = IMG_Load(".\\images\\opts_dump_auto.png");
-#else
-					opts_mode = IMG_Load("./images/opts_dump_auto.png");
-#endif
-					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
+					for (int x = 26; x <=31; x++)
+						for (int y = 116; y <=121; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					break;
 				case 1:						//Manual Mode
-#if defined(_WIN32)
-					opts_mode = IMG_Load(".\\images\\opts_dump_manual.png");
-#else
-					opts_mode = IMG_Load("./images/opts_dump_manual.png");
-#endif
-					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
+					for (int x = 331; x <=336; x++)
+						for (int y = 116; y <=121; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					break;
 				case 2:						//Bankswitch Mode
-#if defined(_WIN32)
-					opts_mode = IMG_Load(".\\images\\opts_dump_bankswitch.png");
-#else
-					opts_mode = IMG_Load("./images/opts_dump_bankswitch.png");
-#endif
-					texture2 = SDL_CreateTextureFromSurface(renderer, opts_mode);
+					for (int x = 173; x <=178; x++)
+						for (int y = 116; y <=121; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					break;
 				}
-				
+						
 			switch(dump_manual_size_opts)	//Create Manual Size Texture
 				{
 				case 0:						//32KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_32.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_32.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 26; x <=31; x++)
+						for (int y = 187; y <=192; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 32;
 					break;
 				case 1:						//64KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_64.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_64.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 146; x <=151; x++)
+						for (int y = 187; y <=192; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 64;
 					break;
 				case 2:						//128KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_128.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_128.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 266; x <=271; x++)
+						for (int y = 187; y <=192; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 128;
 					break;
 				case 3:						//256KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_256.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_256.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 386; x <=391; x++)
+						for (int y = 187; y <=192; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 256;
 					break;
 				case 4:						//512KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_512.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_512.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 26; x <=31; x++)
+						for (int y = 203; y <=208; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 512;
 					break;
 				case 5:						//1024KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_1024.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_1024.png");
-#endif
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 146; x <=151; x++)
+						for (int y = 203; y <=208; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 1024;
 					break;
 				case 6:						//2048KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_2048.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_2048.png");
-#endif				
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
-					manual_game_size = 2048;
+					for (int x = 266; x <=271; x++)
+						for (int y = 203; y <=208; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					break;
 				case 7:						//4096KB
-#if defined(_WIN32)
-					opts_manual_size = IMG_Load(".\\images\\opts_dump_manual_size_4096.png");
-#else
-					opts_manual_size = IMG_Load("./images/opts_dump_manual_size_4096.png");
-#endif				
-					texture3 = SDL_CreateTextureFromSurface(renderer, opts_manual_size);
+					for (int x = 386; x <=391; x++)
+						for (int y = 203; y <=208; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_size = 4096;
 					break;
 				}
@@ -407,32 +400,51 @@ int main(int argc, char *argv[])
 			switch(dump_manual_cart_mode_opts)	//Create Manual Cartridge Mode Texture
 				{
 				case 0:						//Mega Drive Mode
-#if defined(_WIN32)
-					opts_manual_cart_mode = IMG_Load(".\\images\\opts_dump_manual_md.png");
-#else
-					opts_manual_cart_mode = IMG_Load("./images/opts_dump_manual_md.png");
-#endif
-					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_cart_mode);
+					for (int x = 26; x <=31; x++)
+						for (int y = 245; y <=250; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_cart_mode = 0;
 					break;
 				case 1:						//Master System Mode
-#if defined(_WIN32)
-					opts_manual_cart_mode = IMG_Load(".\\images\\opts_dump_manual_sms.png");
-#else
-					opts_manual_cart_mode = IMG_Load("./images/opts_dump_manual_sms.png");
-#endif
-					texture4 = SDL_CreateTextureFromSurface(renderer, opts_manual_cart_mode);
+					for (int x = 146; x <=151; x++)
+						for (int y = 245; y <=250; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
 					manual_game_cart_mode = 1;
 					break;
 				}
 			
+			switch(write_flash)				//Create Write Mode Opts Texture
+				{
+				case 1:						//Write Flash
+					for (int x = 538; x <=543; x++)
+						for (int y = 116; y <=121; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				case 0:						//Erase Flash
+					for (int x = 645; x <=650; x++)
+						for (int y = 116; y <=121; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				}
+
+			switch(write_save)				//Create Write Mode Opts Texture
+				{
+				case 1:						//Write Save
+					for (int x = 538; x <=543; x++)
+						for (int y = 162; y <=167; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				case 0:						//Erase Save
+					for (int x = 645; x <=650; x++)
+						for (int y = 162; y <=167; y++)
+							SDL_RenderDrawPoint(renderer, x, y);
+					break;
+				}
+
 			//Display Texture	
-			SDL_RenderCopy(renderer, texture, NULL, NULL);
-			SDL_RenderCopy(renderer, texture2, NULL, NULL);
-			SDL_RenderCopy(renderer, texture3, NULL, NULL);
-			SDL_RenderCopy(renderer, texture4, NULL, NULL);
 			SDL_RenderPresent(renderer);
 		
+			SDL_GetMouseState(&mouse_x, &mouse_y);
 			SDL_WaitEvent(&event);
 				 
 			switch (event.type)		//Window Events according to mouse positions and left click on this Window
@@ -446,37 +458,60 @@ int main(int argc, char *argv[])
 					SDL_Quit();
 					return 1;
 				case SDL_MOUSEBUTTONDOWN:
-					if(mouse_x>=17 && mouse_x<=24)
+					if(mouse_x>=79  && mouse_x<=88) 
 						{
-						if(mouse_y>=49 && mouse_y<=56)			{ dump_mode = 0; }					//Auto Mode Selected
-						else if(mouse_y>=67 && mouse_y<=74)		{ dump_mode = 1; }					//Manual Mode Selected
-						else if(mouse_y>=86 && mouse_y<=91)		{ dump_mode = 2; }					//Bankswitch Mode Selected
+						if (mouse_y>=94  && mouse_y<=103)			{ gui_choice = 0;					}	//Read Mode  / Game
+						else if (mouse_y>=273 && mouse_y<=282)		{ gui_choice = 1;					}	//Read Mode  / Save
+						}				
+					else if(mouse_x>=591 && mouse_x<=600) 
+						{
+						if (mouse_y>=94  && mouse_y<=103)			{ gui_choice = 2;					}	//Write Mode / Game
+						else if (mouse_y>=140 && mouse_y<=149)		{ gui_choice = 3;					}	//Write Mode / Save
 						}
-					else if(mouse_x>=215 && mouse_x<=221)
+					else if(mouse_x>=24  && mouse_x<=33 ) 
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 0; }		//Manual Size : 32KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 4; }		//Manual Size : 512KB
-						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 0; }	//Manual Cart Mode : Mega Drive
+						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 0;					}	//Automatic Mode
+						else if (mouse_y>=185 && mouse_y<=194)		{ dump_manual_size_opts = 0;		}	//32KB
+						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 4;		}	//512KB
+						else if (mouse_y>=243 && mouse_y<=252)		{ dump_manual_cart_mode_opts = 0;	}	//Mega Drive Cartridge Mode
 						}
-					else if(mouse_x>=335 && mouse_x<=340)
+					else if(mouse_x>=329 && mouse_x<=338)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 1; }		//Manual Size : 64KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 5; }		//Manual Size : 1024KB
-						else if(mouse_y>=159 && mouse_y<=164)	{ dump_manual_cart_mode_opts = 1; }	//Manual Cart Mode : Master System
+						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 1;					}	//Manual Mode
 						}
-					else if(mouse_x>=455 && mouse_x<=460)
+					else if(mouse_x>=171 && mouse_x<=180)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 2; }		//Manual Size : 128KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 6; }		//Manual Size : 2048KB
+						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 2;					}	//Bankswitch Mode
 						}
-					else if(mouse_x>=575 && mouse_x<=580)
+					else if(mouse_x>=144 && mouse_x<=153)
 						{
-						if(mouse_y>=101 && mouse_y<=106)		{ dump_manual_size_opts = 3; }		//Manual Size : 286KB
-						else if(mouse_y>=117 && mouse_y<=122)	{ dump_manual_size_opts = 7; }		//Manual Size : 4096KB
+						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 1;		}	//64KB
+						if (mouse_y>=201 && mouse_y<=210)			{ dump_manual_size_opts = 5;		}	//1024KB
+						if (mouse_y>=243 && mouse_y<=252)			{ dump_manual_cart_mode_opts = 1;	}	//Master System Cartridge Mode
+						}
+					else if(mouse_x>=264 && mouse_x<=273)
+						{
+						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 2;		}	//128KB
+						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 6;		}	//2048KB
+						}
+					else if(mouse_x>=384 && mouse_x<=393)
+						{
+						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 3;		}	//256KB
+						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 7;		}	//4096KB
+						}
+					else if(mouse_x>=537 && mouse_x<=544)
+						{
+						if (mouse_y>=115 && mouse_y<=122)			{ write_flash = 1;					}	//Write Flash
+						else if (mouse_y>=161 && mouse_y<=168)		{ write_save = 1;					}	//Write Save
+						}
+					else if(mouse_x>=644 && mouse_x<=651)
+						{
+						if (mouse_y>=115 && mouse_y<=122)			{ write_flash = 0;					}	//Erase Flash
+						else if (mouse_y>=161 && mouse_y<=168)		{ write_save = 0;					}	//Erase Save
 						}
 					else if(mouse_x>=16 && mouse_x<=199)
 						{
-						if(mouse_y>=183 && mouse_y<=214)	//Exit
+						if(mouse_y>=528 && mouse_y<=559)	//Exit
 							{
 							quit = 1;
 							SDL_DestroyTexture(texture);
@@ -487,29 +522,29 @@ int main(int argc, char *argv[])
 							return 1;
 							}
 						}
-					else if(mouse_x>=228 && mouse_x<=411)
+					else if(mouse_x>=420 && mouse_x<=603)
 						{
-						if(mouse_y>=183 && mouse_y<=214)	//Launch the dump
+						if(mouse_y>=528 && mouse_y<=559)	//Launch
 							{
 							quit = 1;
+							SDL_DestroyTexture(texture);
+							SDL_FreeSurface(image);
+							SDL_DestroyRenderer(renderer);
+							SDL_DestroyWindow(window);
+							SDL_Quit();
 							break;
 							}
 						}
-					else if(mouse_x>=440 && mouse_x<=623)
+					else if(mouse_x>=824 && mouse_x<=1007)
 						{
-						if(mouse_y>=183 && mouse_y<=214)	//Manual / PDF
+						if(mouse_y>=528 && mouse_y<=559)	//Documentation
 							{
-							SDL_Log("Open Manual : TODO\n");
+							SDL_Log("Open PDF : TODO\n");
 							}
 						}
 					break;
 				}
 			}
-		SDL_DestroyTexture(texture);
-		SDL_FreeSurface(image);
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
-		SDL_Quit();
 		}
 	else
 		{
