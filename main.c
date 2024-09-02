@@ -280,6 +280,7 @@ int main(int argc, char *argv[])
     unsigned short rom_id=0;
     unsigned short flash_id=0;
     unsigned char flash_algo=0;
+    const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 	
@@ -1328,9 +1329,9 @@ int main(int argc, char *argv[])
         usb_buffer_out[0] = ERASE_MD_FLASH;
         libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
         i=0;
-        SDL_Log("ERASE SMD flash in progress...\n");
         while(usb_buffer_in[0]!=0xFF)
         {
+			SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
             libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
             fflush(stdout);
             i++;
@@ -1433,6 +1434,7 @@ int main(int argc, char *argv[])
             while(usb_buffer_in[0]!=0xFF)
             {
                 libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+       			SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
                 fflush(stdout);
                 i++;
                 if(i==4)
