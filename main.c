@@ -519,10 +519,7 @@ int main(int argc, char *argv[])
         fwrite(BufferROM, 1,game_size, myfile);
         fclose(myfile);
 
-
-
     }
-
 
     if (strcmp(argv[2], "b") == 0)
     {
