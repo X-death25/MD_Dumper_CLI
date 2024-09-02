@@ -1754,7 +1754,9 @@ int main(int argc, char *argv[])
 
             SDL_Log("SRAM Sucessfully Writted !\n");
         }
-        return 0;
     }
+    return 0;
+}
+
 
 
