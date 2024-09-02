@@ -125,38 +125,38 @@ void cb2(int c, void *data)
 
 //Timer functions according to Operating Systems
 #if defined(_WIN32)		//Windows
-	clock_t microsec_start;
-	clock_t microsec_end;
+clock_t microsec_start;
+clock_t microsec_end;
 	
-	void timer_start() 	{ microsec_start = clock();		}
-	void timer_end()	{ microsec_end = clock();		}
-	void timer_show()
-		{
-		SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000);
-		SDL_Log(" (%ldms)\n", (microsec_end - microsec_start));
-		}
+void timer_start() 	{ microsec_start = clock();		}
+void timer_end()	{ microsec_end = clock();		}
+void timer_show()
+	{
+	SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000);
+	SDL_Log(" (%ldms)\n", (microsec_end - microsec_start));
+	}
 #else 				//Others
-	struct timeval ostime;
-	long microsec_start = 0;
-	long microsec_end = 0;
+struct timeval ostime;
+long microsec_start = 0;
+long microsec_end = 0;
 	
-	void timer_start()
-		{     
-		gettimeofday(&ostime, NULL);
-		microsec_start = ((unsigned long long)ostime.tv_sec * 1000000) + ostime.tv_usec;
-		}
+void timer_start()
+	{     
+	gettimeofday(&ostime, NULL);
+	microsec_start = ((unsigned long long)ostime.tv_sec * 1000000) + ostime.tv_usec;
+	}
 
-	void timer_end()
-		{
-		gettimeofday(&ostime, NULL);
-		microsec_end = ((unsigned long long)ostime.tv_sec * 1000000) + ostime.tv_usec;
-		}
+void timer_end()
+	{
+	gettimeofday(&ostime, NULL);
+	microsec_end = ((unsigned long long)ostime.tv_sec * 1000000) + ostime.tv_usec;
+	}
 
-	void timer_show()
-		{
-		SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000000);
-		SDL_Log(" (%ldms)\n", (microsec_end - microsec_start)/1000);
-		}
+void timer_show()
+	{
+	SDL_Log("~ Elapsed time: %lds", (microsec_end - microsec_start)/1000000);
+	SDL_Log(" (%ldms)\n", (microsec_end - microsec_start)/1000);
+	}
 #endif
 
 
@@ -284,7 +284,8 @@ int main(int argc, char *argv[])
 
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 	
-	if (strcmp(argv[1], "-help") == 0) {
+	if (strcmp(argv[1], "-help") == 0)
+		{
 		SDL_Log("\n");
 		SDL_Log("How to use the program:\n");
 		SDL_Log("\n");
@@ -492,54 +493,75 @@ int main(int argc, char *argv[])
 				case SDL_MOUSEBUTTONDOWN:
 					if(mouse_x>=79  && mouse_x<=88) 
 						{
-						if (mouse_y>=94  && mouse_y<=103)			{ opts_choice = 0;					}	//Read Mode  / Game
-						else if (mouse_y>=273 && mouse_y<=282)		{ opts_choice = 1;					}	//Read Mode  / Save
+						if (mouse_y>=94  && mouse_y<=103)
+							opts_choice = 0;						//Read Mode  / Game
+						else if (mouse_y>=273 && mouse_y<=282)
+							opts_choice = 1;						//Read Mode  / Save
 						}				
 					else if(mouse_x>=591 && mouse_x<=600) 
 						{
-						if (mouse_y>=94  && mouse_y<=103)			{ opts_choice = 2;					}	//Write Mode / Game
-						else if (mouse_y>=140 && mouse_y<=149)		{ opts_choice = 3;					}	//Write Mode / Save
+						if (mouse_y>=94  && mouse_y<=103)			
+							opts_choice = 2;						//Write Mode / Game
+						else if (mouse_y>=140 && mouse_y<=149)
+							opts_choice = 3;						//Write Mode / Save
 						}
 					else if(mouse_x>=24  && mouse_x<=33 ) 
 						{
-						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 0;					}	//Automatic Mode
-						else if (mouse_y>=185 && mouse_y<=194)		{ dump_manual_size_opts = 0;		}	//32KB
-						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 4;		}	//512KB
-						else if (mouse_y>=243 && mouse_y<=252)		{ dump_manual_cart_mode_opts = 0;	}	//Mega Drive Cartridge Mode
+						if (mouse_y>=114 && mouse_y<=123)			
+							dump_mode = 0;							//Automatic Mode
+						else if (mouse_y>=185 && mouse_y<=194)		
+							dump_manual_size_opts = 0;				//32KB
+						else if (mouse_y>=201 && mouse_y<=210)
+							dump_manual_size_opts = 4;				//512KB
+						else if (mouse_y>=243 && mouse_y<=252)
+							dump_manual_cart_mode_opts = 0;			//Mega Drive Cartridge Mode
 						}
 					else if(mouse_x>=329 && mouse_x<=338)
 						{
-						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 1;					}	//Manual Mode
+						if (mouse_y>=114 && mouse_y<=123)
+							dump_mode = 1;							//Manual Mode
 						}
 					else if(mouse_x>=171 && mouse_x<=180)
 						{
-						if (mouse_y>=114 && mouse_y<=123)			{ dump_mode = 2;					}	//Bankswitch Mode
+						if (mouse_y>=114 && mouse_y<=123)
+							dump_mode = 2;							//Bankswitch Mode
 						}
 					else if(mouse_x>=144 && mouse_x<=153)
 						{
-						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 1;		}	//64KB
-						if (mouse_y>=201 && mouse_y<=210)			{ dump_manual_size_opts = 5;		}	//1024KB
-						if (mouse_y>=243 && mouse_y<=252)			{ dump_manual_cart_mode_opts = 1;	}	//Master System Cartridge Mode
+						if (mouse_y>=185 && mouse_y<=194)
+							dump_manual_size_opts = 1;				//64KB
+						if (mouse_y>=201 && mouse_y<=210)
+							dump_manual_size_opts = 5;				//1024KB
+						if (mouse_y>=243 && mouse_y<=252)			
+							dump_manual_cart_mode_opts = 1;			//Master System Cartridge Mode
 						}
 					else if(mouse_x>=264 && mouse_x<=273)
 						{
-						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 2;		}	//128KB
-						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 6;		}	//2048KB
+						if (mouse_y>=185 && mouse_y<=194)
+							dump_manual_size_opts = 2;				//128KB
+						else if (mouse_y>=201 && mouse_y<=210)
+							dump_manual_size_opts = 6;				//2048KB
 						}
 					else if(mouse_x>=384 && mouse_x<=393)
 						{
-						if (mouse_y>=185 && mouse_y<=194)			{ dump_manual_size_opts = 3;		}	//256KB
-						else if (mouse_y>=201 && mouse_y<=210)		{ dump_manual_size_opts = 7;		}	//4096KB
+						if (mouse_y>=185 && mouse_y<=194)
+							dump_manual_size_opts = 3;				//256KB
+						else if (mouse_y>=201 && mouse_y<=210)
+							dump_manual_size_opts = 7;				//4096KB
 						}
 					else if(mouse_x>=537 && mouse_x<=544)
 						{
-						if (mouse_y>=115 && mouse_y<=122)			{ write_flash = 1;					}	//Write Flash
-						else if (mouse_y>=161 && mouse_y<=168)		{ write_save = 1;					}	//Write Save
+						if (mouse_y>=115 && mouse_y<=122)
+							write_flash = 1;						//Write Flash
+						else if (mouse_y>=161 && mouse_y<=168)
+							write_save = 1;							//Write Save
 						}
 					else if(mouse_x>=644 && mouse_x<=651)
 						{
-						if (mouse_y>=115 && mouse_y<=122)			{ write_flash = 0;					}	//Erase Flash
-						else if (mouse_y>=161 && mouse_y<=168)		{ write_save = 0;					}	//Erase Save
+						if (mouse_y>=115 && mouse_y<=122)
+							write_flash = 0;						//Erase Flash
+						else if (mouse_y>=161 && mouse_y<=168)		
+							write_save = 0;							//Erase Save
 						}
 					else if(mouse_x>=16 && mouse_x<=199)
 						{
@@ -872,29 +894,46 @@ int main(int argc, char *argv[])
 				{
 				dump_mode=1; opts_choice=0;
 				// Vérifier le 3ème argument
-				if (strcmp(argv[3], "32") == 0) 		{ manual_game_size = 32; 	}
-				else if (strcmp(argv[3], "64") == 0) 	{ manual_game_size = 64; 	}
-				else if (strcmp(argv[3], "128") == 0)	{ manual_game_size = 128; 	}
-				else if (strcmp(argv[3], "256") == 0) 	{ manual_game_size = 256; 	}
-				else if (strcmp(argv[3], "512") == 0) 	{ manual_game_size = 512; 	}
-				else if (strcmp(argv[3], "1024") == 0) 	{ manual_game_size = 1024; 	}
-				else if (strcmp(argv[3], "2048") == 0) 	{ manual_game_size = 2048; 	}
-				else if (strcmp(argv[3], "4096") == 0) 	{ manual_game_size = 4096; 	}
+				if (strcmp(argv[3], "32") == 0) 		
+					manual_game_size = 32;
+				else if (strcmp(argv[3], "64") == 0)
+					manual_game_size = 64;
+				else if (strcmp(argv[3], "128") == 0)
+					manual_game_size = 128;
+				else if (strcmp(argv[3], "256") == 0)
+					manual_game_size = 256;
+				else if (strcmp(argv[3], "512") == 0)
+					manual_game_size = 512;
+				else if (strcmp(argv[3], "1024") == 0)
+					manual_game_size = 1024;
+				else if (strcmp(argv[3], "2048") == 0)
+					manual_game_size = 2048;
+				else if (strcmp(argv[3], "4096") == 0)
+					manual_game_size = 4096;
 				else
 					{
 					SDL_Log("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
 					return 1;
 					}
-				if (strcmp(argv[4], "md") == 0) 		{ manual_game_cart_mode = 0; 	}
-				else if (strcmp(argv[4], "sms") == 0) 	{ manual_game_cart_mode = 1; 	}
+				if (strcmp(argv[4], "md") == 0)
+					manual_game_cart_mode = 0;
+				else if (strcmp(argv[4], "sms") == 0)
+					manual_game_cart_mode = 1;
 				else
 					{
 					SDL_Log("Vous devez écrire une des valeurs suivantes : md, sms.\n");
 					return 1;
 					}	
 				}
-			else if (strcmp(argv[2], "b") == 0) { dump_mode=2; opts_choice=0; }								//Mode Bankswitch
-			else if (strcmp(argv[2], "s") == 0) { opts_choice=1; }											//Lecture de la sauvegarde
+			else if (strcmp(argv[2], "b") == 0) //Mode Bankswitch
+				{ 
+				dump_mode=2; 
+				opts_choice=0; 
+				}								
+			else if (strcmp(argv[2], "s") == 0) //Lecture de la sauvegarde
+				{
+				opts_choice=1;
+				}											
 			}
 		//Mode Ecriture
 		else if (strcmp(argv[1], "-write") == 0) 
@@ -945,7 +984,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	
-    if ( dump_mode==0 && opts_choice==0 )										//Mode Automatique
+    if ( dump_mode==0 && opts_choice==0 )	//Mode Automatique
 		{
 		SDL_Log("\n");
 		SDL_Log("Read Mode : Read ROM in automatic mode\n");
@@ -1172,58 +1211,6 @@ int main(int argc, char *argv[])
 			{
             SDL_Log("Error \n");
             return 1;
-        }
-        printf("\nDump ROM completed !\n");
-        timer_end();
-        timer_show();
-        myfile = fopen("dump_smd.bin","wb");
-        fwrite(BufferROM, 1,game_size, myfile);
-        fclose(myfile);
-
-    }
-
-    if (strcmp(argv[2], "b") == 0)
-    {
-        printf("Read ROM in mode : Bankswitch SSF2 \n");
-		i=0;
-		while (i<8)
-        {
-
-            usb_buffer_out[0] = READ_MD;
-            usb_buffer_out[1] = address&0xFF ;
-            usb_buffer_out[2] = (address&0xFF00)>>8;
-            usb_buffer_out[3]=(address & 0xFF0000)>>16;
-            usb_buffer_out[4] = 0; // Slow Mode
-
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
-            address+=32;
-            i++;
-        }
-
-        if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
-        {
-            printf("\nMegadrive/Genesis/32X cartridge detected!\n");
-            printf("\n --- HEADER ---\n");
-            memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
-            trim((unsigned char *)dump_name, 0);
-            printf(" Domestic: %.*s\n", 48, (char *)game_name);
-            memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
-            trim((unsigned char *)dump_name, 0);
-
-            printf(" International: %.*s\n", 48, game_name);
-            printf(" Release date: %.*s\n", 16, buffer_header+0x10);
-            printf(" Version: %.*s\n", 14, buffer_header+0x80);
-            memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
-            for(i=0; i<4; i++)
-            {
-                if(region[i]==0x20)
-                {
-                    game_region = (char *)malloc(i);
-                    memcpy((unsigned char *)game_region, (unsigned char *)buffer_header +0xF0, i);
-                    game_region[i] = '\0';
-                    break;
-                }
             }
 
 		ActualBank = 8;
