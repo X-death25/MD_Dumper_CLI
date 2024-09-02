@@ -1456,6 +1456,7 @@ int main(int argc, char *argv[])
         i=0;
         address = 0;
         SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
+        int old=0; int new=0;
         while(i<game_size)
 			{
             usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
@@ -1477,9 +1478,14 @@ int main(int argc, char *argv[])
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
             i += usb_buffer_out[4];
             address += (usb_buffer_out[4]>>1);
-            SDL_Log("WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
-            fflush(stdout);
-        }
+            new=(100 * i)/game_size);
+            if(new!=old)
+				{
+				old=new;
+				SDL_Log("WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
+				fflush(stdout);
+				}
+			}
         printf("SMD flash completed !\n");
 		}
 	else if (opts_choice==3 && write_save==0)
