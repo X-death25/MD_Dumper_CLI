@@ -22,9 +22,14 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 #include <SDL_image.h>			//For PNG loading files
 
 #include <libusb.h>				//Library for detecting the MD Dumper device
+
+//Read CSV Files
 #include "csv.h"
 #include "csv.c"
 
+//File Manager Library
+#include "sfd.h"
+#include "sfd.c"
 
 // USB Special Command
 #define WAKEUP          0x10	// WakeUP for first STM32 Communication
@@ -278,9 +283,9 @@ int main(int argc, char *argv[])
 		SDL_Log("\n");
 		SDL_Log("Write Mode:\n");
 		SDL_Log("  %s -write f e  -  Erase Flash Memory\n", argv[0]);
-		SDL_Log("  %s -write f w \"file\"  -  Write Flash Memory\n", argv[0]);
+		SDL_Log("  %s -write f w  -  Write Flash Memory\n", argv[0]);
 		SDL_Log("  %s -write s e  -  Erase Save Memory\n", argv[0]);
-		SDL_Log("  %s -write s w \"file\"  -  Write Save Memory\n", argv[0]);
+		SDL_Log("  %s -write s w  -  Write Save Memory\n", argv[0]);
 		SDL_Log("\n");
 		return 1;
 		}
@@ -1177,6 +1182,19 @@ int main(int argc, char *argv[])
 	else if (opts_choice==2 && write_flash==1)
 		{
 		SDL_Log("Write Mode : Write Flash Data\n");
+		sfd_Options opt = {
+			  .title        = "Select your Flash Data File",
+			  .filter_name  = "Flash Data",
+			  .filter       = "*.*",
+			};
+		const char *filename = sfd_open_dialog(&opt);
+		if (filename)
+			{
+			  SDL_Log("You selected the file: '%s'\n", filename);
+			} else {
+			  SDL_Log("Operation canceled\n");
+			  return 0;
+			}
 		}
 	else if (opts_choice==3 && write_save==0)
 		{
@@ -1185,6 +1203,19 @@ int main(int argc, char *argv[])
 	else if (opts_choice==3 && write_save==1)
 		{
 		SDL_Log("Write Mode : Write Save Data\n");
+		sfd_Options opt = {
+			  .title        = "Select your Save Data File",
+			  .filter_name  = "Save Data",
+			  .filter       = "*.*",
+			};
+		const char *filename = sfd_open_dialog(&opt);
+		if (filename)
+			{
+			  SDL_Log("You selected the file: '%s'\n", filename);
+			} else {
+			  SDL_Log("Operation canceled\n");
+			  return 0;
+			}
 		}
     return 0;
 	}
