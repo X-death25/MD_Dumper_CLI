@@ -1478,11 +1478,11 @@ int main(int argc, char *argv[])
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
             i += usb_buffer_out[4];
             address += (usb_buffer_out[4]>>1);
-            new=(100 * i)/game_size);
+            new=(100 * i)/game_size;
             if(new!=old)
 				{
 				old=new;
-				SDL_Log("WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
+				SDL_Log("WRITE SMD flash in progress: %ld%%", new);
 				fflush(stdout);
 				}
 			}
