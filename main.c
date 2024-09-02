@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
     int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
     int write_flash=1;				 		/* 1=Write, 0=Erase */
     int write_save=1;				 		/* 1=Write, 0=Erase */
-   	int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
+    int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
     int game_size=0;
     int manual_game_size=0;
     int manual_game_cart_mode=0;
@@ -293,26 +293,26 @@ int main(int argc, char *argv[])
 
     if (strcmp(argv[1], "-help") == 0)
     {
-		SDL_Log("\n");
-		SDL_Log("How to use the program:\n");
-		SDL_Log("\n");
-		SDL_Log("GUI Mode:\n");
-		SDL_Log("  %s -gui\n", argv[0]);
-		SDL_Log("\n");
-		SDL_Log("CLI Mode:\n");
-		SDL_Log("\n");
-		SDL_Log("Read Mode:\n");
-		SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
-		SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
-		SDL_Log("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
-		SDL_Log("  %s -read s (0|8192|32768) -  Read Save Data\n", argv[0]);
-		SDL_Log("\n");
-		SDL_Log("Write Mode:\n");
-		SDL_Log("  %s -write f e  -  Erase Flash Memory\n", argv[0]);
-		SDL_Log("  %s -write f w  -  Write Flash Memory\n", argv[0]);
-		SDL_Log("  %s -write s e  -  Erase Save Memory\n", argv[0]);
-		SDL_Log("  %s -write s w  -  Write Save Memory\n", argv[0]);
-		SDL_Log("\n");
+	SDL_Log("\n");
+	SDL_Log("How to use the program:\n");
+	SDL_Log("\n");
+	SDL_Log("GUI Mode:\n");
+	SDL_Log("  %s -gui\n", argv[0]);
+	SDL_Log("\n");
+	SDL_Log("CLI Mode:\n");
+	SDL_Log("\n");
+	SDL_Log("Read Mode:\n");
+	SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
+	SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
+	SDL_Log("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
+	SDL_Log("  %s -read s (0|8192|32768) -  Read Save Data\n", argv[0]);
+	SDL_Log("\n");
+	SDL_Log("Write Mode:\n");
+	SDL_Log("  %s -write f e  -  Erase Flash Memory\n", argv[0]);
+	SDL_Log("  %s -write f w  -  Write Flash Memory\n", argv[0]);
+	SDL_Log("  %s -write s e  -  Erase Save Memory\n", argv[0]);
+	SDL_Log("  %s -write s w  -  Write Save Memory\n", argv[0]);
+	SDL_Log("\n");
         return 1;
     }
 
