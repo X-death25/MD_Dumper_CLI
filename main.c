@@ -1482,6 +1482,20 @@ int main(int argc, char *argv[])
 	else if (opts_choice==3 && write_save==0)
 		{
 		SDL_Log("Write Mode : Erase Save Data\n");
+		SDL_Log("ALL SRAM DATAS WILL BE ERASED ...\n");
+        address=(save_address/2);
+        usb_buffer_out[0] = WRITE_MD_SAVE; // Select write in 8bit Mode
+        usb_buffer_out[1]=address & 0xFF;
+        usb_buffer_out[2]=(address & 0xFF00)>>8;
+        usb_buffer_out[3]=(address & 0xFF0000)>>16;
+        usb_buffer_out[7] = 0xBB;  // SRAM Clean Flag
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        while ( usb_buffer_in[6] != 0xAA)
+        {
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+        }
+
+        SDL_Log("SRAM Sucessfully Erased !\n");
 		}
 	else if (opts_choice==3 && write_save==1)
 		{
@@ -1499,6 +1513,67 @@ int main(int argc, char *argv[])
 			  SDL_Log("Operation canceled\n");
 			  return 0;
 			}
+		SDL_Log(" ALL DATAS WILL BE ERASED BEFORE ANY WRITE!\n");
+        myfile = fopen(filename,"rb");
+        fseek(myfile,0,SEEK_END);
+        save_size = ftell(myfile);
+        BufferSAVE = (unsigned char*)malloc(save_size);
+        rewind(myfile);
+        fread(BufferSAVE, 1, save_size, myfile);
+        fclose(myfile);
+
+        // Erase SRAM
+
+        address=(save_address/2);
+        usb_buffer_out[0] = WRITE_MD_SAVE; // Select write in 8bit Mode
+        usb_buffer_out[1]=address & 0xFF;
+        usb_buffer_out[2]=(address & 0xFF00)>>8;
+        usb_buffer_out[3]=(address & 0xFF0000)>>16;
+        usb_buffer_out[7] = 0xBB;  // SRAM Clean Flag
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        while ( usb_buffer_in[6] != 0xAA)
+        {
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+        }
+
+        SDL_Log("SRAM Sucessfully Erased\n");
+
+        // Write SRAM
+
+        i=0;
+        j=0;
+        unsigned long k=1;
+        // save_size=save_size/2; // 16 bit input to 8 bit out
+        address=(save_address/2);
+        while ( j < save_size)
+        {
+
+            // Fill buffer 8bit with save_data
+
+            // Fill usb out buffer with save data in 8bit
+            for (i=32; i<64; i++)
+            {
+                usb_buffer_out[i] = BufferSAVE[k];
+                k=k+2;
+
+            }
+            i=0;
+            j+=64;
+
+            usb_buffer_out[0] = WRITE_MD_SAVE; // Select write in 8bit Mode
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[7] = 0xCC;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            while ( usb_buffer_in[6] != 0xAA)
+            {
+                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+            }
+            address+=32;
+        }
+
+        SDL_Log("SRAM Sucessfully Writted !\n");				
 		}
     return 0;
 	}
