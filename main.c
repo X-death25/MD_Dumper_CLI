@@ -1446,58 +1446,70 @@ int main(int argc, char *argv[])
     }
     else if (opts_choice==2 && write_flash==0)
     {
-        SDL_Log("Write Mode : Erase Flash Data\n");
-        SDL_Log("Launch Flash Erase command ... \n");
-        SDL_Log("Detecting Flash Memory... \n");
-        usb_buffer_out[0] = INFOS_ID;
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
-        manufacturer_id = usb_buffer_in[1];
-        chip_id = usb_buffer_in[3];
-        flash_id = (manufacturer_id<<8) | chip_id;
-        SDL_Log("Flash ID : %04X \n",flash_id);
-
-        switch(flash_id)
+        if ( md_dumper_type == 0 ) // Keep the old detection code for oldest MD Dumper exemple STM32F4 / Blue Pill
         {
-        case 0xBFB6 :
-            SDL_Log("SST Flash use algo number 1 \n");
-            usb_buffer_out[1] = 1;
-            break;
-        case 0xBFB7 :
-            SDL_Log("SST Flash use algo number 1 \n");
-            usb_buffer_out[1] = 1;
-            break;
-        case 0xC2CB :
-            SDL_Log("Macronix Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            break;
-        case 0x20ED :
-            SDL_Log("STMicroelectronics Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            break;
-        default :
-            SDL_Log("Flash use algo number 1 \n");
-            usb_buffer_out[1] = 1;
-            break;
-        }
+            SDL_Log("Write Mode : Erase Flash Data\n");
+            SDL_Log("Launch Flash Erase command ... \n");
+            SDL_Log("Detecting Flash Memory... \n");
+            usb_buffer_out[0] = INFOS_ID;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+            manufacturer_id = usb_buffer_in[1];
+            chip_id = usb_buffer_in[3];
+            flash_id = (manufacturer_id<<8) | chip_id;
+            SDL_Log("Flash ID : %04X \n",flash_id);
 
-        usb_buffer_out[0] = ERASE_MD_FLASH;
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        i=0;
-        while(usb_buffer_in[0]!=0xFF)
-        {
-            SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
-            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-            fflush(stdout);
-            i++;
-            if(i==4)
+            switch(flash_id)
             {
-                i=0;
+            case 0xBFB6 :
+                SDL_Log("SST Flash use algo number 1 \n");
+                usb_buffer_out[1] = 1;
+                break;
+            case 0xBFB7 :
+                SDL_Log("SST Flash use algo number 1 \n");
+                usb_buffer_out[1] = 1;
+                break;
+            case 0xC2CB :
+                SDL_Log("Macronix Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                break;
+            case 0x20ED :
+                SDL_Log("STMicroelectronics Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                break;
+            default :
+                SDL_Log("Flash use algo number 1 \n");
+                usb_buffer_out[1] = 1;
+                break;
             }
+
+            usb_buffer_out[0] = ERASE_MD_FLASH;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            i=0;
+            while(usb_buffer_in[0]!=0xFF)
+            {
+                SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
+                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                fflush(stdout);
+                i++;
+                if(i==4)
+                {
+                    i=0;
+                }
+            }
+            SDL_Log("\n");
+            SDL_Log("\nFlash Erased sucessfully !");
+            fflush(stdout);
         }
-        SDL_Log("\n");
-        SDL_Log("\nFlash Erased sucessfully !");
-        fflush(stdout);
+
+        else  // Erase Flash code for new STM32 board 
+        {
+            SDL_Log("Write Mode : Erase Flash Data\n");
+            SDL_Log("Launch Flash Erase command ... \n");
+            SDL_Log("Detecting Flash Memory... \n");
+            CSV_ReadFlashID();
+        }
+        
     }
     else if (opts_choice==2 && write_flash==1)
     {
@@ -1522,85 +1534,90 @@ int main(int argc, char *argv[])
         address=0;
         i=0;
 
-        while (i<8)
+        if ( md_dumper_type == 0 ) // Keep the old detection code for oldest MD Dumper exemple STM32F4 / Blue Pill
         {
-            usb_buffer_out[0] = READ_MD;
-            usb_buffer_out[1] = address&0xFF ;
-            usb_buffer_out[2] = (address&0xFF00)>>8;
-            usb_buffer_out[3]=(address & 0xFF0000)>>16;
-            usb_buffer_out[4] = 0; // Slow Mode
 
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            libusb_bulk_transfer(handle, 0x82,dump_flash+(64*i),64, &numBytes, 60000);
-            address+=32;
-            i++;
-        }
-
-        SDL_Log("Detecting Flash Memory ID... \n");
-        usb_buffer_out[0] = INFOS_ID;
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
-        manufacturer_id = usb_buffer_in[1];
-        chip_id = usb_buffer_in[3];
-        flash_id = (manufacturer_id<<8) | chip_id;
-        SDL_Log("Flash ID : %04X \n",flash_id);
-
-        switch(flash_id)
-        {
-        case 0xBFB6 :
-            SDL_Log(" SST Flash use algo number 1 \n");
-            usb_buffer_out[1] = 1;
-            flash_algo = 1;
-            break;
-        case 0xBFB7 :
-            SDL_Log("SST Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            flash_algo = 1;
-            break;
-        case 0x20ED :
-            SDL_Log("STMicroelectronics Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            flash_algo = 2;
-            break;
-        case 0xC2CB :
-            SDL_Log("Macronix Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            flash_algo = 2;
-            break;
-        default :
-            SDL_Log("Flash use algo number 2 \n");
-            usb_buffer_out[1] = 2;
-            flash_algo = 2;
-            break;
-        }
-        SDL_Log("Detect if Flash is empty... \n");
-        if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
-        {
-            SDL_Log("Flash is empty !\n");
-        }
-        else
-        {
-            SDL_Log("Flash Memory is not empty \n");
-
-            SDL_Log("Erasing flash with algo %d \n ",flash_algo);
-            usb_buffer_out[0] = ERASE_MD_FLASH;
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            i=0;
-            SDL_Log("ERASE SMD flash in progress...");
-            while(usb_buffer_in[0]!=0xFF)
+            while (i<8)
             {
-                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-                SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
-                fflush(stdout);
+                usb_buffer_out[0] = READ_MD;
+                usb_buffer_out[1] = address&0xFF ;
+                usb_buffer_out[2] = (address&0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4] = 0; // Slow Mode
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                libusb_bulk_transfer(handle, 0x82,dump_flash+(64*i),64, &numBytes, 60000);
+                address+=32;
                 i++;
-                if(i==4)
-                {
-                    i=0;
-                }
             }
 
-            SDL_Log("Flash Erased sucessfully !\n");
-            fflush(stdout);
+            SDL_Log("Detecting Flash Memory ID... \n");
+            usb_buffer_out[0] = INFOS_ID;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+            manufacturer_id = usb_buffer_in[1];
+            chip_id = usb_buffer_in[3];
+            flash_id = (manufacturer_id<<8) | chip_id;
+            SDL_Log("Flash ID : %04X \n",flash_id);
+
+            switch(flash_id)
+            {
+            case 0xBFB6 :
+                SDL_Log(" SST Flash use algo number 1 \n");
+                usb_buffer_out[1] = 1;
+                flash_algo = 1;
+                break;
+            case 0xBFB7 :
+                SDL_Log("SST Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                flash_algo = 1;
+                break;
+            case 0x20ED :
+                SDL_Log("STMicroelectronics Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                flash_algo = 2;
+                break;
+            case 0xC2CB :
+                SDL_Log("Macronix Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                flash_algo = 2;
+                break;
+            default :
+                SDL_Log("Flash use algo number 2 \n");
+                usb_buffer_out[1] = 2;
+                flash_algo = 2;
+                break;
+            }
+
+
+            SDL_Log("Detect if Flash is empty... \n");
+            if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
+            {
+                SDL_Log("Flash is empty !\n");
+            }
+            else
+            {
+                SDL_Log("Flash Memory is not empty \n");
+
+                SDL_Log("Erasing flash with algo %d \n ",flash_algo);
+                usb_buffer_out[0] = ERASE_MD_FLASH;
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                i=0;
+                SDL_Log("ERASE SMD flash in progress...");
+                while(usb_buffer_in[0]!=0xFF)
+                {
+                    libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                    SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
+                    fflush(stdout);
+                    i++;
+                    if(i==4)
+                    {
+                        i=0;
+                    }
+                }
+                SDL_Log("Flash Erased sucessfully !\n");
+                fflush(stdout);
+            }
         }
         myfile = fopen(filename,"rb");
         fseek(myfile,0,SEEK_END);
