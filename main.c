@@ -282,10 +282,6 @@ extern unsigned char chip_id=0;
 extern unsigned short flash_id=0;
 extern unsigned long i=0;
 
-//Subsource for Flash
-
-#include "flashlist.h"
-#include "flashlist.c"
 
 int main(int argc, char *argv[])
 {
