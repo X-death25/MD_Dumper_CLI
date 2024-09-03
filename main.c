@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     unsigned char flash_algo=0;
     const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_QUIET); //Display informations on console on quiet mode
+    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_APPLICATION); //Display informations on console
 
     if (strcmp(argv[1], "-help") == 0)
     {
