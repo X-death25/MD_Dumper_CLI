@@ -61,6 +61,7 @@ jobs:
         
         cd ..
         mkdir Windows_Build
+        cp -dR LICENSE ./Windows_Build
         cp *.csv ./Windows_Build
         cp -dR images ./Windows_Build
         cp -dR MD_Dumper_GUI.bat ./Windows_Build/
