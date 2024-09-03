@@ -775,6 +775,10 @@ int main(int argc, char *argv[])
     {
         SDL_Log("MD Dumper type : SMD ARM TQFP100 Aligned  \n");
     }
+       if ( md_dumper_type == 4 )
+    {
+        SDL_Log("MD Dumper type : Marv17 aligned tqfp44  \n");
+    }
     SDL_Log("Hardware Firmware version : %d.%d\n", usb_buffer_in[20],usb_buffer_in[21]);
 
     //Init Lib CSV
