@@ -289,6 +289,11 @@ extern unsigned long i=0;
 
 int main(int argc, char *argv[])
 {
+    // LibUSB specific var
+
+    int res                      = 0;        /* return codes from libusb functions */
+    int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
+    unsigned long len            = 0;        /* Number of bytes transferred. */
 
     // MD Dumper Var
     unsigned char md_dumper_type=0;
