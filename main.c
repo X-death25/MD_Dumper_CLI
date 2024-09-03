@@ -115,7 +115,6 @@ unsigned char txt_csv_flash_name[11+1];
 unsigned char txt_csv_man_name[18+1];
 unsigned char txt_csv_voltage[2+1];
 unsigned char csv_voltage=0;
-
 unsigned char flash_algo=0;
 
 FILE *fp2;
@@ -268,30 +267,24 @@ unsigned int trim(unsigned char * buf, unsigned char is_out)
     return 0;
 }
 
-// Extern global var
-
-
-extern unsigned long address=0;
-extern unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
-extern libusb_device_handle* handle = 0;        /* handle for USB device */
-extern int numBytes                 = 0;        /* Actual bytes transferred. */
-extern unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
-extern unsigned short rom_id=0;
-extern unsigned char manufacturer_id=0;
-extern unsigned char chip_id=0;
-extern unsigned short flash_id=0;
-extern unsigned long i=0;
 
 
 int main(int argc, char *argv[])
 {
-    // LibUSB specific var
+      // LibUSB Specific Var
 
     int res                      = 0;        /* return codes from libusb functions */
     int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
     unsigned long len            = 0;        /* Number of bytes transferred. */
+    unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
+    libusb_device_handle* handle = 0;        /* handle for USB device */
+    int numBytes                 = 0;        /* Actual bytes transferred. */
+    unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
 
     // MD Dumper Var
+	
+	unsigned long address=0;
+    unsigned long i=0;
     unsigned char md_dumper_type=0;
     unsigned long j=0;
     unsigned char *buffer_header = NULL;
