@@ -5,6 +5,8 @@ Function to read flash id and set & return correct algo
 X-death
 */
 
+#include <SDL.h>				//Main Library files
+
 CSV_ReadFlashID(void)
 
 {
