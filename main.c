@@ -24,6 +24,7 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 #include <libusb.h>				//Library for detecting the MD Dumper device
 
 //Read CSV Files
+
 #include "csv.h"
 #include "csv.c"
 
@@ -236,20 +237,29 @@ unsigned int trim(unsigned char * buf, unsigned char is_out)
     return 0;
 }
 
+// Extern global var
+
+
+extern unsigned long address=0;
+extern unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
+extern libusb_device_handle* handle = 0;        /* handle for USB device */
+extern int numBytes                 = 0;        /* Actual bytes transferred. */
+extern unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
+extern unsigned short rom_id=0;
+extern unsigned char manufacturer_id=0;
+extern unsigned char chip_id=0;
+extern unsigned short flash_id=0;
+extern unsigned long i=0;
+
+//Subsource for Flash
+
+#include "flashlist.h"
+#include "flashlist.c"
+
 int main(int argc, char *argv[])
 {
-    // LibUSB Specific Var
-    int res                      = 0;        /* return codes from libusb functions */
-    int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
-    unsigned long len            = 0;        /* Number of bytes transferred. */
-    unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
-    libusb_device_handle* handle = 0;        /* handle for USB device */
-    int numBytes                 = 0;        /* Actual bytes transferred. */
-    unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
 
     // MD Dumper Var
-    unsigned long address=0;
-    unsigned long i=0;
     unsigned char md_dumper_type=0;
     unsigned long j=0;
     unsigned char *buffer_header = NULL;
@@ -280,15 +290,11 @@ int main(int argc, char *argv[])
     unsigned char NumberOfBank=0;
     unsigned char ActualBank=0;
     unsigned long offset=0;
-
-    unsigned char manufacturer_id=0;
-    unsigned char chip_id=0;
-    unsigned short rom_id=0;
     unsigned short flash_id=0;
     unsigned char flash_algo=0;
     const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE); //Display informations on console
+    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 
     if (strcmp(argv[1], "-help") == 0)
     {
