@@ -1503,6 +1503,7 @@ int main(int argc, char *argv[])
 
         else  // Erase Flash code for new STM32 board 
         {
+            SDL_Log("Execute Erase code V2\n");
             SDL_Log("Write Mode : Erase Flash Data\n");
             SDL_Log("Launch Flash Erase command ... \n");
             SDL_Log("Detecting Flash Memory... \n");
