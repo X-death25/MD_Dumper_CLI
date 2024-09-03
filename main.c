@@ -90,6 +90,37 @@ unsigned char csv_save_type=0;
 char txt_save_size[2];
 unsigned char csv_save_size=0;
 
+// csv Flashlist specific Variable
+
+
+#define CHIPID_TEXT_SIZE 48 // taille de toute la chaine
+#define TEXT_SIZE2 48
+
+int current_row2 = 0;
+int current_col2 = 0;
+int non_empty_cells_in_col_A2 = 0; // Compteur de cellules non vides en colonne A
+char chipid_text_values[MAX_NON_EMPTY_CELLS][CHIPID_TEXT_SIZE + 1];
+int chipid_text_values_count = 0;
+
+char txt_csv_deviceID[4];
+unsigned short csv_deviceID=0;
+unsigned char txt_csv_flash_size[3+1];
+unsigned char csv_flash_size=0;
+unsigned long flash_size=0;
+unsigned char txt_csv_erase_algo[2+1];
+unsigned char csv_erase_algo=0;
+unsigned char txt_csv_write_algo[2+1];
+unsigned char csv_write_algo=0;
+unsigned char txt_csv_flash_name[11+1];
+unsigned char txt_csv_man_name[18+1];
+unsigned char txt_csv_voltage[2+1];
+unsigned char csv_voltage=0;
+
+unsigned char flash_algo=0;
+
+FILE *fp2;
+struct csv_parser p2;
+
 void cb1(void *s, size_t len, void *data)
 {
     int target_row = 0; // Index basé sur 0 (deuxième ligne a l'index 1)
