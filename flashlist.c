@@ -31,7 +31,7 @@ CSV_ReadFlashID(void)
         chip_id = usb_buffer_in[3];
         flash_id = (manufacturer_id<<8) | chip_id;
 
-        printf("Flash ID : %04X \n",flash_id);
+        SDL_Log("Flash ID : %04X \n",flash_id);
 
 	for (i = 0; i < chipid_text_values_count; i++)
         {
@@ -44,8 +44,8 @@ CSV_ReadFlashID(void)
 		 if ( flash_id == csv_deviceID  )
             {
 				Index_chksm = i;
-				printf("Found chip in CSV Flashlist ! \n");
-				printf("Position in csv table %d \n",i);
+				SDL_Log("Found chip in CSV Flashlist ! \n");
+				SDL_Log("Position in csv table %d \n",i);
 
 				// Flash Size
 				strncpy(txt_csv_flash_size,chipid_text_values[i]+5,3);
@@ -89,20 +89,20 @@ CSV_ReadFlashID(void)
 				txt_csv_man_name[19] = '\0'; // Null-terminate the output string
 				//printf("Chip Manufacturer : %s \n",txt_csv_man_name);
 
-				printf("Memory : %s \n",txt_csv_flash_name);
-				printf("Capacity %ld Ko \n",flash_size);
-				printf("Chip Manufacturer : %s \n",txt_csv_man_name);
-				printf("Chip Voltage %ld V \n",csv_voltage);
-				printf("CSV Erase Algo  %d \n",csv_erase_algo);
-				printf("CSV Write Algo %d \n",csv_write_algo);
+				SDL_Log("Memory : %s \n",txt_csv_flash_name);
+				SDL_Log("Capacity %ld Ko \n",flash_size);
+				SDL_Log("Chip Manufacturer : %s \n",txt_csv_man_name);
+				SDL_Log("Chip Voltage %ld V \n",csv_voltage);
+				SDL_Log("CSV Erase Algo  %d \n",csv_erase_algo);
+				SDL_Log("CSV Write Algo %d \n",csv_write_algo);
 				
 			}
 		  }
 				if  ( flash_id == 0x9090 )
-			{ printf("No compatible Flash detected ! \n");}
+			{ SDL_Log("No compatible Flash detected ! \n");}
 
 				if  ( flash_id == 0x0000 )
-			{ printf("No compatible Flash detected ! \n");}
+			{ SDL_Log("No compatible Flash detected ! \n");}
 			
 
 }
