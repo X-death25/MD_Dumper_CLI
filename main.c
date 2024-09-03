@@ -316,8 +316,11 @@ int main(int argc, char *argv[])
     unsigned char NumberOfBank=0;
     unsigned char ActualBank=0;
     unsigned long offset=0;
+    unsigned short rom_id=0;
     unsigned short flash_id=0;
     unsigned char flash_algo=0;
+    unsigned char chip_id=0;
+    unsigned char manufacturer_id=0;
     const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
