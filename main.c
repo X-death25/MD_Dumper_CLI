@@ -1508,6 +1508,24 @@ int main(int argc, char *argv[])
             SDL_Log("Launch Flash Erase command ... \n");
             SDL_Log("Detecting Flash Memory... \n");
             CSV_ReadFlashID();
+            
+            usb_buffer_out[0] = ERASE_MD_FLASH;
+            usb_buffer_out[1] = csv_erase_algo;
+            SDL_Log("Memory : %s \n",txt_csv_flash_name);
+            SDL_Log("Erase flash with algo %d \n ",csv_erase_algo);
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            i=0;
+             while(usb_buffer_in[0]!=0xFF)
+             {
+                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                SDL_Log("\rERASE SMD flash in progress: %s ", wheel[i]);
+                fflush(stdout);
+                i++;
+                if(i==4)
+                {
+                 i=0;
+                }
+            }
         }
         
     }
