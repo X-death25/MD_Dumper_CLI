@@ -1534,9 +1534,9 @@ int main(int argc, char *argv[])
 	for (i = 0; i < chipid_text_values_count; i++)
         {
 			strncpy(txt_csv_deviceID,chipid_text_values[i],4);
-			//printf(" \n txt chipid value : %s \n",txt_csv_deviceID);
+			SDL_Log(" \n txt chipid value : %s \n",txt_csv_deviceID);
 			csv_deviceID = (unsigned short)strtol(txt_csv_deviceID, NULL, 16);
-			//printf(" \n DEC Device ID value : %ld \n",csv_deviceID);
+			SDL_Log(" \n DEC Device ID value : %ld \n",csv_deviceID);
 		
 			// If found we need to copy all usefull info from CSV to MD dumper Var
 		 if ( flash_id == csv_deviceID  )
