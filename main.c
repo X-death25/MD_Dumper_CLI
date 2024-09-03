@@ -860,6 +860,43 @@ int main(int argc, char *argv[])
     //Afficher le nombre de cellules non vides en colonne A
     SDL_Log("Add : %d Special Games into MD Dumper Database \n", non_empty_cells_in_col_A);
 
+    // open csv flash list File
+
+    if (csv_init(&p2, options) != 0)
+    {
+        SDL_Log("\n\n ERROR Failed to init CSV Parser for Flashlist ...\n");
+        exit(EXIT_FAILURE);
+    }
+    csv_set_quote(&p2,';');
+
+
+    FILE *fp2 = fopen("flashlist.csv", "r");
+    if (!fp)
+    {
+        SDL_Log("\n\n ERROR Can't find flashlist.csv ...\n");
+        return EXIT_FAILURE;
+    }
+
+    char buffer2[BUFFER_SIZE];
+    size_t bytes_read2;
+    while ((bytes_read2 = fread(buffer2, 1, BUFFER_SIZE, fp)) > 0)
+    {
+        if (csv_parse(&p2, buffer2, bytes_read2, cb3, cb4, NULL) != bytes_read2)
+        {
+            SDL_Log("\n\n ERROR while parsing file ...\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    csv_fini(&p, cb1, cb2, NULL);
+    csv_free(&p);
+    fclose(fp);
+
+    SDL_Log("CSV Flashlist file opened sucessfully\n");
+// Afficher le nombre de cellules non vides en colonne A
+    SDL_Log("Add : %d Flash ID into MD Dumper Database \n", non_empty_cells_in_col_A2);
+
+
     //First try to read ROM MD Header
 
     buffer_header = (unsigned char *)malloc(0x200);
