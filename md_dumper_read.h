@@ -43,7 +43,7 @@ int Read_ROM_Auto(void)
 
 int Read_ROM_Manual(void)
 {
-SDL_Log("\n");
+        SDL_Log("\n");
         SDL_Log("Read Mode : Read ROM in manual mode\n");
 
         SDL_Log("Sending command Dump ROM \n");
