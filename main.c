@@ -731,86 +731,9 @@ int main(int argc, char *argv[])
     if(Detect_Device()==1)
         return 1;
     
-    //Init Lib CSV
-
-    if (csv_init(&p, options) != 0)
-    {
-        SDL_Log("\n");
-        SDL_Log("\n");
-        SDL_Log("ERROR Failed to init CSV Parser for Gamelist ...\n");
-        exit(EXIT_FAILURE);
-    }
-    csv_set_quote(&p,';');
-
-    FILE *fp = fopen("gameslist.csv", "r");
-    if (!fp)
-    {
-        SDL_Log("\n");
-        SDL_Log("\n");
-        SDL_Log("ERROR Can't find gamelist.csv ...\n");
-        return EXIT_FAILURE;
-    }
-
-    char buffer[BUFFER_SIZE];
-    size_t bytes_read;
-    while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, fp)) > 0)
-    {
-        if (csv_parse(&p, buffer, bytes_read, cb1, cb2, NULL) != bytes_read)
-        {
-            buffer_header[i]=0x00;
-            SDL_Log("\n");
-            SDL_Log("\n");
-            SDL_Log("ERROR while parsing file ...\n");
-            return EXIT_FAILURE;
-        }
-    }
-    i = 0;
-
-    csv_fini(&p, cb1, cb2, NULL);
-    csv_free(&p);
-    fclose(fp);
-
-    SDL_Log("\n");
-    SDL_Log("CSV Gamelist file opened sucessfully\n");
-    //Afficher le nombre de cellules non vides en colonne A
-    SDL_Log("Add : %d Special Games into MD Dumper Database \n", non_empty_cells_in_col_A);
-
-    // open csv flash list File
-
-    if (csv_init(&p2, options) != 0)
-    {
-        SDL_Log("\n\n ERROR Failed to init CSV Parser for Flashlist ...\n");
-        exit(EXIT_FAILURE);
-    }
-    csv_set_quote(&p2,';');
-
-
-    FILE *fp2 = fopen("flashlist.csv", "r");
-    if (!fp)
-    {
-        SDL_Log("\n\n ERROR Can't find flashlist.csv ...\n");
-        return EXIT_FAILURE;
-    }
-
-    char buffer2[BUFFER_SIZE];
-    size_t bytes_read2;
-    while ((bytes_read2 = fread(buffer2, 1, BUFFER_SIZE, fp)) > 0)
-    {
-        if (csv_parse(&p2, buffer2, bytes_read2, cb3, cb4, NULL) != bytes_read2)
-        {
-            SDL_Log("\n\n ERROR while parsing file ...\n");
-            return EXIT_FAILURE;
-        }
-    }
-
-    csv_fini(&p, cb1, cb2, NULL);
-    csv_free(&p);
-    fclose(fp);
-
-    SDL_Log("CSV Flashlist file opened sucessfully\n");
-// Afficher le nombre de cellules non vides en colonne A
-    SDL_Log("Add : %d Flash ID into MD Dumper Database \n", non_empty_cells_in_col_A2);
-
+    //LibCsv : Init & Open files
+    if(Open_CSV_Files()==1)
+        return 1;
 
     //First try to read ROM MD Header
 
