@@ -33,15 +33,21 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 #include "sfd.c"
 
 // USB Special Command
-#define WAKEUP          0x10	// WakeUP for first STM32 Communication
-#define READ_MD         0x11
-#define READ_MD_SAVE    0x12
-#define WRITE_MD_SAVE   0x13
-#define WRITE_MD_FLASH 	0x14
-#define ERASE_MD_FLASH  0x15
-#define READ_SMS   		0x16
-#define INFOS_ID        0x18
-#define MAPPER_SSF2     0x20
+
+#define WAKEUP             0x10	 // WakeUP for first STM32 Communication
+#define READ_MD            0x11
+#define READ_MD_SAVE       0x12
+#define WRITE_MD_SAVE      0x13
+#define WRITE_MD_FLASH 	   0x14
+#define ERASE_MD_FLASH     0x15
+#define READ_SMS   		   0x16
+#define INFOS_ID           0x18
+#define MAPPER_SSF2        0x20
+#define CREATE_MX_BUFFER   0x60
+#define WRITE_MX_BUFFER    0x61
+#define FLASH_MX_BUFFER    0x62
+#define SECTOR_ERASE       0x64
+#define SEND_FLASH_ALGO    0x65
 
 
 // Version
@@ -306,7 +312,7 @@ unsigned int trim(unsigned char * buf, unsigned char is_out)
 
 int main(int argc, char *argv[])
 {
-      // LibUSB Specific Var
+    // LibUSB Specific Var
 
     int res                      = 0;        /* return codes from libusb functions */
     int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
@@ -317,12 +323,14 @@ int main(int argc, char *argv[])
     unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
 
     // MD Dumper Var
-	
-	unsigned long address=0;
+
+    unsigned long address=0;
     unsigned long i=0;
     unsigned char md_dumper_type=0;
     unsigned long j=0;
+    unsigned long k=0;
     unsigned char *buffer_header = NULL;
+    unsigned char *buffer_rom = NULL;
     char dump_name[64];
     unsigned char region[5];
     char *game_region = NULL;
@@ -407,303 +415,303 @@ int main(int argc, char *argv[])
         SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
 
         while (quit==0)
-			{    		
-			SDL_RenderCopy(renderer, texture, NULL, NULL);
+        {
+            SDL_RenderCopy(renderer, texture, NULL, NULL);
 
-			SDL_SetRenderDrawColor(renderer, 238, 67, 67, 255);
-			switch(opts_choice)				//Create GUI Choice Texture
-				{
-				case 0:						//Read Mode / Game
-					for (int x = 81; x <=86; x++)
-						for (int y = 96; y <=101; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 1:						//Read Mode / Save
-					for (int x = 81; x <=86; x++)
-						for (int y = 275; y <=280; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 2:						//Write Mode / Game
-					for (int x = 593; x <=598; x++)
-						for (int y = 96; y <=101; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 3:						//Write Mode / Save
-					for (int x = 593; x <=598; x++)
-						for (int y = 142; y <=147; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				}
+            SDL_SetRenderDrawColor(renderer, 238, 67, 67, 255);
+            switch(opts_choice)				//Create GUI Choice Texture
+            {
+            case 0:						//Read Mode / Game
+                for (int x = 81; x <=86; x++)
+                    for (int y = 96; y <=101; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 1:						//Read Mode / Save
+                for (int x = 81; x <=86; x++)
+                    for (int y = 275; y <=280; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 2:						//Write Mode / Game
+                for (int x = 593; x <=598; x++)
+                    for (int y = 96; y <=101; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 3:						//Write Mode / Save
+                for (int x = 593; x <=598; x++)
+                    for (int y = 142; y <=147; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
-			SDL_SetRenderDrawColor(renderer, 250, 173, 5, 255);
-			switch(dump_mode)				//Create Mode Texture
-				{
-				case 0:						//Auto Mode
-					for (int x = 26; x <=31; x++)
-						for (int y = 116; y <=121; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 1:						//Manual Mode
-					for (int x = 331; x <=336; x++)
-						for (int y = 116; y <=121; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 2:						//Bankswitch Mode
-					for (int x = 173; x <=178; x++)
-						for (int y = 116; y <=121; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				}
+            SDL_SetRenderDrawColor(renderer, 250, 173, 5, 255);
+            switch(dump_mode)				//Create Mode Texture
+            {
+            case 0:						//Auto Mode
+                for (int x = 26; x <=31; x++)
+                    for (int y = 116; y <=121; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 1:						//Manual Mode
+                for (int x = 331; x <=336; x++)
+                    for (int y = 116; y <=121; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 2:						//Bankswitch Mode
+                for (int x = 173; x <=178; x++)
+                    for (int y = 116; y <=121; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
-			switch(dump_manual_size_opts)	//Create Manual Size Texture
-				{
-				case 0:						//32KB
-					for (int x = 26; x <=31; x++)
-						for (int y = 187; y <=192; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 32;
-					break;
-				case 1:						//64KB
-					for (int x = 146; x <=151; x++)
-						for (int y = 187; y <=192; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 64;
-					break;
-				case 2:						//128KB
-					for (int x = 266; x <=271; x++)
-						for (int y = 187; y <=192; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 128;
-					break;
-				case 3:						//256KB
-					for (int x = 386; x <=391; x++)
-						for (int y = 187; y <=192; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 256;
-					break;
-				case 4:						//512KB
-					for (int x = 26; x <=31; x++)
-						for (int y = 203; y <=208; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 512;
-					break;
-				case 5:						//1024KB
-					for (int x = 146; x <=151; x++)
-						for (int y = 203; y <=208; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 1024;
-					break;
-				case 6:						//2048KB
-					for (int x = 266; x <=271; x++)
-						for (int y = 203; y <=208; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 7:						//4096KB
-					for (int x = 386; x <=391; x++)
-						for (int y = 203; y <=208; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_size = 4096;
-					break;
-				}
+            switch(dump_manual_size_opts)	//Create Manual Size Texture
+            {
+            case 0:						//32KB
+                for (int x = 26; x <=31; x++)
+                    for (int y = 187; y <=192; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 32;
+                break;
+            case 1:						//64KB
+                for (int x = 146; x <=151; x++)
+                    for (int y = 187; y <=192; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 64;
+                break;
+            case 2:						//128KB
+                for (int x = 266; x <=271; x++)
+                    for (int y = 187; y <=192; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 128;
+                break;
+            case 3:						//256KB
+                for (int x = 386; x <=391; x++)
+                    for (int y = 187; y <=192; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 256;
+                break;
+            case 4:						//512KB
+                for (int x = 26; x <=31; x++)
+                    for (int y = 203; y <=208; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 512;
+                break;
+            case 5:						//1024KB
+                for (int x = 146; x <=151; x++)
+                    for (int y = 203; y <=208; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 1024;
+                break;
+            case 6:						//2048KB
+                for (int x = 266; x <=271; x++)
+                    for (int y = 203; y <=208; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 7:						//4096KB
+                for (int x = 386; x <=391; x++)
+                    for (int y = 203; y <=208; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_size = 4096;
+                break;
+            }
 
-			switch(dump_manual_cart_mode_opts)	//Create Manual Cartridge Mode Texture
-				{
-				case 0:						//Mega Drive Mode
-					for (int x = 26; x <=31; x++)
-						for (int y = 245; y <=250; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_cart_mode = 0;
-					break;
-				case 1:						//Master System Mode
-					for (int x = 146; x <=151; x++)
-						for (int y = 245; y <=250; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					manual_game_cart_mode = 1;
-					break;
-				}
+            switch(dump_manual_cart_mode_opts)	//Create Manual Cartridge Mode Texture
+            {
+            case 0:						//Mega Drive Mode
+                for (int x = 26; x <=31; x++)
+                    for (int y = 245; y <=250; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_cart_mode = 0;
+                break;
+            case 1:						//Master System Mode
+                for (int x = 146; x <=151; x++)
+                    for (int y = 245; y <=250; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                manual_game_cart_mode = 1;
+                break;
+            }
 
-			switch(write_flash)				//Create Write Mode Opts Texture
-				{
-				case 1:						//Write Flash
-					for (int x = 538; x <=543; x++)
-						for (int y = 116; y <=121; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 0:						//Erase Flash
-					for (int x = 645; x <=650; x++)
-						for (int y = 116; y <=121; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				}
+            switch(write_flash)				//Create Write Mode Opts Texture
+            {
+            case 1:						//Write Flash
+                for (int x = 538; x <=543; x++)
+                    for (int y = 116; y <=121; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 0:						//Erase Flash
+                for (int x = 645; x <=650; x++)
+                    for (int y = 116; y <=121; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
-			switch(write_save)				//Create Write Mode Opts Texture
-				{
-				case 1:						//Write Save
-					for (int x = 538; x <=543; x++)
-						for (int y = 162; y <=167; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 0:						//Erase Save
-					for (int x = 645; x <=650; x++)
-						for (int y = 162; y <=167; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				}
+            switch(write_save)				//Create Write Mode Opts Texture
+            {
+            case 1:						//Write Save
+                for (int x = 538; x <=543; x++)
+                    for (int y = 162; y <=167; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 0:						//Erase Save
+                for (int x = 645; x <=650; x++)
+                    for (int y = 162; y <=167; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
-			switch(dump_sram_size_opts)		//Memory size opts
-				{
-				case 0:						//Automatic
-					for (int x = 26; x <=31; x++)
-						for (int y = 318; y <=323; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 1:						//8192
-					for (int x = 146; x <=151; x++)
-						for (int y = 318; y <=323; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				case 2:						//32768
-					for (int x = 266; x <=271; x++)
-						for (int y = 318; y <=323; y++)
-							SDL_RenderDrawPoint(renderer, x, y);
-					break;
-				}
+            switch(dump_sram_size_opts)		//Memory size opts
+            {
+            case 0:						//Automatic
+                for (int x = 26; x <=31; x++)
+                    for (int y = 318; y <=323; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 1:						//8192
+                for (int x = 146; x <=151; x++)
+                    for (int y = 318; y <=323; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 2:						//32768
+                for (int x = 266; x <=271; x++)
+                    for (int y = 318; y <=323; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
 
 
-			//Display Texture	
-			SDL_RenderPresent(renderer);
+            //Display Texture
+            SDL_RenderPresent(renderer);
 
-			SDL_GetMouseState(&mouse_x, &mouse_y);
-			SDL_WaitEvent(&event);
+            SDL_GetMouseState(&mouse_x, &mouse_y);
+            SDL_WaitEvent(&event);
 
-			switch (event.type)		//Window Events according to mouse positions and left click on this Window
-				{
-				case SDL_QUIT:
-					quit = 1;
-					SDL_DestroyTexture(texture);
-					SDL_FreeSurface(image);
-					SDL_DestroyRenderer(renderer);
-					SDL_DestroyWindow(window);
-					SDL_Quit();
-					return 1;
-				case SDL_MOUSEBUTTONDOWN:
-					if(mouse_x>=79  && mouse_x<=88) 
-						{
-						if (mouse_y>=94  && mouse_y<=103)
-							opts_choice = 0;						//Read Mode  / Game
-						else if (mouse_y>=273 && mouse_y<=282)
-							opts_choice = 1;						//Read Mode  / Save
-						}				
-					else if(mouse_x>=591 && mouse_x<=600) 
-						{
-						if (mouse_y>=94  && mouse_y<=103)			
-							opts_choice = 2;						//Write Mode / Game
-						else if (mouse_y>=140 && mouse_y<=149)
-							opts_choice = 3;						//Write Mode / Save
-						}
-					else if(mouse_x>=24  && mouse_x<=33 ) 
-						{
-						if (mouse_y>=114 && mouse_y<=123)			
-							dump_mode = 0;							//Automatic Mode
-						else if (mouse_y>=185 && mouse_y<=194)		
-							dump_manual_size_opts = 0;				//32KB
-						else if (mouse_y>=201 && mouse_y<=210)
-							dump_manual_size_opts = 4;				//512KB
-						else if (mouse_y>=243 && mouse_y<=252)
-							dump_manual_cart_mode_opts = 0;			//Mega Drive Cartridge Mode
-						else if (mouse_y>=316 && mouse_y<=325)
-							dump_sram_size_opts = 0;				//Memory Size : Auto
-						}
-					else if(mouse_x>=329 && mouse_x<=338)
-						{
-						if (mouse_y>=114 && mouse_y<=123)
-							dump_mode = 1;							//Manual Mode
-						}
-					else if(mouse_x>=171 && mouse_x<=180)
-						{
-						if (mouse_y>=114 && mouse_y<=123)
-							dump_mode = 2;							//Bankswitch Mode
-						}
-					else if(mouse_x>=144 && mouse_x<=153)
-						{
-						if (mouse_y>=185 && mouse_y<=194)
-							dump_manual_size_opts = 1;				//64KB
-						else if (mouse_y>=201 && mouse_y<=210)
-							dump_manual_size_opts = 5;				//1024KB
-						else if (mouse_y>=243 && mouse_y<=252)			
-							dump_manual_cart_mode_opts = 1;			//Master System Cartridge Mode
-						else if (mouse_y>=316 && mouse_y<=325)
-							dump_sram_size_opts = 1;				//Memory Size : 8192
-						}
-					else if(mouse_x>=264 && mouse_x<=273)
-						{
-						if (mouse_y>=185 && mouse_y<=194)
-							dump_manual_size_opts = 2;				//128KB
-						else if (mouse_y>=201 && mouse_y<=210)
-							dump_manual_size_opts = 6;				//2048KB
-						else if (mouse_y>=316 && mouse_y<=325)
-							dump_sram_size_opts = 2;				//Memory Size : 32768
-						}
-					else if(mouse_x>=384 && mouse_x<=393)
-						{
-						if (mouse_y>=185 && mouse_y<=194)
-							dump_manual_size_opts = 3;				//256KB
-						else if (mouse_y>=201 && mouse_y<=210)
-							dump_manual_size_opts = 7;				//4096KB
-						}
-					else if(mouse_x>=537 && mouse_x<=544)
-						{
-						if (mouse_y>=115 && mouse_y<=122)
-							write_flash = 1;						//Write Flash
-						else if (mouse_y>=161 && mouse_y<=168)
-							write_save = 1;							//Write Save
-						}
-					else if(mouse_x>=644 && mouse_x<=651)
-						{
-						if (mouse_y>=115 && mouse_y<=122)
-							write_flash = 0;						//Erase Flash
-						else if (mouse_y>=161 && mouse_y<=168)		
-							write_save = 0;							//Erase Save
-						}
-					else if(mouse_x>=16 && mouse_x<=199)
-						{
-						if(mouse_y>=528 && mouse_y<=559)	//Exit
-							{
-							quit = 1;
-							SDL_DestroyTexture(texture);
-							SDL_FreeSurface(image);
-							SDL_DestroyRenderer(renderer);
-							SDL_DestroyWindow(window);
-							SDL_Quit();
-							return 1;
-							}
-						}
-					else if(mouse_x>=420 && mouse_x<=603)
-						{
-						if(mouse_y>=528 && mouse_y<=559)	//Launch
-							{
-							quit = 1;
-							SDL_DestroyTexture(texture);
-							SDL_FreeSurface(image);
-							SDL_DestroyRenderer(renderer);
-							SDL_DestroyWindow(window);
-							SDL_Quit();
-							break;
-							}
-						}
-					else if(mouse_x>=824 && mouse_x<=1007)
-						{
-						if(mouse_y>=528 && mouse_y<=559)	//Documentation
-							{
-							SDL_Log("Open PDF : TODO\n");
-							}
-						}
-					break;
-				}
-			}
-		}
-	else
+            switch (event.type)		//Window Events according to mouse positions and left click on this Window
+            {
+            case SDL_QUIT:
+                quit = 1;
+                SDL_DestroyTexture(texture);
+                SDL_FreeSurface(image);
+                SDL_DestroyRenderer(renderer);
+                SDL_DestroyWindow(window);
+                SDL_Quit();
+                return 1;
+            case SDL_MOUSEBUTTONDOWN:
+                if(mouse_x>=79  && mouse_x<=88)
+                {
+                    if (mouse_y>=94  && mouse_y<=103)
+                        opts_choice = 0;						//Read Mode  / Game
+                    else if (mouse_y>=273 && mouse_y<=282)
+                        opts_choice = 1;						//Read Mode  / Save
+                }
+                else if(mouse_x>=591 && mouse_x<=600)
+                {
+                    if (mouse_y>=94  && mouse_y<=103)
+                        opts_choice = 2;						//Write Mode / Game
+                    else if (mouse_y>=140 && mouse_y<=149)
+                        opts_choice = 3;						//Write Mode / Save
+                }
+                else if(mouse_x>=24  && mouse_x<=33 )
+                {
+                    if (mouse_y>=114 && mouse_y<=123)
+                        dump_mode = 0;							//Automatic Mode
+                    else if (mouse_y>=185 && mouse_y<=194)
+                        dump_manual_size_opts = 0;				//32KB
+                    else if (mouse_y>=201 && mouse_y<=210)
+                        dump_manual_size_opts = 4;				//512KB
+                    else if (mouse_y>=243 && mouse_y<=252)
+                        dump_manual_cart_mode_opts = 0;			//Mega Drive Cartridge Mode
+                    else if (mouse_y>=316 && mouse_y<=325)
+                        dump_sram_size_opts = 0;				//Memory Size : Auto
+                }
+                else if(mouse_x>=329 && mouse_x<=338)
+                {
+                    if (mouse_y>=114 && mouse_y<=123)
+                        dump_mode = 1;							//Manual Mode
+                }
+                else if(mouse_x>=171 && mouse_x<=180)
+                {
+                    if (mouse_y>=114 && mouse_y<=123)
+                        dump_mode = 2;							//Bankswitch Mode
+                }
+                else if(mouse_x>=144 && mouse_x<=153)
+                {
+                    if (mouse_y>=185 && mouse_y<=194)
+                        dump_manual_size_opts = 1;				//64KB
+                    else if (mouse_y>=201 && mouse_y<=210)
+                        dump_manual_size_opts = 5;				//1024KB
+                    else if (mouse_y>=243 && mouse_y<=252)
+                        dump_manual_cart_mode_opts = 1;			//Master System Cartridge Mode
+                    else if (mouse_y>=316 && mouse_y<=325)
+                        dump_sram_size_opts = 1;				//Memory Size : 8192
+                }
+                else if(mouse_x>=264 && mouse_x<=273)
+                {
+                    if (mouse_y>=185 && mouse_y<=194)
+                        dump_manual_size_opts = 2;				//128KB
+                    else if (mouse_y>=201 && mouse_y<=210)
+                        dump_manual_size_opts = 6;				//2048KB
+                    else if (mouse_y>=316 && mouse_y<=325)
+                        dump_sram_size_opts = 2;				//Memory Size : 32768
+                }
+                else if(mouse_x>=384 && mouse_x<=393)
+                {
+                    if (mouse_y>=185 && mouse_y<=194)
+                        dump_manual_size_opts = 3;				//256KB
+                    else if (mouse_y>=201 && mouse_y<=210)
+                        dump_manual_size_opts = 7;				//4096KB
+                }
+                else if(mouse_x>=537 && mouse_x<=544)
+                {
+                    if (mouse_y>=115 && mouse_y<=122)
+                        write_flash = 1;						//Write Flash
+                    else if (mouse_y>=161 && mouse_y<=168)
+                        write_save = 1;							//Write Save
+                }
+                else if(mouse_x>=644 && mouse_x<=651)
+                {
+                    if (mouse_y>=115 && mouse_y<=122)
+                        write_flash = 0;						//Erase Flash
+                    else if (mouse_y>=161 && mouse_y<=168)
+                        write_save = 0;							//Erase Save
+                }
+                else if(mouse_x>=16 && mouse_x<=199)
+                {
+                    if(mouse_y>=528 && mouse_y<=559)	//Exit
+                    {
+                        quit = 1;
+                        SDL_DestroyTexture(texture);
+                        SDL_FreeSurface(image);
+                        SDL_DestroyRenderer(renderer);
+                        SDL_DestroyWindow(window);
+                        SDL_Quit();
+                        return 1;
+                    }
+                }
+                else if(mouse_x>=420 && mouse_x<=603)
+                {
+                    if(mouse_y>=528 && mouse_y<=559)	//Launch
+                    {
+                        quit = 1;
+                        SDL_DestroyTexture(texture);
+                        SDL_FreeSurface(image);
+                        SDL_DestroyRenderer(renderer);
+                        SDL_DestroyWindow(window);
+                        SDL_Quit();
+                        break;
+                    }
+                }
+                else if(mouse_x>=824 && mouse_x<=1007)
+                {
+                    if(mouse_y>=528 && mouse_y<=559)	//Documentation
+                    {
+                        SDL_Log("Open PDF : TODO\n");
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else
     {
         SDL_Log("\n");
         SDL_Log("----------------------------------------------------------------------------\n");
@@ -810,7 +818,7 @@ int main(int argc, char *argv[])
     {
         SDL_Log("MD Dumper type : SMD ARM TQFP100 Aligned  \n");
     }
-       if ( md_dumper_type == 4 )
+    if ( md_dumper_type == 4 )
     {
         SDL_Log("MD Dumper type : Marv17 aligned tqfp44  \n");
     }
@@ -1103,7 +1111,7 @@ int main(int argc, char *argv[])
             {
                 opts_choice=1;
                 // Vérifier le 3ème argument
-                if (strcmp(argv[3], "0") == 0) 		
+                if (strcmp(argv[3], "0") == 0)
                     dump_sram_size_opts = 0;
                 else if (strcmp(argv[3], "8192") == 0)
                     dump_sram_size_opts = 1;
@@ -1467,11 +1475,11 @@ int main(int argc, char *argv[])
         SDL_Log("Reading in progress...\n");
         timer_start();
         if(dump_sram_size_opts==1)
-			save_size = 8192;
-		else if(dump_sram_size_opts==2)
-			save_size = 32768;
-		else
-			save_size *= 1024;
+            save_size = 8192;
+        else if(dump_sram_size_opts==2)
+            save_size = 32768;
+        else
+            save_size *= 1024;
 
         BufferROM = (unsigned char*)malloc(save_size); // raw buffer
         BufferSAVE = (unsigned char*)malloc((save_size*2)); // raw in 16bit format
@@ -1573,126 +1581,130 @@ int main(int argc, char *argv[])
             fflush(stdout);
         }
 
-        else  // Erase Flash code for new STM32 board 
+        else  // Erase Flash code for new STM32 board
         {
             SDL_Log("Execute Erase code V2\n");
             SDL_Log("Write Mode : Erase Flash Data\n");
             SDL_Log("Launch Flash Erase command ... \n");
             SDL_Log("Detecting Flash Memory... \n");
             address=0;
-        usb_buffer_out[0] = READ_MD;
-        usb_buffer_out[1] = address&0xFF ;
-        usb_buffer_out[2] = (address&0xFF00)>>8;
-        usb_buffer_out[3]=(address & 0xFF0000)>>16;
-        usb_buffer_out[4] = 0; // Slow Mode
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
 
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
 
-        //printf("Flash data at address 0 : 0x%02X \n",usb_buffer_in[0]);
-        //printf("Flash data at address 1 : 0x%02X \n",usb_buffer_in[1]);
-        rom_id = (usb_buffer_in[1]<<8) | usb_buffer_in[0];
+            //printf("Flash data at address 0 : 0x%02X \n",usb_buffer_in[0]);
+            //printf("Flash data at address 1 : 0x%02X \n",usb_buffer_in[1]);
+            rom_id = (usb_buffer_in[1]<<8) | usb_buffer_in[0];
 
-        usb_buffer_out[0] = INFOS_ID;
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+            usb_buffer_out[0] = INFOS_ID;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
 
-        manufacturer_id = usb_buffer_in[1];
-        chip_id = usb_buffer_in[3];
-        flash_id = (manufacturer_id<<8) | chip_id;
+            manufacturer_id = usb_buffer_in[1];
+            chip_id = usb_buffer_in[3];
+            flash_id = (manufacturer_id<<8) | chip_id;
 
-        SDL_Log("Flash ID : %04X \n",flash_id);
+            SDL_Log("Flash ID : %04X \n",flash_id);
 
-	for (i = 0; i < chipid_text_values_count; i++)
-        {
-			strncpy(txt_csv_deviceID,chipid_text_values[i],4);
-			//SDL_Log(" \n txt chipid value : %s \n",txt_csv_deviceID);
-			csv_deviceID = (unsigned short)strtol(txt_csv_deviceID, NULL, 16);
-			//SDL_Log(" \n DEC Device ID value : %ld \n",csv_deviceID);
-		
-			// If found we need to copy all usefull info from CSV to MD dumper Var
-		 if ( flash_id == csv_deviceID  )
+            for (i = 0; i < chipid_text_values_count; i++)
             {
-				Index_chksm = i;
-				SDL_Log("Found chip in CSV Flashlist ! \n");
-				SDL_Log("Position in csv table %d \n",i);
+                strncpy(txt_csv_deviceID,chipid_text_values[i],4);
+                //SDL_Log(" \n txt chipid value : %s \n",txt_csv_deviceID);
+                csv_deviceID = (unsigned short)strtol(txt_csv_deviceID, NULL, 16);
+                //SDL_Log(" \n DEC Device ID value : %ld \n",csv_deviceID);
 
-				// Flash Size
-				strncpy(txt_csv_flash_size,chipid_text_values[i]+5,3);
-				txt_csv_flash_size[4] = '\0'; // Null-terminate the output string
-				//printf("Txt flash size : %s \n",txt_csv_flash_size);
-				csv_flash_size = (unsigned char)strtol(txt_csv_flash_size, NULL, 10);
-				//printf("CSV Flash Size  %d \n",csv_flash_size);
-				flash_size=1024*csv_flash_size;
-				//printf("La valeur de FlashSize est %ld Ko \n",flash_size);
+                // If found we need to copy all usefull info from CSV to MD dumper Var
+                if ( flash_id == csv_deviceID  )
+                {
+                    Index_chksm = i;
+                    SDL_Log("Found chip in CSV Flashlist ! \n");
+                    SDL_Log("Position in csv table %d \n",i);
 
-				// Algo Erase
-				strncpy(txt_csv_erase_algo,chipid_text_values[i]+9,2);
-				txt_csv_erase_algo[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Erase Algo : %s \n",txt_csv_erase_algo);
-				csv_erase_algo = (unsigned char)strtol(txt_csv_erase_algo, NULL, 8);
-				//printf("CSV Erase Algo  %d \n",csv_erase_algo);
+                    // Flash Size
+                    strncpy(txt_csv_flash_size,chipid_text_values[i]+5,3);
+                    txt_csv_flash_size[4] = '\0'; // Null-terminate the output string
+                    //printf("Txt flash size : %s \n",txt_csv_flash_size);
+                    csv_flash_size = (unsigned char)strtol(txt_csv_flash_size, NULL, 10);
+                    //printf("CSV Flash Size  %d \n",csv_flash_size);
+                    flash_size=1024*csv_flash_size;
+                    //printf("La valeur de FlashSize est %ld Ko \n",flash_size);
 
-				// Write Algo
-				strncpy(txt_csv_write_algo,chipid_text_values[i]+12,2);
-				txt_csv_write_algo[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Write Algo  : %s \n",txt_csv_write_algo);
-				csv_write_algo = (unsigned char)strtol(txt_csv_write_algo, NULL, 8);
-				//printf("CSV Write Algo %d \n",csv_write_algo);
+                    // Algo Erase
+                    strncpy(txt_csv_erase_algo,chipid_text_values[i]+9,2);
+                    txt_csv_erase_algo[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Erase Algo : %s \n",txt_csv_erase_algo);
+                    csv_erase_algo = (unsigned char)strtol(txt_csv_erase_algo, NULL, 8);
+                    //printf("CSV Erase Algo  %d \n",csv_erase_algo);
 
-				// Chip Name
-				strncpy(txt_csv_flash_name,chipid_text_values[i]+15,11);
-				txt_csv_flash_name[12] = '\0'; // Null-terminate the output string
-				//printf("Flash Device Reference : %s \n",txt_csv_flash_name);
+                    // Write Algo
+                    strncpy(txt_csv_write_algo,chipid_text_values[i]+12,2);
+                    txt_csv_write_algo[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Write Algo  : %s \n",txt_csv_write_algo);
+                    csv_write_algo = (unsigned char)strtol(txt_csv_write_algo, NULL, 8);
+                    //printf("CSV Write Algo %d \n",csv_write_algo);
 
-				// Voltage
+                    // Chip Name
+                    strncpy(txt_csv_flash_name,chipid_text_values[i]+15,11);
+                    txt_csv_flash_name[12] = '\0'; // Null-terminate the output string
+                    //printf("Flash Device Reference : %s \n",txt_csv_flash_name);
 
-				strncpy(txt_csv_voltage,chipid_text_values[i]+27,2);
-				txt_csv_voltage[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Chip Voltage : %s \n",txt_csv_voltage);
-				csv_voltage = (unsigned char)strtol(txt_csv_voltage, NULL, 8);
-				//printf("CSV Chip Voltage  %d \n",csv_voltage);
+                    // Voltage
 
-				// Manufacturer
+                    strncpy(txt_csv_voltage,chipid_text_values[i]+27,2);
+                    txt_csv_voltage[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Chip Voltage : %s \n",txt_csv_voltage);
+                    csv_voltage = (unsigned char)strtol(txt_csv_voltage, NULL, 8);
+                    //printf("CSV Chip Voltage  %d \n",csv_voltage);
 
-				strncpy(txt_csv_man_name,chipid_text_values[i]+30,18);
-				txt_csv_man_name[19] = '\0'; // Null-terminate the output string
-				//printf("Chip Manufacturer : %s \n",txt_csv_man_name);
+                    // Manufacturer
 
-				SDL_Log("Memory : %s \n",txt_csv_flash_name);
-				SDL_Log("Capacity %ld Ko \n",flash_size);
-				SDL_Log("Chip Manufacturer : %s \n",txt_csv_man_name);
-				SDL_Log("Chip Voltage %ld V \n",csv_voltage);
-				SDL_Log("CSV Erase Algo  %d \n",csv_erase_algo);
-				SDL_Log("CSV Write Algo %d \n",csv_write_algo);
-				
-			}
-		  }
-				if  ( flash_id == 0x9090 )
-			{ SDL_Log("No compatible Flash detected ! \n");}
+                    strncpy(txt_csv_man_name,chipid_text_values[i]+30,18);
+                    txt_csv_man_name[19] = '\0'; // Null-terminate the output string
+                    //printf("Chip Manufacturer : %s \n",txt_csv_man_name);
 
-				if  ( flash_id == 0x0000 )
-			{ SDL_Log("No compatible Flash detected ! \n");}
-            
+                    SDL_Log("Memory : %s \n",txt_csv_flash_name);
+                    SDL_Log("Capacity %ld Ko \n",flash_size);
+                    SDL_Log("Chip Manufacturer : %s \n",txt_csv_man_name);
+                    SDL_Log("Chip Voltage %ld V \n",csv_voltage);
+                    SDL_Log("CSV Erase Algo  %d \n",csv_erase_algo);
+                    SDL_Log("CSV Write Algo %d \n",csv_write_algo);
+
+                }
+            }
+            if  ( flash_id == 0x9090 )
+            {
+                SDL_Log("No compatible Flash detected ! \n");
+            }
+
+            if  ( flash_id == 0x0000 )
+            {
+                SDL_Log("No compatible Flash detected ! \n");
+            }
+
             usb_buffer_out[0] = ERASE_MD_FLASH;
             usb_buffer_out[1] = csv_erase_algo;
             SDL_Log("Memory : %s \n",txt_csv_flash_name);
             SDL_Log("Erase flash with algo %d \n ",csv_erase_algo);
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
             i=0;
-             while(usb_buffer_in[0]!=0xFF)
-             {
+            while(usb_buffer_in[0]!=0xFF)
+            {
                 libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
                 SDL_Log("\rERASE SMD flash in progress: %s ", wheel[i]);
                 fflush(stdout);
                 i++;
                 if(i==4)
                 {
-                 i=0;
+                    i=0;
                 }
             }
         }
-        
+
     }
     else if (opts_choice==2 && write_flash==1)
     {
@@ -1770,260 +1782,50 @@ int main(int argc, char *argv[])
                 usb_buffer_out[1] = 2;
                 flash_algo = 2;
                 break;
-            }
 
-
-            SDL_Log("Detect if Flash is empty... \n");
-            if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
-            {
-                SDL_Log("Flash is empty !\n");
-            }
-            else
-            {
-                SDL_Log("Flash Memory is not empty \n");
-
-                SDL_Log("Erasing flash with algo %d \n ",flash_algo);
-                usb_buffer_out[0] = ERASE_MD_FLASH;
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-                i=0;
-                SDL_Log("ERASE SMD flash in progress...");
-                while(usb_buffer_in[0]!=0xFF)
+                SDL_Log("Detect if Flash is empty... \n");
+                if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
                 {
-                    libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-                    SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
-                    fflush(stdout);
-                    i++;
-                    if(i==4)
-                    {
-                        i=0;
-                    }
+                    SDL_Log("Flash is empty !\n");
                 }
-                SDL_Log("Flash Erased sucessfully !\n");
-                fflush(stdout);
-            }
-        }
-        myfile = fopen(filename,"rb");
-        fseek(myfile,0,SEEK_END);
-        game_size = ftell(myfile);
-        BufferROM = (unsigned char*)malloc(game_size);
-        rewind(myfile);
-        fread(BufferROM, 1, game_size, myfile);
-        fclose(myfile);
-        i=0;
-        address = 0;
-        SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
-        while(i<game_size)
-        {
-            usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
-            usb_buffer_out[1] = address & 0xFF;
-            usb_buffer_out[2] = (address & 0xFF00)>>8;
-            usb_buffer_out[3] = (address & 0xFF0000)>>16;
-
-            if((game_size - i)<54)
-            {
-                usb_buffer_out[4] = (game_size - i); //adjust last packet
-            }
-            else
-            {
-                usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
-            }
-
-            memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)BufferROM +i, usb_buffer_out[4]);
-
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            i += usb_buffer_out[4];
-            address += (usb_buffer_out[4]>>1);
-            new=(100 * i)/game_size;
-            if(new!=old)
-            {
-                old=new;
-                SDL_Log("WRITE SMD flash in progress: %ld%%", new);
-                fflush(stdout);
-            }
-        }
-        printf("SMD flash completed !\n");
-    }
-    else  // MD Dumper New Flash write code
-    {
-            SDL_Log("Execute Flash Write code V2\n");
-            SDL_Log("Write Mode : Erase Flash Data\n");
-            SDL_Log("Launch Flash Erase command ... \n");
-            SDL_Log("Detecting Flash Memory... \n");
-            address=0;
-            i=0;
-         while (i<8)
-        {
-
-            usb_buffer_out[0] = READ_MD;
-            usb_buffer_out[1] = address&0xFF ;
-            usb_buffer_out[2] = (address&0xFF00)>>8;
-            usb_buffer_out[3]=(address & 0xFF0000)>>16;
-            usb_buffer_out[4] = 0; // Slow Mode
-
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            libusb_bulk_transfer(handle, 0x82,dump_flash+(64*i),64, &numBytes, 60000);
-            address+=32;
-            i++;
-        }
-        SDL_Log("Detecting Flash Memory... \n");
-        address=0;
-        usb_buffer_out[0] = READ_MD;
-        usb_buffer_out[1] = address&0xFF ;
-        usb_buffer_out[2] = (address&0xFF00)>>8;
-        usb_buffer_out[3]=(address & 0xFF0000)>>16;
-        usb_buffer_out[4] = 0; // Slow Mode
-
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
-
-        //printf("Flash data at address 0 : 0x%02X \n",usb_buffer_in[0]);
-        //printf("Flash data at address 1 : 0x%02X \n",usb_buffer_in[1]);
-        rom_id = (usb_buffer_in[1]<<8) | usb_buffer_in[0];
-
-        usb_buffer_out[0] = INFOS_ID;
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
-
-        manufacturer_id = usb_buffer_in[1];
-        chip_id = usb_buffer_in[3];
-        flash_id = (manufacturer_id<<8) | chip_id;
-
-        SDL_Log("Flash ID : %04X \n",flash_id);
-
-	for (i = 0; i < chipid_text_values_count; i++)
-        {
-			strncpy(txt_csv_deviceID,chipid_text_values[i],4);
-			//SDL_Log(" \n txt chipid value : %s \n",txt_csv_deviceID);
-			csv_deviceID = (unsigned short)strtol(txt_csv_deviceID, NULL, 16);
-			//SDL_Log(" \n DEC Device ID value : %ld \n",csv_deviceID);
-		
-			// If found we need to copy all usefull info from CSV to MD dumper Var
-		 if ( flash_id == csv_deviceID  )
-            {
-				Index_chksm = i;
-				SDL_Log("Found chip in CSV Flashlist ! \n");
-				SDL_Log("Position in csv table %d \n",i);
-
-				// Flash Size
-				strncpy(txt_csv_flash_size,chipid_text_values[i]+5,3);
-				txt_csv_flash_size[4] = '\0'; // Null-terminate the output string
-				//printf("Txt flash size : %s \n",txt_csv_flash_size);
-				csv_flash_size = (unsigned char)strtol(txt_csv_flash_size, NULL, 10);
-				//printf("CSV Flash Size  %d \n",csv_flash_size);
-				flash_size=1024*csv_flash_size;
-				//printf("La valeur de FlashSize est %ld Ko \n",flash_size);
-
-				// Algo Erase
-				strncpy(txt_csv_erase_algo,chipid_text_values[i]+9,2);
-				txt_csv_erase_algo[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Erase Algo : %s \n",txt_csv_erase_algo);
-				csv_erase_algo = (unsigned char)strtol(txt_csv_erase_algo, NULL, 8);
-				//printf("CSV Erase Algo  %d \n",csv_erase_algo);
-
-				// Write Algo
-				strncpy(txt_csv_write_algo,chipid_text_values[i]+12,2);
-				txt_csv_write_algo[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Write Algo  : %s \n",txt_csv_write_algo);
-				csv_write_algo = (unsigned char)strtol(txt_csv_write_algo, NULL, 8);
-				//printf("CSV Write Algo %d \n",csv_write_algo);
-
-				// Chip Name
-				strncpy(txt_csv_flash_name,chipid_text_values[i]+15,11);
-				txt_csv_flash_name[12] = '\0'; // Null-terminate the output string
-				//printf("Flash Device Reference : %s \n",txt_csv_flash_name);
-
-				// Voltage
-
-				strncpy(txt_csv_voltage,chipid_text_values[i]+27,2);
-				txt_csv_voltage[2] = '\0'; // Null-terminate the output string
-				//printf("Txt Chip Voltage : %s \n",txt_csv_voltage);
-				csv_voltage = (unsigned char)strtol(txt_csv_voltage, NULL, 8);
-				//printf("CSV Chip Voltage  %d \n",csv_voltage);
-
-				// Manufacturer
-
-				strncpy(txt_csv_man_name,chipid_text_values[i]+30,18);
-				txt_csv_man_name[19] = '\0'; // Null-terminate the output string
-				//printf("Chip Manufacturer : %s \n",txt_csv_man_name);
-
-				SDL_Log("Memory : %s \n",txt_csv_flash_name);
-				SDL_Log("Capacity %ld Ko \n",flash_size);
-				SDL_Log("Chip Manufacturer : %s \n",txt_csv_man_name);
-				SDL_Log("Chip Voltage %ld V \n",csv_voltage);
-				SDL_Log("CSV Erase Algo  %d \n",csv_erase_algo);
-				SDL_Log("CSV Write Algo %d \n",csv_write_algo);
-				
-			}
-        }
-
-        // At this point flash ID is known so we can start Write flash with csv algo
-
-        SDL_Log("Memory : %s \n",txt_csv_flash_name);
-        SDL_Log("Detect if Flash is empty... \n");
-        if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
-        {
-            SDL_Log("Flash is empty !\n");
-        }
-        else
-        {
-            SDL_Log("Flash Memory is not empty \n");
-
-            SDL_Log("Erasing flash with algo %d \n ",csv_erase_algo);
-            usb_buffer_out[0] = ERASE_MD_FLASH;
-            usb_buffer_out[1] = csv_erase_algo;
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            i=0;
-            while(usb_buffer_in[0]!=0xFF)
-            {
-                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-                SDL_Log("\rERASE SMD flash in progress: %s ", wheel[i]);
-                fflush(stdout);
-                i++;
-                if(i==4)
+                else
                 {
+                    SDL_Log("Flash Memory is not empty \n");
+
+                    SDL_Log("Erasing flash with algo %d \n ",flash_algo);
+                    usb_buffer_out[0] = ERASE_MD_FLASH;
+                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
                     i=0;
+                    SDL_Log("ERASE SMD flash in progress...");
+                    while(usb_buffer_in[0]!=0xFF)
+                    {
+                        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                        SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
+                        fflush(stdout);
+                        i++;
+                        if(i==4)
+                        {
+                            i=0;
+                        }
+                    }
+                    SDL_Log("Flash Erased sucessfully !\n");
+                    fflush(stdout);
                 }
             }
-
-            SDL_Log("\rERASE SMD flash in progress: 100%%");
-            SDL_Log("\nFlash Erased sucessfully \n");
-            fflush(stdout);
-        }
-         if (csv_write_algo != 5 )
-        {
-
-            SDL_Log(" Please enter rom file name \n ");
-            SDL_Log(" ROM file: ");
-            scanf("%60s", dump_name);
-            myfile = fopen(dump_name,"rb");
+            myfile = fopen(filename,"rb");
             fseek(myfile,0,SEEK_END);
             game_size = ftell(myfile);
-            buffer_rom = (unsigned char*)malloc(game_size);
+            BufferROM = (unsigned char*)malloc(game_size);
             rewind(myfile);
-            fread(buffer_rom, 1, game_size, myfile);
+            fread(BufferROM, 1, game_size, myfile);
             fclose(myfile);
             i=0;
-            j=0;
-            k=0;
+            int new =0;
+            int old =0;
             address = 0;
-
-
-            SDL_Log("Writing flash with algo %d \n ",csv_write_algo);
-
-            // Send correct flah Algo to MD dumper
-
-            usb_buffer_out[0] = SEND_FLASH_ALGO;
-            usb_buffer_out[4] = csv_write_algo;
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            while ( usb_buffer_in[6] != 0xDD)
-            {
-                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
-            }
-
-            timer_start();
+            SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
             while(i<game_size)
             {
-
                 usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
                 usb_buffer_out[1] = address & 0xFF;
                 usb_buffer_out[2] = (address & 0xFF00)>>8;
@@ -2038,124 +1840,334 @@ int main(int argc, char *argv[])
                     usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
                 }
 
-                memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)buffer_rom +i, usb_buffer_out[4]);
+                memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)BufferROM +i, usb_buffer_out[4]);
 
                 libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
                 i += usb_buffer_out[4];
                 address += (usb_buffer_out[4]>>1);
-                SDL_Log("\r WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
+                new=(100 * i)/game_size;
+                if(new!=old)
+                {
+                    old=new;
+                    SDL_Log("WRITE SMD flash in progress: %ld%%", new);
+                    fflush(stdout);
+                }
+            }
+            printf("SMD flash completed !\n");
+        }
+        else  // MD Dumper New Flash write code with CSV
+        {
+            SDL_Log("Execute Flash Write code CSV\n");
+            SDL_Log("Write Mode : Erase Flash Data\n");
+            SDL_Log("Launch Flash Erase command ... \n");
+            SDL_Log("Detecting Flash Memory... \n");
+            address=0;
+            i=0;
+            while (i<8)
+            {
+
+                usb_buffer_out[0] = READ_MD;
+                usb_buffer_out[1] = address&0xFF ;
+                usb_buffer_out[2] = (address&0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4] = 0; // Slow Mode
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                libusb_bulk_transfer(handle, 0x82,dump_flash+(64*i),64, &numBytes, 60000);
+                address+=32;
+                i++;
+            }
+            SDL_Log("Detecting Flash Memory... \n");
+            address=0;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
+
+            //printf("Flash data at address 0 : 0x%02X \n",usb_buffer_in[0]);
+            //printf("Flash data at address 1 : 0x%02X \n",usb_buffer_in[1]);
+            rom_id = (usb_buffer_in[1]<<8) | usb_buffer_in[0];
+
+            usb_buffer_out[0] = INFOS_ID;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+
+            manufacturer_id = usb_buffer_in[1];
+            chip_id = usb_buffer_in[3];
+            flash_id = (manufacturer_id<<8) | chip_id;
+
+            SDL_Log("Flash ID : %04X \n",flash_id);
+
+            for (i = 0; i < chipid_text_values_count; i++)
+            {
+                strncpy(txt_csv_deviceID,chipid_text_values[i],4);
+                //SDL_Log(" \n txt chipid value : %s \n",txt_csv_deviceID);
+                csv_deviceID = (unsigned short)strtol(txt_csv_deviceID, NULL, 16);
+                //SDL_Log(" \n DEC Device ID value : %ld \n",csv_deviceID);
+
+                // If found we need to copy all usefull info from CSV to MD dumper Var
+                if ( flash_id == csv_deviceID  )
+                {
+                    Index_chksm = i;
+                    SDL_Log("Found chip in CSV Flashlist ! \n");
+                    SDL_Log("Position in csv table %d \n",i);
+
+                    // Flash Size
+                    strncpy(txt_csv_flash_size,chipid_text_values[i]+5,3);
+                    txt_csv_flash_size[4] = '\0'; // Null-terminate the output string
+                    //printf("Txt flash size : %s \n",txt_csv_flash_size);
+                    csv_flash_size = (unsigned char)strtol(txt_csv_flash_size, NULL, 10);
+                    //printf("CSV Flash Size  %d \n",csv_flash_size);
+                    flash_size=1024*csv_flash_size;
+                    //printf("La valeur de FlashSize est %ld Ko \n",flash_size);
+
+                    // Algo Erase
+                    strncpy(txt_csv_erase_algo,chipid_text_values[i]+9,2);
+                    txt_csv_erase_algo[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Erase Algo : %s \n",txt_csv_erase_algo);
+                    csv_erase_algo = (unsigned char)strtol(txt_csv_erase_algo, NULL, 8);
+                    //printf("CSV Erase Algo  %d \n",csv_erase_algo);
+
+                    // Write Algo
+                    strncpy(txt_csv_write_algo,chipid_text_values[i]+12,2);
+                    txt_csv_write_algo[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Write Algo  : %s \n",txt_csv_write_algo);
+                    csv_write_algo = (unsigned char)strtol(txt_csv_write_algo, NULL, 8);
+                    //printf("CSV Write Algo %d \n",csv_write_algo);
+
+                    // Chip Name
+                    strncpy(txt_csv_flash_name,chipid_text_values[i]+15,11);
+                    txt_csv_flash_name[12] = '\0'; // Null-terminate the output string
+                    //printf("Flash Device Reference : %s \n",txt_csv_flash_name);
+
+                    // Voltage
+
+                    strncpy(txt_csv_voltage,chipid_text_values[i]+27,2);
+                    txt_csv_voltage[2] = '\0'; // Null-terminate the output string
+                    //printf("Txt Chip Voltage : %s \n",txt_csv_voltage);
+                    csv_voltage = (unsigned char)strtol(txt_csv_voltage, NULL, 8);
+                    //printf("CSV Chip Voltage  %d \n",csv_voltage);
+
+                    // Manufacturer
+
+                    strncpy(txt_csv_man_name,chipid_text_values[i]+30,18);
+                    txt_csv_man_name[19] = '\0'; // Null-terminate the output string
+                    //printf("Chip Manufacturer : %s \n",txt_csv_man_name);
+
+                    SDL_Log("Memory : %s \n",txt_csv_flash_name);
+                    SDL_Log("Capacity %ld Ko \n",flash_size);
+                    SDL_Log("Chip Manufacturer : %s \n",txt_csv_man_name);
+                    SDL_Log("Chip Voltage %ld V \n",csv_voltage);
+                    SDL_Log("CSV Erase Algo  %d \n",csv_erase_algo);
+                    SDL_Log("CSV Write Algo %d \n",csv_write_algo);
+
+                }
+            }
+
+            // At this point flash ID is known so we can start Write flash with csv algo
+
+            SDL_Log("Memory : %s \n",txt_csv_flash_name);
+            SDL_Log("Detect if Flash is empty... \n");
+            if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
+            {
+                SDL_Log("Flash is empty !\n");
+            }
+            else
+            {
+                SDL_Log("Flash Memory is not empty \n");
+
+                SDL_Log("Erasing flash with algo %d \n ",csv_erase_algo);
+                usb_buffer_out[0] = ERASE_MD_FLASH;
+                usb_buffer_out[1] = csv_erase_algo;
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                i=0;
+                while(usb_buffer_in[0]!=0xFF)
+                {
+                    libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                    SDL_Log("\rERASE SMD flash in progress: %s ", wheel[i]);
+                    fflush(stdout);
+                    i++;
+                    if(i==4)
+                    {
+                        i=0;
+                    }
+                }
+
+                SDL_Log("\rERASE SMD flash in progress: 100%%");
+                SDL_Log("\nFlash Erased sucessfully \n");
                 fflush(stdout);
             }
-            SDL_Log("\r SMD flash completed\n");
-            timer_end();
-            timer_show();
-            free(buffer_rom);
-        }
-        if (csv_write_algo == 5 ) // Special Write mode for flash type MX29L3211
-
-        {
-            SDL_Log(" Please enter rom file name \n ");
-            SDL_Log(" ROM file: ");
-            scanf("%60s", dump_name);
-            myfile = fopen(dump_name,"rb");
-            fseek(myfile,0,SEEK_END);
-            game_size = ftell(myfile);
-            buffer_rom = (unsigned char*)malloc(game_size);
-            rewind(myfile);
-            fread(buffer_rom, 1, game_size, myfile);
-            fclose(myfile);
-            i=0;
-            j=0;
-            k=0;
-            address = 0;
-
-            SDL_Log("Writing flash with algo %d \n ",csv_write_algo);
-
-            // Send correct flah Algo to MD dumper
-
-            usb_buffer_out[0] = SEND_FLASH_ALGO;
-            usb_buffer_out[4] = csv_write_algo;
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            while ( usb_buffer_in[6] != 0xDD)
-            {
-                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
-            }
-
-            timer_start();
-
-            // printf("Create MX Buffer...\n");
-            usb_buffer_out[0] = CREATE_MX_BUFFER;
-            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            i=0;
-            while(usb_buffer_in[6]!=0xAA)
-            {
-                libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-            }
-            //  printf("Buffer MX Created sucessfully ! \n");
-
-            while (k < game_size)
+            if (csv_write_algo != 5 )
             {
 
-                // Send ROM To MX Buffer
-                while (j!=8)
+                SDL_Log(" Please enter rom file name \n ");
+                SDL_Log(" ROM file: ");
+                scanf("%60s", dump_name);
+                myfile = fopen(dump_name,"rb");
+                fseek(myfile,0,SEEK_END);
+                game_size = ftell(myfile);
+                buffer_rom = (unsigned char*)malloc(game_size);
+                rewind(myfile);
+                fread(buffer_rom, 1, game_size, myfile);
+                fclose(myfile);
+                i=0;
+                j=0;
+                k=0;
+                address = 0;
+
+
+                SDL_Log("Writing flash with algo %d \n ",csv_write_algo);
+
+                // Send correct flah Algo to MD dumper
+
+                usb_buffer_out[0] = SEND_FLASH_ALGO;
+                usb_buffer_out[4] = csv_write_algo;
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                while ( usb_buffer_in[6] != 0xDD)
+                {
+                    libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+                }
+
+                timer_start();
+                while(i<game_size)
                 {
 
-
-                    // Fill usb out buffer with save data in 8bit
-
-                    for (i=0; i<32; i++)
-                    {
-                        usb_buffer_out[32+i] = buffer_rom [i+k];
-                    }
-                    k=k+32;
-                    i=0;
-
-                    //  printf("Send ROM to MX Buffer...\n");
-                    usb_buffer_out[0] = WRITE_MX_BUFFER; // Select write in 16bit Mode
+                    usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
                     usb_buffer_out[1] = address & 0xFF;
                     usb_buffer_out[2] = (address & 0xFF00)>>8;
                     usb_buffer_out[3] = (address & 0xFF0000)>>16;
-                    usb_buffer_out[6] = j;
-                    j=j+1;
 
-                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 6000);
-                    while(usb_buffer_in[6]!=0xBB)
+                    if((game_size - i)<54)
                     {
-                        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                        usb_buffer_out[4] = (game_size - i); //adjust last packet
+                    }
+                    else
+                    {
+                        usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
                     }
 
+                    memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)buffer_rom +i, usb_buffer_out[4]);
 
+                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                    i += usb_buffer_out[4];
+                    address += (usb_buffer_out[4]>>1);
+                    SDL_Log("\r WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
+                    fflush(stdout);
                 }
-                j=0;
-
-
-                // printf("Flash Buffer in memory...\n");
-                usb_buffer_out[0] = FLASH_MX_BUFFER; // Select write in 16bit Mode
-                usb_buffer_out[1] = address & 0xFF;
-                usb_buffer_out[2] = (address & 0xFF00)>>8;
-                usb_buffer_out[3] = (address & 0xFF0000)>>16;
-
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 6000);
-                while(usb_buffer_in[6]!=0xCC)
-                {
-                    libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-                }
-
-                // printf("Buffer Flashed ! \n");
-
-                address=address+128;
-				SDL_Log("\r Flash ROM in progress: %ld%%", ((200 * (address))/		 (game_size)));
-                fflush(stdout);
+                SDL_Log("\r SMD flash completed\n");
+                timer_end();
+                timer_show();
+                free(buffer_rom);
             }
+            /* if (csv_write_algo == 5 ) // Special Write mode for flash type MX29L3211
 
-            SDL_Log("MX Flashed sucessfully ! \n");
-            timer_end();
-            timer_show();
+             {
+                 SDL_Log(" Please enter rom file name \n ");
+                 SDL_Log(" ROM file: ");
+                 scanf("%60s", dump_name);
+                 myfile = fopen(dump_name,"rb");
+                 fseek(myfile,0,SEEK_END);
+                 game_size = ftell(myfile);
+                 buffer_rom = (unsigned char*)malloc(game_size);
+                 rewind(myfile);
+                 fread(buffer_rom, 1, game_size, myfile);
+                 fclose(myfile);
+                 i=0;
+                 j=0;
+                 k=0;
+                 address = 0;
+
+                 SDL_Log("Writing flash with algo %d \n ",csv_write_algo);
+
+                 // Send correct flah Algo to MD dumper
+
+                 usb_buffer_out[0] = SEND_FLASH_ALGO;
+                 usb_buffer_out[4] = csv_write_algo;
+                 libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                 while ( usb_buffer_in[6] != 0xDD)
+                 {
+                     libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);
+                 }
+
+                 timer_start();
+
+                 // printf("Create MX Buffer...\n");
+                 usb_buffer_out[0] = CREATE_MX_BUFFER;
+                 libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                 i=0;
+                 while(usb_buffer_in[6]!=0xAA)
+                 {
+                     libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                 }
+                 //  printf("Buffer MX Created sucessfully ! \n");
+
+                 while (k < game_size)
+                 {
+
+                     // Send ROM To MX Buffer
+                     while (j!=8)
+                     {
+
+
+                         // Fill usb out buffer with save data in 8bit
+
+                         for (i=0; i<32; i++)
+                         {
+                             usb_buffer_out[32+i] = buffer_rom [i+k];
+                         }
+                         k=k+32;
+                         i=0;
+
+                         //  printf("Send ROM to MX Buffer...\n");
+                         usb_buffer_out[0] = WRITE_MX_BUFFER; // Select write in 16bit Mode
+                         usb_buffer_out[1] = address & 0xFF;
+                         usb_buffer_out[2] = (address & 0xFF00)>>8;
+                         usb_buffer_out[3] = (address & 0xFF0000)>>16;
+                         usb_buffer_out[6] = j;
+                         j=j+1;
+
+                         libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 6000);
+                         while(usb_buffer_in[6]!=0xBB)
+                         {
+                             libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                         }
+
+
+                     }
+                     j=0;
+
+
+                     // printf("Flash Buffer in memory...\n");
+                     usb_buffer_out[0] = FLASH_MX_BUFFER; // Select write in 16bit Mode
+                     usb_buffer_out[1] = address & 0xFF;
+                     usb_buffer_out[2] = (address & 0xFF00)>>8;
+                     usb_buffer_out[3] = (address & 0xFF0000)>>16;
+
+                     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 6000);
+                     while(usb_buffer_in[6]!=0xCC)
+                     {
+                         libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                     }
+
+                     // printf("Buffer Flashed ! \n");
+
+                     address=address+128;
+                     SDL_Log("\r Flash ROM in progress: %ld%%", ((200 * (address))/		 (game_size)));
+                     fflush(stdout);
+                 }
+
+                 SDL_Log("MX Flashed sucessfully ! \n");
+                 timer_end();
+                 timer_show();
+             }*/
         }
-     }
-  }
-    
-    else if (opts_choice==3 && write_save==0)
+    }
+
+    if (opts_choice==3 && write_save==0)
     {
         SDL_Log("Write Mode : Erase Save Data\n");
         SDL_Log("ALL SRAM DATAS WILL BE ERASED ...\n");
