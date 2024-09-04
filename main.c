@@ -377,7 +377,8 @@ int main(int argc, char *argv[])
         SDL_Log("8     8 8   8 wwww 8   8 8b..d8 8     8 8wwP' 8    8wwK'      8b    8     8\n");
         SDL_Log("8     8 888P'      888P' `Y88P' 8     8 8     8888 8  Yb wwww `Y88P 8888 888\n");
         SDL_Log("----------------------------------------------------------------------------\n");
-        SDL_Log("\nRelease : 1.0 alpha \n");
+        SDL_Log("\n");
+        SDL_Log("Release : 1.0 alpha \n");
         SDL_Log("\n");
     }
 
@@ -401,7 +402,7 @@ int main(int argc, char *argv[])
             // Vérifier le deuxième argument
             if (strcmp(argv[2], "a") != 0 && strcmp(argv[2], "b") != 0 && strcmp(argv[2], "m") != 0 && strcmp(argv[2], "s") != 0)
             {
-                SDL_Log("Le mode doit être 'a' (Automatique), 'b' (Bankswitch), 'm' (Manuel) ou 's' (Lecture de la sauvegarde).\n");
+                SDL_Log("You must select 'a' (Auto), 'b' (Bankswitch), 'm' (Manual) or 's' (Read Save).\n");
                 return 1;
             }
 
@@ -449,7 +450,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    SDL_Log("Vous devez écrire une des valeurs suivantes : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
+                    SDL_Log("You must write one of the following values to set the game size : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
                     return 1;
                 }
                 if (strcmp(argv[4], "md") == 0)
@@ -462,7 +463,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    SDL_Log("Vous devez écrire une des valeurs suivantes : md, sms.\n");
+                    SDL_Log("You must write one of the following values to set the cartridge type : md, sms.\n");
                     return 1;
                 }
             }
@@ -483,7 +484,7 @@ int main(int argc, char *argv[])
                     dump_sram_size_opts = 2;
                 else
                 {
-                    SDL_Log("Vous devez écrire une des valeurs suivantes : 0 (Auto), 8192, 32768.\n");
+                    SDL_Log("You must write one of the following values to set the save size  : 0 (Auto), 8192, 32768.\n");
                     return 1;
                 }
             }
@@ -494,7 +495,7 @@ int main(int argc, char *argv[])
             // Vérifier le deuxième argument
             if (strcmp(argv[2], "f") != 0 && strcmp(argv[2], "s") != 0 )
             {
-                SDL_Log("Le mode doit être 'f' (Flash) ou 's' (Sauvegarde).\n");
+                SDL_Log("You must write 'f' (Flash) or 's' (Save).\n");
                 return 1;
             }
 
@@ -532,7 +533,7 @@ int main(int argc, char *argv[])
         //Erreur
         else
         {
-            SDL_Log("Le premier argument doit être -read ou -write.\n");
+            SDL_Log("You must write '-read' or '-write' .\n");
             return 1;
         }
     }
