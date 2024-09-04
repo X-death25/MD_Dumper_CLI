@@ -494,7 +494,9 @@ if (csv_init(&p, options) != 0)
 
     if (csv_init(&p2, options) != 0)
     {
-        SDL_Log("\n\n ERROR Failed to init CSV Parser for Flashlist ...\n");
+        SDL_Log("\n");
+        SDL_Log("\n");
+        SDL_Log(" ERROR Failed to init CSV Parser for Flashlist ...\n");
         exit(EXIT_FAILURE);
     }
     csv_set_quote(&p2,';');
@@ -503,7 +505,9 @@ if (csv_init(&p, options) != 0)
     FILE *fp2 = fopen("flashlist.csv", "r");
     if (!fp)
     {
-        SDL_Log("\n\n ERROR Can't find flashlist.csv ...\n");
+        SDL_Log("\n");
+        SDL_Log("\n");
+        SDL_Log(" ERROR Can't find flashlist.csv ...\n");
         return EXIT_FAILURE;
     }
 
@@ -513,7 +517,9 @@ if (csv_init(&p, options) != 0)
     {
         if (csv_parse(&p2, buffer2, bytes_read2, cb3, cb4, NULL) != bytes_read2)
         {
-            SDL_Log("\n\n ERROR while parsing file ...\n");
+            SDL_Log("\n");
+            SDL_Log("\n");
+            SDL_Log(" ERROR while parsing file ...\n");
             return EXIT_FAILURE;
         }
     }
