@@ -1857,7 +1857,7 @@ int main(int argc, char *argv[])
         }
         else  // MD Dumper New Flash write code with CSV
         {
-            SDL_Log("Execute Flash Write code CSV\n");
+            //SDL_Log("Execute Flash Write code CSV\n");
             SDL_Log("Write Mode : Erase Flash Data\n");
             SDL_Log("Launch Flash Erase command ... \n");
             SDL_Log("Detecting Flash Memory... \n");
