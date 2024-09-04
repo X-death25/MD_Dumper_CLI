@@ -728,135 +728,15 @@ int main(int argc, char *argv[])
     }
 
     //LibUsb : Init & Detect
-    if(Detect_Device()==1)
+    if(Detect_Device()!=0)
         return 1;
     
     //LibCsv : Init & Open files
-    if(Open_CSV_Files()==1)
+    if(Open_CSV_Files()!=0)
         return 1;
 
-    //First try to read ROM MD Header
-
-    buffer_header = (unsigned char *)malloc(0x200);
-    i = 0;
-    address = 0x80;
-
-    // Cleaning header Buffer
-    for (i=0; i<512; i++)
-    {
-        buffer_header[i]=0x00;
-    }
-
-    i = 0;
-
-    while (i<8)
-    {
-        usb_buffer_out[0] = READ_MD;
-        usb_buffer_out[1] = address&0xFF ;
-        usb_buffer_out[2] = (address&0xFF00)>>8;
-        usb_buffer_out[3]=(address & 0xFF0000)>>16;
-        usb_buffer_out[4] = 0; // Slow Mode
-
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
-        address+=32;
-        i++;
-    }
-
-    if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
-    {
-        SDL_Log("\n");
-        SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
-        SDL_Log("\n");
-        SDL_Log(" --- HEADER ---\n");
-        memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
-        trim((unsigned char *)dump_name, 0);
-        SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
-        memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
-        trim((unsigned char *)dump_name, 0);
-
-        SDL_Log(" International: %.*s\n", 48, game_name);
-        SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
-        SDL_Log(" Version: %.*s\n", 14, buffer_header+0x80);
-        memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
-        for(i=0; i<4; i++)
-        {
-            if(region[i]==0x20)
-            {
-                game_region = (char *)malloc(i);
-                memcpy((unsigned char *)game_region, (unsigned char *)buffer_header +0xF0, i);
-                game_region[i] = '\0';
-                break;
-            }
-        }
-
-        if(game_region[0]=='0')
-        {
-            game_region = (char *)malloc(4);
-            memcpy((char *)game_region, (char *)unk, 3);
-            game_region[3] = '\0';
-        }
-
-        SDL_Log(" Region: %s\n", game_region);
-
-        checksum_header = (buffer_header[0x8E]<<8) | buffer_header[0x8F];
-        SDL_Log(" Checksum: %X\n", checksum_header);
-
-        game_size = 1 + ((buffer_header[0xA4]<<24) | (buffer_header[0xA5]<<16) | (buffer_header[0xA6]<<8) | buffer_header[0xA7])/1024;
-        SDL_Log(" Game size: %dKB\n", game_size);
-
-        if((buffer_header[0xB0] + buffer_header[0xB1])!=0x93)
-        {
-            SDL_Log(" Extra Memory : No\n");
-        }
-        else
-        {
-            SDL_Log(" Extra Memory : Yes ");
-            switch(buffer_header[0xB2])
-            {
-            case 0xF0:
-                SDL_Log(" 8bit backup SRAM (even addressing)\n");
-                break;
-            case 0xF8:
-                SDL_Log(" 8bit backup SRAM (odd addressing)\n");
-                break;
-            case 0xB8:
-                SDL_Log(" 8bit volatile SRAM (odd addressing)\n");
-                break;
-            case 0xB0:
-                SDL_Log(" 8bit volatile SRAM (even addressing)\n");
-                break;
-            case 0xE0:
-                SDL_Log(" 16bit backup SRAM\n");
-                break;
-            case 0xA0:
-                SDL_Log(" 16bit volatile SRAM\n");
-                break;
-            case 0xE8:
-                SDL_Log(" Serial EEPROM\n");
-                break;
-            }
-            if ( buffer_header[0xB2] != 0xE0 | buffer_header[0xB2] != 0xA0 ) // 8 bit SRAM
-            {
-                save_size2 = (buffer_header[0xB8]<<24) | (buffer_header[0xB9]<<16) | (buffer_header[0xBA] << 8) | buffer_header[0xBB];
-                save_size1 = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
-
-                save_size = save_size2 - save_size1;
-                save_size = (save_size/1024); // Kb format
-                save_size=(save_size/2) + 1; // 8bit size
-            }
-            save_address = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
-            SDL_Log(" Save size: %dKb\n", save_size);
-            SDL_Log(" Save address: %lX\n", save_address);
-
-            if(usb_buffer_in[0xB2]==0xE8) // EEPROM Game
-            {
-                SDL_Log(" No information on this game!\n");
-            }
-        }
-    }
-
-
+    //Read Game Header/Infos
+    Game_Header_Infos();
 
     // Vérifier le nombre d'arguments
     if(use_gui==0)						//Vérifier que nous utilisons le mode CLI
