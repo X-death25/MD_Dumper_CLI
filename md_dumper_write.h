@@ -664,7 +664,7 @@ int Erase_RAM(void)
         return 0;
 }
 
-int Write_SRAM(void)
+int Write_RAM(void)
 {
 SDL_Log("Write Mode : Write Save Data\n");
         sfd_Options opt =
