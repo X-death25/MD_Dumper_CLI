@@ -2152,8 +2152,8 @@ int main(int argc, char *argv[])
             timer_end();
             timer_show();
         }
-
-    }
+     }
+  }
     
     else if (opts_choice==3 && write_save==0)
     {
