@@ -96,8 +96,7 @@ unsigned char csv_save_type=0;
 char txt_save_size[2];
 unsigned char csv_save_size=0;
 
-// csv Flashlist specific Variable
-
+//CSV Flashlist specific Variables
 
 #define CHIPID_TEXT_SIZE 48 // taille de toute la chaine
 #define TEXT_SIZE2 48
@@ -125,6 +124,59 @@ unsigned char flash_algo=0;
 
 FILE *fp2;
 struct csv_parser p2;
+
+// LibUSB Specific Var
+
+int res                      = 0;        /* return codes from libusb functions */
+int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
+unsigned long len            = 0;        /* Number of bytes transferred. */
+unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
+libusb_device_handle* handle = 0;        /* handle for USB device */
+int numBytes                 = 0;        /* Actual bytes transferred. */
+unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
+
+// MD Dumper Var
+
+unsigned long address=0;
+unsigned long i=0;
+unsigned long j=0;
+unsigned long k=0;
+unsigned char md_dumper_type=0;
+char dump_name[64];
+unsigned char region[5];
+char *game_region = NULL;
+const char unk[] = {"unknown"};
+int checksum_header = 0;
+int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
+int opts_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
+int dump_mode=0; 						/* 0=Auto, 1=Manual, 2=Bankswitch */
+int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
+int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
+int write_flash=1;				 		/* 1=Write, 0=Erase */
+int write_save=1;				 		/* 1=Write, 0=Erase */
+int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
+int game_size=0;
+int manual_game_size=0;
+int manual_game_cart_mode=0;
+unsigned long save_size1 = 0;
+unsigned long save_size2 = 0;
+unsigned long save_size = 0;
+unsigned long save_address = 0;
+unsigned char *BufferROM;
+unsigned char *BufferSAVE;
+char empty_flash[512];
+char dump_flash[512];
+FILE *myfile;
+unsigned char NumberOfBank=0;
+unsigned char ActualBank=0;
+unsigned long offset=0;
+unsigned short rom_id=0;
+unsigned short flash_id=0;
+unsigned char flash_algo=0;
+unsigned char chip_id=0;
+unsigned char manufacturer_id=0;
+const char * wheel[] = { "-","\\","|","/"}; //erase wheel
+
 
 void cb1(void *s, size_t len, void *data)
 {
@@ -312,60 +364,6 @@ unsigned int trim(unsigned char * buf, unsigned char is_out)
 
 int main(int argc, char *argv[])
 {
-    // LibUSB Specific Var
-
-    int res                      = 0;        /* return codes from libusb functions */
-    int kernelDriverDetached     = 0;        /* Set to 1 if kernel driver detached */
-    unsigned long len            = 0;        /* Number of bytes transferred. */
-    unsigned char usb_buffer_out[64] = {0};  /* 64 byte transfer buffer OUT */
-    libusb_device_handle* handle = 0;        /* handle for USB device */
-    int numBytes                 = 0;        /* Actual bytes transferred. */
-    unsigned char usb_buffer_in[64] = {0};   /* 64 byte transfer buffer IN */
-
-    // MD Dumper Var
-
-    unsigned long address=0;
-    unsigned long i=0;
-    unsigned char md_dumper_type=0;
-    unsigned long j=0;
-    unsigned long k=0;
-    unsigned char *buffer_header = NULL;
-    unsigned char *buffer_rom = NULL;
-    char dump_name[64];
-    unsigned char region[5];
-    char *game_region = NULL;
-    const char unk[] = {"unknown"};
-    int checksum_header = 0;
-    int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
-    int opts_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
-    int dump_mode=0; 						/* 0=Auto, 1=Manual, 2=Bankswitch */
-    int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
-    int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
-    int write_flash=1;				 		/* 1=Write, 0=Erase */
-    int write_save=1;				 		/* 1=Write, 0=Erase */
-    int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
-    int game_size=0;
-    int manual_game_size=0;
-    int manual_game_cart_mode=0;
-    unsigned long save_size1 = 0;
-    unsigned long save_size2 = 0;
-    unsigned long save_size = 0;
-    unsigned long save_address = 0;
-    unsigned char *BufferROM;
-    unsigned char *BufferSAVE;
-    char empty_flash[512];
-    char dump_flash[512];
-    FILE *myfile;
-    unsigned char NumberOfBank=0;
-    unsigned char ActualBank=0;
-    unsigned long offset=0;
-    unsigned short rom_id=0;
-    unsigned short flash_id=0;
-    unsigned char flash_algo=0;
-    unsigned char chip_id=0;
-    unsigned char manufacturer_id=0;
-    const char * wheel[] = { "-","\\","|","/"}; //erase wheel
-
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 
     if (strcmp(argv[1], "-help") == 0)
