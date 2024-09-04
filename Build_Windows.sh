@@ -1,7 +1,7 @@
 #!/bin/bash
 # sudo apt-get install mingw-w64 g++-mingw-w64
 
-cmake -Wno-dev -DINCLUDE_EXTRA_CMAKELISTS=ON -DCMAKE_TOOLCHAIN_FILE=../Toolchain-Ubuntu-mingw64.cmake .
+cmake -Wno-dev -DINCLUDE_EXTRA_CMAKELISTS=ON -DCMAKE_TOOLCHAIN_FILE=./Toolchain-Ubuntu-mingw64.cmake .
 make
 mkdir Windows_Build
 cp -dR Informations.txt ./Windows_Build/
