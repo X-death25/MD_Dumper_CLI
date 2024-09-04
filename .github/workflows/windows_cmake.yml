@@ -56,17 +56,8 @@ jobs:
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: |
-        cd build
-        make
-        
-        cd ..
-        mkdir Windows_Build
-        cp -dR LICENSE ./Windows_Build
-        cp *.csv ./Windows_Build
-        cp -dR images ./Windows_Build
-        cp -dR MD_Dumper_GUI.bat ./Windows_Build/
-        cp ./windows_deps/files/bin/*.dll ./Windows_Build
-        cp -dR ./build/MD_Dumper.exe ./Windows_Build
+        chmod +x ./Build_Windows.sh
+        ./Build_Windows.sh
 
     - uses: actions/upload-artifact@v4
       with:
