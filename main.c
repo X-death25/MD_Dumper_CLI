@@ -2063,7 +2063,7 @@ int main(int argc, char *argv[])
                 timer_show();
                 free(buffer_rom);
             }
-            /* if (csv_write_algo == 5 ) // Special Write mode for flash type MX29L3211
+             if (csv_write_algo == 5 ) // Special Write mode for flash type MX29L3211
 
              {
                  SDL_Log(" Please enter rom file name \n ");
@@ -2163,7 +2163,7 @@ int main(int argc, char *argv[])
                  SDL_Log("MX Flashed sucessfully ! \n");
                  timer_end();
                  timer_show();
-             }*/
+             }
         }
     }
 
