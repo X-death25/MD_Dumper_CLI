@@ -178,8 +178,7 @@ unsigned char chip_id=0;
 unsigned char manufacturer_id=0;
 const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
-//MD Dumper Functions
-#include "md_dumper_read.h"
+//Others Functions
 
 void cb1(void *s, size_t len, void *data)
 {
@@ -363,6 +362,8 @@ unsigned int trim(unsigned char * buf, unsigned char is_out)
     return 0;
 }
 
+//MD Dumper Functions
+#include "md_dumper_read.h"
 
 
 int main(int argc, char *argv[])
