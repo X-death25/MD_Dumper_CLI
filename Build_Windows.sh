@@ -4,7 +4,7 @@
 cmake -Wno-dev -DINCLUDE_EXTRA_CMAKELISTS=ON -DCMAKE_TOOLCHAIN_FILE=../Toolchain-Ubuntu-mingw64.cmake .
 make
 mkdir Windows_Build
-cp -dR LICENSE ./Windows_Build/
+cp -dR Informations.txt ./Windows_Build/
 cp *.csv ./Windows_Build/
 cp MD_Dumper.exe ./Windows_Build/
 cp -dR images ./Windows_Build/
