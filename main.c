@@ -40,7 +40,7 @@ Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 #define WRITE_MD_SAVE      0x13
 #define WRITE_MD_FLASH 	   0x14
 #define ERASE_MD_FLASH     0x15
-#define READ_SMS   		   0x16
+#define READ_SMS           0x16
 #define INFOS_ID           0x18
 #define MAPPER_SSF2        0x20
 #define CREATE_MX_BUFFER   0x60
@@ -141,6 +141,8 @@ unsigned long address=0;
 unsigned long i=0;
 unsigned long j=0;
 unsigned long k=0;
+unsigned char *buffer_header = NULL;
+unsigned char *buffer_rom = NULL;
 unsigned char md_dumper_type=0;
 char dump_name[64];
 unsigned char region[5];
@@ -172,7 +174,6 @@ unsigned char ActualBank=0;
 unsigned long offset=0;
 unsigned short rom_id=0;
 unsigned short flash_id=0;
-unsigned char flash_algo=0;
 unsigned char chip_id=0;
 unsigned char manufacturer_id=0;
 const char * wheel[] = { "-","\\","|","/"}; //erase wheel
