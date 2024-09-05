@@ -52,7 +52,8 @@ int Erase_Flash()
                 }
             }
             SDL_Log("\n");
-            SDL_Log("\nFlash Erased sucessfully !");
+            SDL_Log("\n");
+            SDL_Log("Flash Erased sucessfully !");
             fflush(stdout);
         }
 
@@ -234,7 +235,7 @@ SDL_Log("Write Mode : Write Flash Data\n");
             switch(flash_id)
             {
             case 0xBFB6 :
-                SDL_Log(" SST Flash use algo number 1 \n");
+                SDL_Log("SST Flash use algo number 1 \n");
                 usb_buffer_out[1] = 1;
                 flash_algo = 1;
                 break;
@@ -474,7 +475,8 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 }
 
                 SDL_Log("\rERASE SMD flash in progress: 100%%");
-                SDL_Log("\nFlash Erased sucessfully \n");
+                SDL_Log("\n");
+                SDL_Log("Flash Erased sucessfully \n");
                 fflush(stdout);
             }
             if (csv_write_algo != 5 )
