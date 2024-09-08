@@ -205,8 +205,6 @@ SDL_Log("Write Mode : Write Flash Data\n");
 
         address=0;
         i=0;
-        int new =0;
-        int old =0;
 
         if ( md_dumper_type == 0 ) // Keep the old detection code for oldest MD Dumper exemple STM32F4 / Blue Pill
         {
@@ -299,6 +297,7 @@ SDL_Log("Write Mode : Write Flash Data\n");
             fread(BufferROM, 1, game_size, myfile);
             fclose(myfile);
             i=0;
+
             address = 0;
             SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
             while(i<game_size)
@@ -507,36 +506,31 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 }
 
                 timer_start();
-               while(i<game_size)
-            {
-                usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
-                usb_buffer_out[1] = address & 0xFF;
-                usb_buffer_out[2] = (address & 0xFF00)>>8;
-                usb_buffer_out[3] = (address & 0xFF0000)>>16;
-
-                if((game_size - i)<54)
+                while(i<game_size)
                 {
-                    usb_buffer_out[4] = (game_size - i); //adjust last packet
-                }
-                else
-                {
-                    usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
-                }
+                    usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
+                    usb_buffer_out[1] = address & 0xFF;
+                    usb_buffer_out[2] = (address & 0xFF00)>>8;
+                    usb_buffer_out[3] = (address & 0xFF0000)>>16;
 
-                memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)BufferROM +i, usb_buffer_out[4]);
+                    if((game_size - i)<54)
+                    {
+                        usb_buffer_out[4] = (game_size - i); //adjust last packet
+                    }
+                    else
+                    {
+                        usb_buffer_out[4] = 54; //max 58 bytes - must by pair (word)
+                    }
 
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-                i += usb_buffer_out[4];
-                address += (usb_buffer_out[4]>>1);
-                new=(100 * i)/game_size;
-                if(new!=old)
-                {
-                    old=new;
-                    SDL_Log("WRITE SMD flash in progress: %ld%%", new);
+                    memcpy((unsigned char *)usb_buffer_out +5, (unsigned char *)buffer_rom +i, usb_buffer_out[4]);
+
+                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                    i += usb_buffer_out[4];
+                    address += (usb_buffer_out[4]>>1);
+                    SDL_Log("\r WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
                     fflush(stdout);
                 }
-            }
-            printf("SMD flash completed !\n");
+                SDL_Log("\r SMD flash completed\n");
                 timer_end();
                 timer_show();
                 free(buffer_rom);
