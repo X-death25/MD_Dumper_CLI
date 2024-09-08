@@ -436,6 +436,11 @@ int Detect_Device(void)
         usb_buffer_out[i]=0x00;
     }
     i=0;
+    for (i = 0; i < 512; i++)
+    {
+        empty_flash[i]=0xFF;
+        dump_flash[i]=0xFF;
+    }
 
     usb_buffer_out[0] = WAKEUP;// Affect request to  WakeUP Command
     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0); // Send Packets to Sega Dumper
