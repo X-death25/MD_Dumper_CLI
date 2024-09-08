@@ -6,9 +6,6 @@ X-death - 07/2024
 MD Dumper SDL GUI Version
 Jackobo Le Chocobo (Akina Usagi) - 31/08/2024
 
-- Read mode automatic / manual
-- Read mode bankswitch
-
 */
 
 //Operating System Libraries and variables declarations
