@@ -170,12 +170,12 @@ void Display_Help(char *prog_name)
     SDL_Log("\n");
     SDL_Log("CLI Mode:\n");
     SDL_Log("\n");
-    SDL_Log("  %s -read_rom auto  -  Auto Mode\n", prog_name);
-    SDL_Log("  %s -read_rom bankswitch  -  Bankswitch Mode\n", prog_name);
-    SDL_Log("  %s -read_rom manual (32|64|128|256|512|1024|2048|4096|8192) (gg|md|sms) -  Manual Mode\n", prog_name);
-    SDL_Log("  %s -backup_memory auto  -  Auto Mode\n", prog_name);
-    SDL_Log("  %s -backup_memory bankswitch  -  Bankswitch Mode\n", prog_name);
-    SDL_Log("  %s -backup_memory manual (8192|32768) (serial_spi|serial_i2c|parallel_sram) -  Manual Mode\n", prog_name);
+    SDL_Log("  %s -read auto  -  Auto Mode\n", prog_name);
+    SDL_Log("  %s -read bankswitch  -  Bankswitch Mode\n", prog_name);
+    SDL_Log("  %s -read manual (32|64|128|256|512|1024|2048|4096|8192) (gg|md|sms) -  Manual Mode\n", prog_name);
+    SDL_Log("  %s -backup auto  -  Auto Mode\n", prog_name);
+    SDL_Log("  %s -backup bankswitch  -  Bankswitch Mode\n", prog_name);
+    SDL_Log("  %s -backup manual (8192|32768) (serial_spi|serial_i2c|parallel_sram) -  Manual Mode\n", prog_name);
     SDL_Log("\n");
     SDL_Log("  %s -erase_flash -  Erase Flash Data\n", prog_name);
     SDL_Log("  %s -write_flash -  Write Flash Data\n", prog_name);
