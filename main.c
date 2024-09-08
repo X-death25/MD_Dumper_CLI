@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         SDL_Surface * image2 = IMG_Load("./images/opts_background_read_ram_manual.png");
 		SDL_Surface * image3 = IMG_Load("./images/opts_background_read_rom_manual.png");
 		SDL_Surface * image4 = IMG_Load("./images/opts_background_write_default.png");
-		SDL_Surface * image5 = IMG_Load(".\\images\\opts_background_write_ram.png");
+		SDL_Surface * image5 = IMG_Load("./images/opts_background_write_ram.png");
 #endif
 
         while (quit==0)
