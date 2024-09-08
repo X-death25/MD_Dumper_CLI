@@ -297,7 +297,9 @@ SDL_Log("Write Mode : Write Flash Data\n");
             fread(BufferROM, 1, game_size, myfile);
             fclose(myfile);
             i=0;
-
+			int new =0;
+			int old =0;
+			
             address = 0;
             SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
             while(i<game_size)
