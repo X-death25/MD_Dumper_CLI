@@ -509,7 +509,6 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 timer_start();
                 while(i<game_size)
                 {
-
                     usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
                     usb_buffer_out[1] = address & 0xFF;
                     usb_buffer_out[2] = (address & 0xFF00)>>8;
@@ -540,10 +539,7 @@ SDL_Log("Write Mode : Write Flash Data\n");
              if (csv_write_algo == 5 ) // Special Write mode for flash type MX29L3211
 
              {
-                 SDL_Log(" Please enter rom file name \n ");
-                 SDL_Log(" ROM file: ");
-                 scanf("%60s", dump_name);
-                 myfile = fopen(dump_name,"rb");
+                 myfile = fopen(filename,"rb");
                  fseek(myfile,0,SEEK_END);
                  game_size = ftell(myfile);
                  buffer_rom = (unsigned char*)malloc(game_size);
