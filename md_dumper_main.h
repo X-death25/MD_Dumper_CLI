@@ -136,6 +136,7 @@ int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
 int write_flash=1;				 		/* 1=Write, 0=Erase */
 int write_save=1;				 		/* 1=Write, 0=Erase */
 int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
+int sram_type_opts=0; 					/* 0=serial_spi, 1=serial_i2c, 2=parallel_sram */
 int game_size=0;
 int manual_game_size=0;
 int manual_game_cart_mode=0;
@@ -158,6 +159,27 @@ unsigned char manufacturer_id=0;
 const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 
 //Others Functions
+void Display_Help(char *prog_name)
+{
+    SDL_Log("\n");
+    SDL_Log("How to use the program:\n");
+    SDL_Log("\n");
+    SDL_Log("GUI Mode:\n");
+    SDL_Log("  %s -gui\n", prog_name);
+    SDL_Log("\n");
+    SDL_Log("CLI Mode:\n");
+    SDL_Log("\n");
+    SDL_Log("  %s -read_rom auto  -  Auto Mode\n", prog_name);
+    SDL_Log("  %s -read_rom bankswitch  -  Bankswitch Mode\n", prog_name);
+    SDL_Log("  %s -read_rom manual (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", prog_name);
+    SDL_Log("  %s -backup_memory (0|8192|32768) (serial_spi|serial_i2c|parallel_sram) -  Read Save/Memory Data\n", prog_name);
+    SDL_Log("\n");
+    SDL_Log("  %s -erase_flash -  Erase Flash Data\n", prog_name);
+    SDL_Log("  %s -write_flash -  Write Flash Data\n", prog_name);
+    SDL_Log("  %s -erase_memory (serial_spi|serial_i2c|parallel_sram) -  Erase Save/Memory Data\n", prog_name);
+    SDL_Log("  %s -restore_memory (serial_spi|serial_i2c|parallel_sram) - Write Save/Memory Data\n", prog_name);
+    SDL_Log("\n");
+}
 
 void cb1(void *s, size_t len, void *data)
 {

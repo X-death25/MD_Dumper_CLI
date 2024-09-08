@@ -25,28 +25,14 @@ int main(int argc, char *argv[])
 {
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO); //Display informations on console
 
-    if (strcmp(argv[1], "-help") == 0)
+	if(argc == 1)
+	{
+		Display_Help(argv[0]);
+		return 1;
+	}
+    else if (strcmp(argv[1], "-help") == 0)
     {
-        SDL_Log("\n");
-        SDL_Log("How to use the program:\n");
-        SDL_Log("\n");
-        SDL_Log("GUI Mode:\n");
-        SDL_Log("  %s -gui\n", argv[0]);
-        SDL_Log("\n");
-        SDL_Log("CLI Mode:\n");
-        SDL_Log("\n");
-        SDL_Log("Read Mode:\n");
-        SDL_Log("  %s -read a  -  Auto Mode\n", argv[0]);
-        SDL_Log("  %s -read b  -  Bankswitch Mode\n", argv[0]);
-        SDL_Log("  %s -read m (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", argv[0]);
-        SDL_Log("  %s -read s (0|8192|32768) -  Read Save Data\n", argv[0]);
-        SDL_Log("\n");
-        SDL_Log("Write Mode:\n");
-        SDL_Log("  %s -write f e  -  Erase Flash Memory\n", argv[0]);
-        SDL_Log("  %s -write f w  -  Write Flash Memory\n", argv[0]);
-        SDL_Log("  %s -write s e  -  Erase Save Memory\n", argv[0]);
-        SDL_Log("  %s -write s w  -  Write Save Memory\n", argv[0]);
-        SDL_Log("\n");
+        Display_Help(argv[0]);
         return 1;
     }
 
@@ -233,8 +219,34 @@ int main(int argc, char *argv[])
                         SDL_RenderDrawPoint(renderer, x, y);
                 break;
             }
-
-
+            
+            switch(sram_type_opts)		//Memory type opts
+            {
+            case 0:						//Serial SPI
+                for (int x = 26; x <=31; x++)
+                    for (int y = 356; y <=361; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                for (int x = 538; x <=543; x++)
+                    for (int y = 200; y <=205; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 1:						//Serial I2C
+                for (int x = 146; x <=151; x++)
+                    for (int y = 356; y <=361; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                for (int x = 658; x <=663; x++)
+                    for (int y = 200; y <=205; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            case 2:						//Parallel SRAM
+                for (int x = 266; x <=271; x++)
+                    for (int y = 356; y <=361; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                for (int x = 778; x <=783; x++)
+                    for (int y = 200; y <=205; y++)
+                        SDL_RenderDrawPoint(renderer, x, y);
+                break;
+            }
 
             //Display Texture
             SDL_RenderPresent(renderer);
@@ -279,6 +291,8 @@ int main(int argc, char *argv[])
                         dump_manual_cart_mode_opts = 0;			//Mega Drive Cartridge Mode
                     else if (mouse_y>=316 && mouse_y<=325)
                         dump_sram_size_opts = 0;				//Memory Size : Auto
+                    else if (mouse_y>=354 && mouse_y<=363)
+                        sram_type_opts = 0;						//Memory Type : Serial SPI
                 }
                 else if(mouse_x>=329 && mouse_x<=338)
                 {
@@ -300,6 +314,8 @@ int main(int argc, char *argv[])
                         dump_manual_cart_mode_opts = 1;			//Master System Cartridge Mode
                     else if (mouse_y>=316 && mouse_y<=325)
                         dump_sram_size_opts = 1;				//Memory Size : 8192
+                    else if (mouse_y>=354 && mouse_y<=363)
+                        sram_type_opts = 1;						//Memory Type : Serial I2C
                 }
                 else if(mouse_x>=264 && mouse_x<=273)
                 {
@@ -309,6 +325,8 @@ int main(int argc, char *argv[])
                         dump_manual_size_opts = 6;				//2048KB
                     else if (mouse_y>=316 && mouse_y<=325)
                         dump_sram_size_opts = 2;				//Memory Size : 32768
+                    else if (mouse_y>=354 && mouse_y<=363)
+                        sram_type_opts = 2;						//Memory Type : Parallel SRAM
                 }
                 else if(mouse_x>=384 && mouse_x<=393)
                 {
@@ -323,6 +341,8 @@ int main(int argc, char *argv[])
                         write_flash = 1;						//Write Flash
                     else if (mouse_y>=161 && mouse_y<=168)
                         write_save = 1;							//Write Save
+                    else if (mouse_y>=198 && mouse_y<=206)
+                        sram_type_opts = 0;						//Memory Type : Serial SPI
                 }
                 else if(mouse_x>=644 && mouse_x<=651)
                 {
@@ -330,6 +350,16 @@ int main(int argc, char *argv[])
                         write_flash = 0;						//Erase Flash
                     else if (mouse_y>=161 && mouse_y<=168)
                         write_save = 0;							//Erase Save
+                }
+                else if(mouse_x>=656 && mouse_x<=665)
+                {
+					if (mouse_y>=198 && mouse_y<=206)
+                        sram_type_opts = 1;						//Memory Type : Serial I2C
+                }
+				else if(mouse_x>=776 && mouse_x<=785)
+                {
+					if (mouse_y>=198 && mouse_y<=206)
+                        sram_type_opts = 2;						//Memory Type : Parallel SRAM
                 }
                 else if(mouse_x>=16 && mouse_x<=199)
                 {
@@ -396,26 +426,19 @@ int main(int argc, char *argv[])
     // Vérifier le nombre d'arguments
     if(use_gui==0)						//Vérifier que nous utilisons le mode CLI
     {
-        //Mode Lecture
-        if (strcmp(argv[1], "-read") == 0)
-        {
-            // Vérifier le deuxième argument
-            if (strcmp(argv[2], "a") != 0 && strcmp(argv[2], "b") != 0 && strcmp(argv[2], "m") != 0 && strcmp(argv[2], "s") != 0)
+        //Lecture de la ROM
+        if (strcmp(argv[1], "-read_rom") == 0)
+		{
+            if (strcmp(argv[2], "auto")==0)
             {
-                SDL_Log("You must select 'a' (Auto), 'b' (Bankswitch), 'm' (Manual) or 's' (Read Save).\n");
-                return 1;
-            }
-
-            if (strcmp(argv[2], "a") == 0)
-            {
-                opts_choice=0;    //Mode Auto
+				opts_choice=0;
                 dump_mode=0;
-            }
-            else if (strcmp(argv[2], "m") == 0)					//Mode Manuel
+			}
+			else  if (strcmp(argv[2], "manual")==0)
             {
-                dump_mode=1;
-                opts_choice=0;
-                // Vérifier le 3ème argument
+				opts_choice=0;
+				dump_mode=1;
+                
                 if (strcmp(argv[3], "32") == 0)
                 {
                     manual_game_size = 32;
@@ -453,6 +476,7 @@ int main(int argc, char *argv[])
                     SDL_Log("You must write one of the following values to set the game size : 32, 64, 128, 256, 512, 1024, 2048, 4096.\n");
                     return 1;
                 }
+                
                 if (strcmp(argv[4], "md") == 0)
                 {
                     manual_game_cart_mode = 0;
@@ -466,87 +490,105 @@ int main(int argc, char *argv[])
                     SDL_Log("You must write one of the following values to set the cartridge type : md, sms.\n");
                     return 1;
                 }
-            }
-            else if (strcmp(argv[2], "b") == 0)
+			}
+            else if (strcmp(argv[2], "bankswitch") == 0)
             {
-                dump_mode=2;    //Mode Bankswitch
-                opts_choice=0;
+				opts_choice=0;
+                dump_mode=2;
             }
-            else if (strcmp(argv[2], "s") == 0)
-            {
-                opts_choice=1;
-                // Vérifier le 3ème argument
-                if (strcmp(argv[3], "0") == 0)
-                    dump_sram_size_opts = 0;
-                else if (strcmp(argv[3], "8192") == 0)
-                    dump_sram_size_opts = 1;
-                else if (strcmp(argv[3], "32768") == 0)
-                    dump_sram_size_opts = 2;
-                else
-                {
-                    SDL_Log("You must write one of the following values to set the save size  : 0 (Auto), 8192, 32768.\n");
-                    return 1;
-                }
-            }
+            else
+			{
+                SDL_Log("You must select 'a' (Auto), 'b' (Bankswitch) or 'm' (Manual).\n");
+                return 1;
+			}
         }
-        //Mode Ecriture
-        else if (strcmp(argv[1], "-write") == 0)
-        {
-            // Vérifier le deuxième argument
-            if (strcmp(argv[2], "f") != 0 && strcmp(argv[2], "s") != 0 )
+        else if (strcmp(argv[1], "-backup_memory") == 0)
+		{
+			if (strcmp(argv[2], "0") == 0)
+				dump_sram_size_opts = 0;
+            else if (strcmp(argv[2], "8192") == 0)
+                dump_sram_size_opts = 1;
+            else if (strcmp(argv[2], "32768") == 0)
+                dump_sram_size_opts = 2;
+            else
             {
-                SDL_Log("You must write 'f' (Flash) or 's' (Save).\n");
+                SDL_Log("You must write one of the following values to set the save size  : 0 (Auto), 8192, 32768.\n");
                 return 1;
             }
-
-            if (strcmp(argv[2], "f") == 0)
+            
+            if (strcmp(argv[3], "serial_spi") == 0)
+				sram_type_opts = 0;
+            else if (strcmp(argv[3], "serial_i2c") == 0)
+                sram_type_opts = 1;
+            else if (strcmp(argv[3], "parallel_sram") == 0)
+                sram_type_opts = 2;
+            else
             {
-                // Vérifier le troisième argument
-                if (strcmp(argv[3], "e") == 0 )
-                {
-                    opts_choice=2;
-                    write_flash=0;
-                }
-                else if (strcmp(argv[3], "w") == 0 )
-                {
-                    opts_choice=2;
-                    write_flash=1;
-                }
+                SDL_Log("You must write one of the following values to select the save type : serial_spi, serial_i2c, parallel_sram.\n");
+                return 1;
             }
-            else if (strcmp(argv[2], "s") == 0)
+		}
+        else if (strcmp(argv[1], "-erase_flash") == 0)
+        {
+			opts_choice=2;
+            write_flash=0;
+		}
+		else if (strcmp(argv[1], "-write_flash") == 0)
+        {
+			opts_choice=2;
+            write_flash=1;
+		}
+		else if (strcmp(argv[1], "-erase_memory") == 0)
+        {
+			opts_choice=3;
+            write_save=0;
+            
+            if (strcmp(argv[2], "serial_spi") == 0)
+				sram_type_opts = 0;
+            else if (strcmp(argv[2], "serial_i2c") == 0)
+                sram_type_opts = 1;
+            else if (strcmp(argv[2], "parallel_sram") == 0)
+                sram_type_opts = 2;
+            else
             {
-                // Vérifier le troisième argument
-                if (strcmp(argv[3], "e") == 0 )
-                {
-                    opts_choice=3;
-                    write_save=0;
-                }
-                else if (strcmp(argv[3], "w") == 0 )
-                {
-                    opts_choice=3;
-                    write_save=1;
-                }
+                SDL_Log("You must write one of the following values to select the save type : serial_spi, serial_i2c, parallel_sram.\n");
+                return 1;
             }
-
-
-        }
+		}
+		else if (strcmp(argv[1], "-write_memory") == 0)
+        {
+			opts_choice=3;
+            write_save=0;
+            
+            if (strcmp(argv[2], "serial_spi") == 0)
+				sram_type_opts = 0;
+            else if (strcmp(argv[2], "serial_i2c") == 0)
+                sram_type_opts = 1;
+            else if (strcmp(argv[2], "parallel_sram") == 0)
+                sram_type_opts = 2;
+            else
+            {
+                SDL_Log("You must write one of the following values to select the save type : serial_spi, serial_i2c, parallel_sram.\n");
+                return 1;
+            }
+		}
         //Erreur
         else
         {
-            SDL_Log("You must write '-read' or '-write' .\n");
+            SDL_Log("You must write '-read_rom', '-backup_memory', '-erase_flash', '-write_flash', '-erase_memory' or '-write_memory' .\n");
             return 1;
         }
     }
 
-    if ( dump_mode==0 && opts_choice==0 )										//Mode Automatique
+    if ( dump_mode==0 && opts_choice==0 )
     {
         return Read_ROM_Auto();
     }
-    else if ( dump_mode==1 && opts_choice==0 )								//Mode Manuel
+    else if ( dump_mode==1 && opts_choice==0 )
     {
         return Read_ROM_Manual();
     }
-    else if ( dump_mode==2 && opts_choice==0 )								//Mode Bankswitch
+    else if ( dump_mode==2 && opts_choice==0 )
     {
         return Read_ROM_Bankswitch();
     }

@@ -12,18 +12,18 @@ It allows you to dump Mega Drive cartridges and Master System cartridges (tested
 
 Read mode :
 ```
--read a  :  Auto Mode
--read b  :  Bankswitch Mode
--read m (32|64|128|256|512|1024|2048|4096) (md|sms) :  Manual Mode
--read s (0|8192|32768) :  Read Save Data
+-read_rom auto  :  Auto Mode
+-read_rom bankswitch  :  Bankswitch Mode
+-read_rom manual (32|64|128|256|512|1024|2048|4096) (md|sms) :  Manual Mode
+-backup_memory (0|8192|32768) (serial_spi|serial_i2c|parallel_sram):  Read Save Data
 ```
 
 Write mode :
 ```
--write f e  :  Erase Flash Memory
--write f w  :  Write Flash Memory
--write s e  :  Erase Save Memory
--write s w  :  Write Save Memory
+-erase_flash  :  Erase Flash Memory
+-write_flash  :  Write Flash Memory
+-erase_memory (serial_spi|serial_i2c|parallel_sram) :  Erase Save Memory
+-restore_memory (serial_spi|serial_i2c|parallel_sram)  :  Write Save Memory
 ```
 
 ### GUI Mode
