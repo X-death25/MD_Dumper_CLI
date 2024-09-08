@@ -481,11 +481,7 @@ SDL_Log("Write Mode : Write Flash Data\n");
             }
             if (csv_write_algo != 5 )
             {
-
-                SDL_Log(" Please enter rom file name \n ");
-                SDL_Log(" ROM file: ");
-                scanf("%60s", dump_name);
-                myfile = fopen(dump_name,"rb");
+                myfile = fopen(filename,"rb");
                 fseek(myfile,0,SEEK_END);
                 game_size = ftell(myfile);
                 buffer_rom = (unsigned char*)malloc(game_size);
