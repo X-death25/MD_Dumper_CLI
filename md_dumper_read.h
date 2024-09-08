@@ -49,7 +49,37 @@ int Read_ROM_Manual(void)
         SDL_Log("Sending command Dump ROM \n");
         SDL_Log("Dumping please wait ...\n");
         timer_start();
-        game_size = manual_game_size * 1024;
+        switch(dump_rom_size_opts)
+			{
+			case 0:
+				game_size = 32 * 1024;
+				break;
+			case 1:
+				game_size = 64 * 1024;
+				break;
+			case 2:
+				game_size = 128 * 1024;
+				break;
+			case 3:
+				game_size = 256 * 1024;
+				break;
+			case 4:
+				game_size = 512 * 1024;
+				break;
+			case 5:
+				game_size = 1024 * 1024;
+				break;
+			case 6:
+				game_size = 2048 * 1024;
+				break;
+			case 7:
+				game_size = 4096 * 1024;
+				break;
+			case 8:
+				game_size = 8192 * 1024;
+				break;
+			}
+        
         SDL_Log("\n");
         SDL_Log("Rom Size (Manual Mode) : %ld Ko \n",game_size/1024);
         BufferROM = (unsigned char*)malloc(game_size);
@@ -59,7 +89,11 @@ int Read_ROM_Manual(void)
             BufferROM[i]=0x00;
         }
 
-        if(manual_game_cart_mode==0)						//Mega Drive Mode
+		if(dump_cart_mode_opts==0)						//Game Gear Mode
+        {
+			SDL_Log("Game Gear Mode : ROM dump in progress...\n");
+		}
+        if(dump_cart_mode_opts==1)						//Mega Drive Mode
         {
             address = 0;
             usb_buffer_out[0] = READ_MD;
@@ -84,7 +118,7 @@ int Read_ROM_Manual(void)
             fwrite(BufferROM, 1,game_size, myfile);
             fclose(myfile);
         }
-        else if(manual_game_cart_mode==1)					//Master System Mode
+        else if(dump_cart_mode_opts==2)					//Master System Mode
         {
             address = 0;
             int i=0;
@@ -300,9 +334,21 @@ int Read_ROM_Bankswitch(void)
         return 0;
 }
 
-int Read_RAM(void)
+int Read_RAM_Auto(void)
 {
-        SDL_Log("Read Mode : Read Save Data\n");
+        SDL_Log("Read Mode Auto: Read Save Data\n");
+        SDL_Log("TODO !...\n");
+}
+
+int Read_RAM_Bankswitch(void)
+{
+        SDL_Log("Read Mode Bankswitch: Read Save Data\n");
+        SDL_Log("TODO !...\n");
+}
+
+int Read_RAM_Manual(void)
+{
+        SDL_Log("Read Mode Manual : Read Save Data\n");
         SDL_Log("Reading in progress...\n");
         timer_start();
         if(dump_sram_size_opts==1)

@@ -129,17 +129,18 @@ char *game_region = NULL;
 const char unk[] = {"unknown"};
 int checksum_header = 0;
 int use_gui=0;							/* 0=CLI Mode, 1=GUI Mode */
-int opts_choice=0; 						/* 0=Read Mode / Game, 1=Read Mode / Save, 2=Write Mode / Game, 3=Write Mode / Save */
+
+int gui_tab_mode=0;						/* 0=Read Mode, 1=Write Mode */
+
+int data_type=0;						/* 0=ROM, 1=RAM */
 int dump_mode=0; 						/* 0=Auto, 1=Manual, 2=Bankswitch */
-int dump_manual_size_opts=0; 			/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB */
-int dump_manual_cart_mode_opts=0; 		/* 0=MD MODE, 1=SMS MODE */
-int write_flash=1;				 		/* 1=Write, 0=Erase */
-int write_save=1;				 		/* 1=Write, 0=Erase */
-int dump_sram_size_opts=0; 				/* 0=Automatic, 1=8192, 2=32768 */
-int sram_type_opts=0; 					/* 0=serial_spi, 1=serial_i2c, 2=parallel_sram */
+int dump_rom_size_opts=0; 				/* 0=32KB, 1=64KB, 2=128KB, 3=256KB, 4=512KB, 5=1024KB, 6=2048KB, 7=4096KB, 8=8192KB */
+int dump_cart_mode_opts=0; 				/* 0=GG MODE, 1=MD MODE, 2=SMS MODE */
+int dump_sram_size_opts=0; 				/* 0=8192, 1=32768 */
+int dump_sram_type_opts=0; 				/* 0=parallel_sram, 1=serial_i2c, 2=serial_spi */
+int erase_or_write=0;					/* 0=erase, 1=write */
+
 int game_size=0;
-int manual_game_size=0;
-int manual_game_cart_mode=0;
 unsigned long save_size1 = 0;
 unsigned long save_size2 = 0;
 unsigned long save_size = 0;
@@ -171,8 +172,10 @@ void Display_Help(char *prog_name)
     SDL_Log("\n");
     SDL_Log("  %s -read_rom auto  -  Auto Mode\n", prog_name);
     SDL_Log("  %s -read_rom bankswitch  -  Bankswitch Mode\n", prog_name);
-    SDL_Log("  %s -read_rom manual (32|64|128|256|512|1024|2048|4096) (md|sms) -  Manual Mode\n", prog_name);
-    SDL_Log("  %s -backup_memory (0|8192|32768) (serial_spi|serial_i2c|parallel_sram) -  Read Save/Memory Data\n", prog_name);
+    SDL_Log("  %s -read_rom manual (32|64|128|256|512|1024|2048|4096|8192) (gg|md|sms) -  Manual Mode\n", prog_name);
+    SDL_Log("  %s -backup_memory auto  -  Auto Mode\n", prog_name);
+    SDL_Log("  %s -backup_memory bankswitch  -  Bankswitch Mode\n", prog_name);
+    SDL_Log("  %s -backup_memory manual (8192|32768) (serial_spi|serial_i2c|parallel_sram) -  Manual Mode\n", prog_name);
     SDL_Log("\n");
     SDL_Log("  %s -erase_flash -  Erase Flash Data\n", prog_name);
     SDL_Log("  %s -write_flash -  Write Flash Data\n", prog_name);
