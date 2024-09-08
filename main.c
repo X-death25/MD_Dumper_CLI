@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
     if(use_gui==0)						//Vérifier que nous utilisons le mode CLI
     {
         //Lecture de la ROM
-        if (strcmp(argv[1], "-read_rom") == 0)
+        if (strcmp(argv[1], "-read") == 0)
 		{
             if (strcmp(argv[2], "auto")==0)
             {
@@ -632,7 +632,7 @@ int main(int argc, char *argv[])
                 return 1;
 			}
         }
-        else if (strcmp(argv[1], "-backup_memory") == 0)
+        else if (strcmp(argv[1], "-backup") == 0)
 		{
             if (strcmp(argv[2], "auto")==0)
             {
@@ -741,7 +741,7 @@ int main(int argc, char *argv[])
         //Erreur
         else
         {
-            SDL_Log("You must write '-read_rom', '-backup_memory', '-erase_flash', '-write_flash', '-erase_memory' or '-write_memory' .\n");
+            SDL_Log("You must write '-read', '-backup', '-erase_flash', '-write_flash', '-erase_memory' or '-write_memory' .\n");
             return 1;
         }
     }
