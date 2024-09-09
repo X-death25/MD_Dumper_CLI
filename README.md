@@ -12,10 +12,12 @@ It allows you to dump Mega Drive cartridges and Master System cartridges (tested
 
 Read mode :
 ```
--read_rom auto  :  Auto Mode
--read_rom bankswitch  :  Bankswitch Mode
--read_rom manual (32|64|128|256|512|1024|2048|4096) (md|sms) :  Manual Mode
--backup_memory (0|8192|32768) (serial_spi|serial_i2c|parallel_sram):  Read Save Data
+-read auto  :  Auto Mode
+-read bankswitch  :  Bankswitch Mode
+-read manual (32|64|128|256|512|1024|2048|4096) (gg|md|sms) :  Manual Mode
+-backup auto  :  Auto Mode
+-backup bankswitch  :  Bankswitch Mode
+-backup manual (8192|32768) (serial_spi|serial_i2c|parallel_sram):  Read Save Data
 ```
 
 Write mode :
