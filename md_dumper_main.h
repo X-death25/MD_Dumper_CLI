@@ -580,7 +580,7 @@ void Game_Header_Infos(void)
 
     i = 0;
 	
-	if ( md_dumper_type == 1 )
+	if ( md_dumper_type == 0 )
 	{
 		// Specific detection code for non aligned
 		
