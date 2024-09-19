@@ -123,7 +123,7 @@ unsigned long k=0;
 unsigned char *buffer_header = NULL;
 unsigned char *buffer_rom = NULL;
 unsigned char md_dumper_type=0;
-char dump_name[64];
+unsigned char dump_name[32];
 unsigned char region[5];
 char *game_region = NULL;
 const char unk[] = {"unknown"};
