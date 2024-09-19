@@ -602,12 +602,12 @@ void Game_Header_Infos(void)
             i=0;
             j=0;
 
-            printf("\nDisplaying buffer header \n\n");
+            SDL_Log("\nDisplaying buffer header \n\n");
             for (i = 0; i < 64*8; i++)
             {
-                printf("%02X ",buffer_header[i]);
+                SDL_Log("%02X ",buffer_header[i]);
             	j++;
-            	if (j==16){printf("\n");j=0;}
+            	if (j==16){SDL_Log("\n");j=0;}
             }
 		
 		
