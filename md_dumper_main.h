@@ -579,6 +579,42 @@ void Game_Header_Infos(void)
     }
 
     i = 0;
+	
+	if ( md_dumper_type == 1 )
+	{
+		// Specific detection code for non aligned
+		
+		 while (i<8)
+    {
+        usb_buffer_out[0] = READ_MD;
+        usb_buffer_out[1] = address&0xFF ;
+        usb_buffer_out[2] = (address&0xFF00)>>8;
+        usb_buffer_out[3]=(address & 0xFF0000)>>16;
+        usb_buffer_out[4] = 0; // Slow Mode
+
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
+        address+=32;
+        i++;
+    }
+	
+	 // Affichage du buffer header
+            i=0;
+            j=0;
+
+            printf("\nDisplaying buffer header \n\n");
+            for (i = 0; i < 64*8; i++)
+            {
+                printf("%02X ",buffer_header[i]);
+            	j++;
+            	if (j==16){printf("\n");j=0;}
+            }
+		
+		
+	}
+	
+	else
+  {
 
     while (i<8)
     {
@@ -686,4 +722,5 @@ void Game_Header_Infos(void)
             }
         }
     }
+  }
 }
