@@ -616,8 +616,8 @@ void Game_Header_Infos(void)
         SDL_Log(" --- HEADER ---\n");
 		
 		//Domestic Title
-		memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
-		SDL_Log(" Domestic: %.*s\n", 48, (char *)dump_name);
+		memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header,32);
+		SDL_Log(" Domestic: %.*s\n",32, (char *)dump_name);
 		
 		
 	}
