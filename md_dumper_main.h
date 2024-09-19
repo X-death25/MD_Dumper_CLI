@@ -598,7 +598,7 @@ void Game_Header_Infos(void)
         i++;
     }
 	
-	 // Affichage du buffer header
+	 /*// Affichage du buffer header
             i=0;
             j=0;
 
@@ -608,7 +608,16 @@ void Game_Header_Infos(void)
                 SDL_Log("%02X ",buffer_header[i]);
             	j++;
             	if (j==16){SDL_Log("\n");j=0;}
-            }
+            }*/
+			
+		SDL_Log("\n");
+        SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
+        SDL_Log("\n");
+        SDL_Log(" --- HEADER ---\n");
+		
+		//Domestic Title
+		memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
+		SDL_Log(" Domestic: %.*s\n", 48, (char *)dump_name);
 		
 		
 	}
