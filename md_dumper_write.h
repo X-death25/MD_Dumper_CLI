@@ -297,8 +297,8 @@ SDL_Log("Write Mode : Write Flash Data\n");
             fread(BufferROM, 1, game_size, myfile);
             fclose(myfile);
             i=0;
-			int new =0;
-			int old =0;
+            int new =0;
+            int old =0;
 			
             address = 0;
             SDL_Log("Writing flash with algo %d . In progress...\n ",flash_algo);
@@ -508,6 +508,8 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 }
 
                 timer_start();
+		int new=0;
+		int old=0;
                 while(i<game_size)
                 {
                     usb_buffer_out[0] = WRITE_MD_FLASH; // Select write in 16bit Mode
@@ -529,8 +531,13 @@ SDL_Log("Write Mode : Write Flash Data\n");
                     libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
                     i += usb_buffer_out[4];
                     address += (usb_buffer_out[4]>>1);
-                    SDL_Log("\r WRITE SMD flash in progress: %ld%%", ((100 * i)/game_size));
-                    fflush(stdout);
+		    new=(100 * i)/game_size;
+                    if(new!=old)
+        	    {
+                        old=new;
+                        SDL_Log("WRITE SMD flash in progress: %ld%%", new);
+                        fflush(stdout);
+                    }
                 }
                 SDL_Log("\r SMD flash completed\n");
                 timer_end();
@@ -576,6 +583,8 @@ SDL_Log("Write Mode : Write Flash Data\n");
                  }
                  //  printf("Buffer MX Created sucessfully ! \n");
 
+		 int new=0;
+		 int old=0;
                  while (k < game_size)
                  {
 
@@ -627,8 +636,13 @@ SDL_Log("Write Mode : Write Flash Data\n");
                      // printf("Buffer Flashed ! \n");
 
                      address=address+128;
-                     SDL_Log("\r Flash ROM in progress: %ld%%", ((200 * (address))/		 (game_size)));
-                     fflush(stdout);
+		     new=((200 * (address))/		 (game_size));
+                    if(new!=old)
+        	    {
+                        old=new;
+                        SDL_Log("Flash ROM in progress: %ld%%", new);
+                        fflush(stdout);
+                    }
                  }
 
                  SDL_Log("MX Flashed sucessfully ! \n");
