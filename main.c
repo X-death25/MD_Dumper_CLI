@@ -37,13 +37,14 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "-gui") == 0)
     {
         use_gui=1;
+        int gui_scale=2;
         int quit = 0;
         SDL_Event event;
         int mouse_x, mouse_y;
 
         //Init Window
         SDL_Init(SDL_INIT_VIDEO);
-        SDL_Window * window = SDL_CreateWindow("MD Dumper version 1.0 alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 424, 240, 0);
+        SDL_Window * window = SDL_CreateWindow("MD Dumper version 1.0 alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 424*gui_scale, 240*gui_scale, 0);
         SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
         //Create Background Texture
@@ -97,13 +98,13 @@ int main(int argc, char *argv[])
 				switch(data_type)
 				{
 					case 0: //ROM								
-						for (int x = 224; x <=230; x++)
-							for (int y = 67; y <=73; y++)
+						for (int x = 224*gui_scale; x <=230*gui_scale; x++)
+							for (int y = 67*gui_scale; y <=73*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 					case 1: //RAM
-						for (int x = 270; x <=276; x++)
-							for (int y = 67; y <=73; y++)
+						for (int x = 270*gui_scale; x <=276*gui_scale; x++)
+							for (int y = 67*gui_scale; y <=73*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 				}
@@ -111,13 +112,13 @@ int main(int argc, char *argv[])
 				switch(dump_mode)
 				{
 					case 0: //Auto
-						for (int x = 224; x <=230; x++)
-							for (int y = 84; y <=90; y++)
+						for (int x = 224*gui_scale; x <=230*gui_scale; x++)
+							for (int y = 84*gui_scale; y <=90*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 					case 1: //Manual
-						for (int x = 270; x <=276; x++)
-							for (int y = 84; y <=90; y++)
+						for (int x = 270*gui_scale; x <=276*gui_scale; x++)
+							for (int y = 84*gui_scale; y <=90*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 								
 						switch(data_type)
@@ -126,48 +127,48 @@ int main(int argc, char *argv[])
 								switch(dump_rom_size_opts)
 								{
 									case 0: //32
-										for (int x = 20; x <=26; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 20*gui_scale; x <=26*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 1: //64
-										for (int x = 66; x <=72; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 66*gui_scale; x <=72*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 2: //128
-										for (int x = 112; x <=118; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 112*gui_scale; x <=118*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 3: //256
-										for (int x = 158; x <=164; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 158*gui_scale; x <=164*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 4: //512
-										for (int x = 204; x <=210; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 204*gui_scale; x <=210*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 5: //1024
-										for (int x = 20; x <=26; x++)
-											for (int y = 157; y <=163; y++)
+										for (int x = 20*gui_scale; x <=26*gui_scale; x++)
+											for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 6: //2048
-										for (int x = 66; x <=72; x++)
-											for (int y = 157; y <=163; y++)
+										for (int x = 66*gui_scale; x <=72*gui_scale; x++)
+											for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 7: //4096
-										for (int x = 112; x <=118; x++)
-											for (int y = 157; y <=163; y++)
+										for (int x = 112*gui_scale; x <=118*gui_scale; x++)
+											for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 8: //8192
-										for (int x = 158; x <=164; x++)
-											for (int y = 157; y <=163; y++)
+										for (int x = 158*gui_scale; x <=164*gui_scale; x++)
+											for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 								}
@@ -175,37 +176,37 @@ int main(int argc, char *argv[])
 								switch(dump_cart_mode_opts)
 								{
 									case 0: //GG
-										for (int x = 250; x <=256; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 250*gui_scale; x <=256*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 1: //MD
-										for (int x = 296; x <=302; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 296*gui_scale; x <=302*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 2: //SMS
-										for (int x = 342; x <=348; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 342*gui_scale; x <=348*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 								}
 								break;
 							case 1: //RAM
-								for (int x = 270; x <=276; x++)
-									for (int y = 67; y <=73; y++)
+								for (int x = 270*gui_scale; x <=276*gui_scale; x++)
+									for (int y = 67*gui_scale; y <=73*gui_scale; y++)
 										SDL_RenderDrawPoint(renderer, x, y);
 								
 								switch(dump_sram_size_opts)
 								{
 									case 0: //8192
-										for (int x = 20; x <=26; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 20*gui_scale; x <=26*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 1: //32768
-										for (int x = 66; x <=72; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 66*gui_scale; x <=72*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 								}
@@ -213,18 +214,18 @@ int main(int argc, char *argv[])
 								switch(dump_sram_type_opts)
 								{
 									case 0: //Parallel SRAM
-										for (int x = 250; x <=256; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 250*gui_scale; x <=256*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 1: //Serial I2C
-										for (int x = 342; x <=348; x++)
-											for (int y = 140; y <=146; y++)
+										for (int x = 342*gui_scale; x <=348*gui_scale; x++)
+											for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 									case 2: //Serial SPI
-										for (int x = 250; x <=256; x++)
-											for (int y = 157; y <=163; y++)
+										for (int x = 250*gui_scale; x <=256*gui_scale; x++)
+											for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 												SDL_RenderDrawPoint(renderer, x, y);
 										break;
 								}
@@ -233,8 +234,8 @@ int main(int argc, char *argv[])
 						}		
 						break;		
 					case 2: //Bankswitch
-						for (int x = 329; x <=335; x++)
-							for (int y = 84; y <=90; y++)
+						for (int x = 329*gui_scale; x <=335*gui_scale; x++)
+							for (int y = 84*gui_scale; y <=90*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 				}		
@@ -246,18 +247,18 @@ int main(int argc, char *argv[])
 					switch(dump_sram_type_opts)
 					{
 						case 0: //Parallel SRAM
-							for (int x = 250; x <=256; x++)
-								for (int y = 140; y <=146; y++)
+							for (int x = 250*gui_scale; x <=256*gui_scale; x++)
+								for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 									SDL_RenderDrawPoint(renderer, x, y);
 							break;
 						case 1: //Serial I2C
-							for (int x = 342; x <=348; x++)
-								for (int y = 140; y <=146; y++)
+							for (int x = 342*gui_scale; x <=348*gui_scale; x++)
+								for (int y = 140*gui_scale; y <=146*gui_scale; y++)
 									SDL_RenderDrawPoint(renderer, x, y);
 							break;
 						case 2: //Serial SPI
-							for (int x = 250; x <=256; x++)
-								for (int y = 157; y <=163; y++)
+							for (int x = 250*gui_scale; x <=256*gui_scale; x++)
+								for (int y = 157*gui_scale; y <=163*gui_scale; y++)
 									SDL_RenderDrawPoint(renderer, x, y);
 							break;
 					}
@@ -266,13 +267,13 @@ int main(int argc, char *argv[])
 				switch(erase_or_write)
 				{
 					case 0: //Erase								
-						for (int x = 224; x <=230; x++)
-							for (int y = 67; y <=73; y++)
+						for (int x = 224*gui_scale; x <=230*gui_scale; x++)
+							for (int y = 67*gui_scale; y <=73*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 					case 1: //Write
-						for (int x = 282; x <=288; x++)
-							for (int y = 67; y <=73; y++)
+						for (int x = 282*gui_scale; x <=288*gui_scale; x++)
+							for (int y = 67*gui_scale; y <=73*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 				}	
@@ -280,13 +281,13 @@ int main(int argc, char *argv[])
 				switch(data_type)
 				{
 					case 0: //ROM								
-						for (int x = 224; x <=230; x++)
-							for (int y = 84; y <=90; y++)
+						for (int x = 224*gui_scale; x <=230*gui_scale; x++)
+							for (int y = 84*gui_scale; y <=90*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 					case 1: //RAM
-						for (int x = 282; x <=288; x++)
-							for (int y = 84; y <=90; y++)
+						for (int x = 282*gui_scale; x <=288*gui_scale; x++)
+							for (int y = 84*gui_scale; y <=90*gui_scale; y++)
 								SDL_RenderDrawPoint(renderer, x, y);
 						break;
 				}	
@@ -314,19 +315,19 @@ int main(int argc, char *argv[])
 					return 1;
 				case SDL_MOUSEBUTTONDOWN:
 					
-					if(mouse_x>=18  && mouse_x<=108) 
+					if(mouse_x>=18*gui_scale  && mouse_x<=108*gui_scale) 
 						{
-						if (mouse_y>=46  && mouse_y<=58)
+						if (mouse_y>=46*gui_scale  && mouse_y<=58*gui_scale)
 							gui_tab_mode = 0;
 						}
-					else if(mouse_x>=117  && mouse_x<=207) 
+					else if(mouse_x>=117*gui_scale  && mouse_x<=207*gui_scale) 
 						{
-						if (mouse_y>=46  && mouse_y<=58)
+						if (mouse_y>=46*gui_scale && mouse_y<=58*gui_scale)
 							gui_tab_mode = 1;
 						}
-					else if(mouse_x>=337 && mouse_x<=419)
+					else if(mouse_x>=337*gui_scale && mouse_x<=419*gui_scale)
 						{
-						if(mouse_y>=214 && mouse_y<=235)	//Launch
+						if(mouse_y>=214*gui_scale && mouse_y<=235*gui_scale)	//Launch
 							{
 							quit = 1;
 							SDL_DestroyTexture(texture);
@@ -344,138 +345,138 @@ int main(int argc, char *argv[])
 					
 					if(gui_tab_mode==0 && (dump_mode==0 || dump_mode==2))
 						{
-						if(mouse_x>=222  && mouse_x<=232) 
+						if(mouse_x>=222*gui_scale  && mouse_x<=232*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 0;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 0;
 							}
-						else if(mouse_x>=268  && mouse_x<=278) 
+						else if(mouse_x>=268*gui_scale && mouse_x<=278*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 1;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 1;
 							}
-						else if(mouse_x>=327  && mouse_x<=337) 
+						else if(mouse_x>=327*gui_scale && mouse_x<=337*gui_scale) 
 							{
-							if (mouse_y>=82  && mouse_y<=92)
+							if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 2;
 							}
 						}
 					else if(gui_tab_mode==0 && data_type==1 && dump_mode==1)
 						{
-						if(mouse_x>=222  && mouse_x<=232) 
+						if(mouse_x>=222*gui_scale && mouse_x<=232*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 0;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 0;
 							}
-						else if(mouse_x>=268  && mouse_x<=278) 
+						else if(mouse_x>=268*gui_scale && mouse_x<=278*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 1;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 1;
 							}
-						else if(mouse_x>=327  && mouse_x<=337) 
+						else if(mouse_x>=327*gui_scale && mouse_x<=337*gui_scale) 
 							{
-							if (mouse_y>=82  && mouse_y<=92)
+							if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 2;
 							}
-						else if(mouse_x>=18  && mouse_x<=28) 
+						else if(mouse_x>=18*gui_scale && mouse_x<=28*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_sram_size_opts = 0;
 							}
-						else if(mouse_x>=64  && mouse_x<=74) 
+						else if(mouse_x>=64*gui_scale && mouse_x<=74*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_sram_size_opts = 1;
 							}
 						
-						else if(mouse_x>=248  && mouse_x<=258) 
+						else if(mouse_x>=248*gui_scale && mouse_x<=258*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_sram_type_opts = 0;
-							else if (mouse_y>=155  && mouse_y<=165)
+							else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 								dump_sram_type_opts = 2;
 							}
-						else if(mouse_x>=340  && mouse_x<=350) 
+						else if(mouse_x>=340*gui_scale && mouse_x<=350*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_sram_type_opts = 1;
 							}						
 						}
 					else if(gui_tab_mode==0 && data_type==0 && dump_mode==1)
 						{
-						if(mouse_x>=222  && mouse_x<=232) 
+						if(mouse_x>=222*gui_scale && mouse_x<=232*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 0;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 0;
 							}
-						else if(mouse_x>=268  && mouse_x<=278) 
+						else if(mouse_x>=268*gui_scale && mouse_x<=278*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								data_type = 1;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 1;
 							}
-						else if(mouse_x>=327  && mouse_x<=337) 
+						else if(mouse_x>=327*gui_scale && mouse_x<=337*gui_scale) 
 							{
-							if (mouse_y>=82  && mouse_y<=92)
+							if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								dump_mode = 2;
 							}
-						else if(mouse_x>=18  && mouse_x<=28) 
+						else if(mouse_x>=18*gui_scale && mouse_x<=28*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_rom_size_opts = 0;
-							else if (mouse_y>=155  && mouse_y<=165)
+							else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 								dump_rom_size_opts = 5;
 							}
-						else if(mouse_x>=64  && mouse_x<=74) 
+						else if(mouse_x>=64*gui_scale && mouse_x<=74*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_rom_size_opts = 1;
-							else if (mouse_y>=155  && mouse_y<=165)
+							else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 								dump_rom_size_opts = 6;
 							}
-						else if(mouse_x>=110  && mouse_x<=120) 
+						else if(mouse_x>=110*gui_scale && mouse_x<=120*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_rom_size_opts = 2;
-							else if (mouse_y>=155  && mouse_y<=165)
+							else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 								dump_rom_size_opts = 7;
 							}
-						else if(mouse_x>=156  && mouse_x<=166) 
+						else if(mouse_x>=156*gui_scale && mouse_x<=166*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_rom_size_opts = 3;
-							else if (mouse_y>=155  && mouse_y<=165)
+							else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 								dump_rom_size_opts = 8;
 							}
-						else if(mouse_x>=202  && mouse_x<=212) 
+						else if(mouse_x>=202*gui_scale && mouse_x<=212*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_rom_size_opts = 4;
 							}
-						else if(mouse_x>=248  && mouse_x<=258) 
+						else if(mouse_x>=248*gui_scale && mouse_x<=258*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_cart_mode_opts = 0;
 							}
-						else if(mouse_x>=294  && mouse_x<=304) 
+						else if(mouse_x>=294*gui_scale && mouse_x<=304*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_cart_mode_opts = 1;
 							}
-						else if(mouse_x>=340  && mouse_x<=350) 
+						else if(mouse_x>=340*gui_scale && mouse_x<=350*gui_scale) 
 							{
-							if (mouse_y>=138  && mouse_y<=148)
+							if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 								dump_cart_mode_opts = 2;
 							}
 						}
@@ -483,31 +484,31 @@ int main(int argc, char *argv[])
 						{
 						if(data_type==1)
 							{
-							if(mouse_x>=248  && mouse_x<=258) 
+							if(mouse_x>=248*gui_scale && mouse_x<=258*gui_scale) 
 								{
-								if (mouse_y>=138  && mouse_y<=148)
+								if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 									dump_sram_type_opts = 0;
-								else if (mouse_y>=155  && mouse_y<=165)
+								else if (mouse_y>=155*gui_scale && mouse_y<=165*gui_scale)
 									dump_sram_type_opts = 2;
 								}
-							else if(mouse_x>=340  && mouse_x<=350) 
+							else if(mouse_x>=340*gui_scale && mouse_x<=350*gui_scale) 
 								{
-								if (mouse_y>=138  && mouse_y<=148)
+								if (mouse_y>=138*gui_scale && mouse_y<=148*gui_scale)
 									dump_sram_type_opts = 1;
 								}		
 							}
-						if(mouse_x>=222  && mouse_x<=232) 
+						if(mouse_x>=222*gui_scale && mouse_x<=232*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								erase_or_write = 0;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								data_type = 0;
 							}
-						else if(mouse_x>=280  && mouse_x<=290) 
+						else if(mouse_x>=280*gui_scale && mouse_x<=290*gui_scale) 
 							{
-							if (mouse_y>=65  && mouse_y<=75)
+							if (mouse_y>=65*gui_scale && mouse_y<=75*gui_scale)
 								erase_or_write = 1;
-							else if (mouse_y>=82  && mouse_y<=92)
+							else if (mouse_y>=82*gui_scale && mouse_y<=92*gui_scale)
 								data_type = 1;
 							}
 						}
