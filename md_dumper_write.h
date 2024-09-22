@@ -224,6 +224,35 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 i++;
             }
 
+            SDL_Log("Detect if Flash is empty... \n");
+                if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
+                {
+                    SDL_Log("Flash is empty !\n");
+                }
+                else
+                {
+                    SDL_Log("Flash Memory is not empty \n");
+
+                    SDL_Log("Erasing flash with algo %d \n ",2);
+                    usb_buffer_out[0] = ERASE_MD_FLASH;
+                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                    i=0;
+                    SDL_Log("ERASE SMD flash in progress...");
+                    while(usb_buffer_in[0]!=0xFF)
+                    {
+                        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
+                        SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
+                        fflush(stdout);
+                        i++;
+                        if(i==4)
+                        {
+                            i=0;
+                        }
+                    }
+                    SDL_Log("Flash Erased sucessfully !\n");
+                    fflush(stdout);
+                }
+
             SDL_Log("Detecting Flash Memory ID... \n");
             usb_buffer_out[0] = INFOS_ID;
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
@@ -260,35 +289,6 @@ SDL_Log("Write Mode : Write Flash Data\n");
                 usb_buffer_out[1] = 2;
                 flash_algo = 2;
                 break;
-
-                SDL_Log("Detect if Flash is empty... \n");
-                if(memcmp((char *)dump_flash,(char *)empty_flash,512) == 0)
-                {
-                    SDL_Log("Flash is empty !\n");
-                }
-                else
-                {
-                    SDL_Log("Flash Memory is not empty \n");
-
-                    SDL_Log("Erasing flash with algo %d \n ",flash_algo);
-                    usb_buffer_out[0] = ERASE_MD_FLASH;
-                    libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-                    i=0;
-                    SDL_Log("ERASE SMD flash in progress...");
-                    while(usb_buffer_in[0]!=0xFF)
-                    {
-                        libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 6000);   //wait status
-                        SDL_Log("ERASE SMD flash in progress: %s ", wheel[i]);
-                        fflush(stdout);
-                        i++;
-                        if(i==4)
-                        {
-                            i=0;
-                        }
-                    }
-                    SDL_Log("Flash Erased sucessfully !\n");
-                    fflush(stdout);
-                }
             }
             myfile = fopen(filename,"rb");
             fseek(myfile,0,SEEK_END);
