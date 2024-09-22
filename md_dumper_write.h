@@ -208,6 +208,7 @@ SDL_Log("Write Mode : Write Flash Data\n");
 
         if ( md_dumper_type == 0 ) // Keep the old detection code for oldest MD Dumper exemple STM32F4 / Blue Pill
         {
+            SDL_Log("Write Algo for OLD Version \n");
 
             while (i<8)
             {
