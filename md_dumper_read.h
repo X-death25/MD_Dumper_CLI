@@ -337,7 +337,50 @@ int Read_ROM_Bankswitch(void)
 int Read_RAM_Auto(void)
 {
         SDL_Log("Read Mode Auto: Read Save Data\n");
-        SDL_Log("TODO !...\n");
+        save_size *= 1024;
+
+        BufferROM = (unsigned char*)malloc(save_size); // raw buffer
+        BufferSAVE = (unsigned char*)malloc((save_size*2)); // raw in 16bit format
+
+        for (i=0; i<(save_size*2); i++)
+        {
+            BufferSAVE[i]=0x00;
+        }
+
+        usb_buffer_out[0] = READ_MD_SAVE;
+        address=(save_address/2);
+        i=0;
+        while ( i< save_size)
+        {
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=0;
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,(BufferROM+i),64, &numBytes, 60000);
+            address +=64; //next adr
+            i+=64;
+            fflush(stdout);
+        }
+        i=0;
+        j=0;
+        myfile = fopen("raw.srm","wb");
+        fwrite(BufferROM,1,save_size, myfile);
+
+        for (i=0; i<save_size; i++)
+        {
+            j=j+1;
+            BufferSAVE[i+j]=BufferROM[i];
+        }
+
+        myfile = fopen("dump_smd.srm","wb");
+        fwrite(BufferSAVE,1,save_size*2, myfile);
+        fclose(myfile);
+        SDL_Log("\n");
+        SDL_Log("Save Data completed !\n");
+        timer_end();
+        timer_show();
+        return 0;
 }
 
 int Read_RAM_Bankswitch(void)
@@ -350,6 +393,7 @@ int Read_RAM_Manual(void)
 {
         SDL_Log("Read Mode Manual : Read Save Data\n");
         SDL_Log("Reading in progress...\n");
+        SDL_Log(%ld,dump_sram_size_opts);
         timer_start();
         if(dump_sram_size_opts==1)
             save_size = 8192;
