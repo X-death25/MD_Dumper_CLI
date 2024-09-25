@@ -393,7 +393,7 @@ int Read_RAM_Manual(void)
 {
         SDL_Log("Read Mode Manual : Read Save Data\n");
         SDL_Log("Reading in progress...\n");
-        SDL_Log(%ld,dump_sram_size_opts);
+        SDL_Log("%ld",dump_sram_size_opts);
         timer_start();
         if(dump_sram_size_opts==1)
             save_size = 8192;
