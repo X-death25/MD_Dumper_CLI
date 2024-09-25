@@ -338,6 +338,7 @@ int Read_RAM_Auto(void)
 {
         SDL_Log("Read Mode Auto: Read Save Data\n");
         save_size *= 1024;
+       // if (save_size < 8*1024){save_size=8*1024;}  // SRAM chip can't be low as 8 Ko 
 
         BufferROM = (unsigned char*)malloc(save_size); // raw buffer
         BufferSAVE = (unsigned char*)malloc((save_size*2)); // raw in 16bit format
@@ -395,9 +396,9 @@ int Read_RAM_Manual(void)
         SDL_Log("Reading in progress...\n");
         SDL_Log("%ld",dump_sram_size_opts);
         timer_start();
-        if(dump_sram_size_opts==1)
+        if(dump_sram_size_opts==0)
             save_size = 8192;
-        else if(dump_sram_size_opts==2)
+        else if(dump_sram_size_opts==1)
             save_size = 32768;
         else
             save_size *= 1024;

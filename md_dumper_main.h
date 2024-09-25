@@ -470,7 +470,7 @@ int Detect_Device(void)
     }
     if ( md_dumper_type == 4 )
     {
-        SDL_Log("MD Dumper type : Marv17 aligned tqfp44  \n");
+        SDL_Log("MD Dumper type : Marv17 aligned tqfp48  \n");
     }
     SDL_Log("Hardware Firmware version : %d.%d\n", usb_buffer_in[20],usb_buffer_in[21]);
 return 0;
