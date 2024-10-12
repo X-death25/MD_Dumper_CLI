@@ -7,6 +7,8 @@ int Read_ROM_Auto(void)
         SDL_Log("Dumping please wait ...\n");
         timer_start();
         
+        int sk2needed=0;
+        
         if(lockon_mode==1)
 			{
 			SDL_Log("\n");
@@ -38,15 +40,17 @@ int Read_ROM_Auto(void)
 				{
 				SDL_Log("Sonic 2 Cartridge found\n");
 				
+				game_size=3072*1024;
+				sk2needed=1;
+				
 				usb_buffer_out[0] = 0x45; //WRITE LOCK ON
                 usb_buffer_out[1] = (0x509878) & 0xFF ;
                 usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
                 usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
                 usb_buffer_out[4]=0;
                 usb_buffer_out[5]=0x01; 
+                
                 libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-				
-				game_size=3328*1024;
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
 				{
@@ -91,9 +95,32 @@ int Read_ROM_Auto(void)
 		SDL_Log("Dump ROM completed !\n");
 		timer_end();
 		timer_show();
-		myfile = fopen("dump_smd.bin","wb");
-		fwrite(BufferROM, 1,game_size, myfile);
-		fclose(myfile);
+		
+		if(sk2needed==1)
+			{
+			myfile = fopen("dump_s2k_raw.bin","wb");
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
+		
+			FILE *fp1, *fp2, *fp3; 
+			fp1 = fopen("dump_s2k_raw.bin","rb");
+			fp2 = fopen("sk2chip.bin","rb");
+			fp3 = fopen("dump_smd.bin","wb");
+			
+			while( ( ch = fgetc(fs1) ) != EOF )    fputc(ch,fp3);
+			while( ( ch = fgetc(fs2) ) != EOF )     fputc(ch,fp3);
+			
+			fclose(fp1);    
+			fclose(fp2);    
+			fclose(fp3);
+			}
+		else
+			{
+			myfile = fopen("dump_smd.bin","wb");
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
+			}
+		
 		return 0;
 }
 
