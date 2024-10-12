@@ -34,7 +34,7 @@ int Read_ROM_Auto(void)
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
 				{
-				game_size=3328*1024;
+				game_size=4096*1024;
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
 				{
