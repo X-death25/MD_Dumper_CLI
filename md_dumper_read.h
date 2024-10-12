@@ -114,6 +114,8 @@ int Read_ROM_Auto(void)
 			fclose(fp1);    
 			fclose(fp2);    
 			fclose(fp3);
+			
+			remove("dump_s2k_raw.bin");
 			}
 		else
 			{
