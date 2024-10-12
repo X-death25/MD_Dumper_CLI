@@ -34,10 +34,20 @@ int main(int argc, char *argv[])
     }
 
     //Using GUI Mode ?
-    printf("%d\n",strcmp(argv[1], "-gui") == 0 || strcmp(argv[1], "-gui_fr") == 0);
-    if (strcmp(argv[1], "-gui") == 0 || strcmp(argv[1], "-gui_fr") == 0)
-    {
-        use_gui=1;
+    int lang=0;
+    if(strcmp(argv[1], "-gui") == 0)
+		{
+		use_gui=1;
+		lang=0;
+		}
+	else if(strcmp(argv[1], "-gui_fr") == 0)
+		{
+		use_gui=1;
+		lang=1;
+		}
+    
+    if (use_gui==1)
+    {  
         int gui_scale=2;
         int quit = 0;
         SDL_Event event;
@@ -49,7 +59,7 @@ int main(int argc, char *argv[])
         SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
         //Create Background Texture
-        if(strcmp(argv[1], "-gui_fr") == 0)
+        if(lang == 1)
 			{
 #if defined(_WIN32)
         SDL_Surface * image1 = IMG_Load(".\\images\\opts_background_read_default_FR.png");
