@@ -104,9 +104,9 @@ int Read_ROM_Auto(void)
 			
 			FILE *fp1, *fp2, *fp3; 
 			char ch;
-			fp1 = fopen("dump_s2k_raw.bin","rb");
-			fp2 = fopen("sk2chip.bin","rb");
-			fp3 = fopen("dump_smd.bin","wb");
+			fp1 = fopen("dump_s2k_raw.bin","r");
+			fp2 = fopen("sk2chip.bin","r");
+			fp3 = fopen("dump_smd.bin","w");
 			
 			while( ( ch = fgetc(fp1) ) != EOF ) fputc(ch,fp3);
 			while( ( ch = fgetc(fp2) ) != EOF ) fputc(ch,fp3);
