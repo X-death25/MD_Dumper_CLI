@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 		use_gui=1;
 		lang=0;
 		}
-	else if(strcmp(argv[1], "-gui_fr") == 0)
+	else if(strcmp(argv[1], "-guiFr") == 0)
 		{
 		use_gui=1;
 		lang=1;
