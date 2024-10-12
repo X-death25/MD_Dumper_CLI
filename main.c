@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     }
 
     //Using GUI Mode ?
-    if (strcmp(argv[1], "-gui") == 0)
+    if (strcmp(argv[1], "-gui") == 0 || strcmp(argv[1], "-gui_fr") == 0)
     {
         use_gui=1;
         int gui_scale=2;
@@ -48,6 +48,24 @@ int main(int argc, char *argv[])
         SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
         //Create Background Texture
+        if(strcmp(argv[1], "-gui_fr") == 0)
+			{
+#if defined(_WIN32)
+        SDL_Surface * image1 = IMG_Load(".\\images\\opts_background_read_default_FR.png");
+        SDL_Surface * image2 = IMG_Load(".\\images\\opts_background_read_ram_manual_FR.png");
+		SDL_Surface * image3 = IMG_Load(".\\images\\opts_background_read_rom_manual_FR.png");
+		SDL_Surface * image4 = IMG_Load(".\\images\\opts_background_write_default_FR.png");
+		SDL_Surface * image5 = IMG_Load(".\\images\\opts_background_write_ram_FR.png");
+#else
+        SDL_Surface * image1 = IMG_Load("./images/opts_background_read_default_FR.png");
+        SDL_Surface * image2 = IMG_Load("./images/opts_background_read_ram_manual_FR.png");
+		SDL_Surface * image3 = IMG_Load("./images/opts_background_read_rom_manual_FR.png");
+		SDL_Surface * image4 = IMG_Load("./images/opts_background_write_default_FR.png");
+		SDL_Surface * image5 = IMG_Load("./images/opts_background_write_ram_FR.png");
+#endif
+			}
+		else
+			{
 #if defined(_WIN32)
         SDL_Surface * image1 = IMG_Load(".\\images\\opts_background_read_default.png");
         SDL_Surface * image2 = IMG_Load(".\\images\\opts_background_read_ram_manual.png");
@@ -60,7 +78,9 @@ int main(int argc, char *argv[])
 		SDL_Surface * image3 = IMG_Load("./images/opts_background_read_rom_manual.png");
 		SDL_Surface * image4 = IMG_Load("./images/opts_background_write_default.png");
 		SDL_Surface * image5 = IMG_Load("./images/opts_background_write_ram.png");
-#endif
+#endif			
+			}
+
 
         while (quit==0)
         {

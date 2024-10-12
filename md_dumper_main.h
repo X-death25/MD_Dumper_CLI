@@ -167,7 +167,7 @@ void Display_Help(char *prog_name)
     SDL_Log("How to use the program:\n");
     SDL_Log("\n");
     SDL_Log("GUI Mode:\n");
-    SDL_Log("  %s -gui\n", prog_name);
+    SDL_Log("  %s -gui|-gui_fr \n", prog_name);
     SDL_Log("\n");
     SDL_Log("CLI Mode:\n");
     SDL_Log("\n");
