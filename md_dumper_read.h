@@ -26,22 +26,27 @@ int Read_ROM_Auto(void)
             trim((unsigned char *)dump_name, 0);
             if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
 				{
+				SDL_Log("Sonic 1 Cartridge found\n");
 				game_size=2560*1024;
 				}
             else if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
 				{
+				SDL_Log("Tanglewood Cartridge found\n");
 				game_size=4096*1024;
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
 				{
-				game_size=4096*1024;
+				SDL_Log("Sonic 2 Cartridge found\n");
+				game_size=3072*1024;
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
 				{
+				SDL_Log("Sonic 3 Cartridge found\n");
 				game_size=4096*1024;
 				}
 			else
 				{
+				SDL_Log("No special cartridge : Dumping only Sonic & Knuckles\n");
 				game_size=2048*1024;
 				}
 			}
