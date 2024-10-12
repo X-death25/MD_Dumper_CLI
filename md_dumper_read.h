@@ -101,14 +101,15 @@ int Read_ROM_Auto(void)
 			myfile = fopen("dump_s2k_raw.bin","wb");
 			fwrite(BufferROM, 1,game_size, myfile);
 			fclose(myfile);
-		
+			
 			FILE *fp1, *fp2, *fp3; 
+			char ch;
 			fp1 = fopen("dump_s2k_raw.bin","rb");
 			fp2 = fopen("sk2chip.bin","rb");
 			fp3 = fopen("dump_smd.bin","wb");
 			
-			while( ( ch = fgetc(fs1) ) != EOF )    fputc(ch,fp3);
-			while( ( ch = fgetc(fs2) ) != EOF )     fputc(ch,fp3);
+			while( ( ch = fgetc(fs1) ) != EOF ) fputc(ch,fp3);
+			while( ( ch = fgetc(fs2) ) != EOF ) fputc(ch,fp3);
 			
 			fclose(fp1);    
 			fclose(fp2);    
