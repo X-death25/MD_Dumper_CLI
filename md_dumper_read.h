@@ -7,7 +7,7 @@ int Read_ROM_Auto(void)
         SDL_Log("Dumping please wait ...\n");
         timer_start();
         
-        if(csv_mapper_number==3)
+        if(lockon_mode==1)
 			{
 			SDL_Log("\n");
 			SDL_Log("Extra Hardware : Sonic and Knuckles Lock-On\n");

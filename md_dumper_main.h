@@ -158,6 +158,7 @@ unsigned short flash_id=0;
 unsigned char chip_id=0;
 unsigned char manufacturer_id=0;
 const char * wheel[] = { "-","\\","|","/"}; //erase wheel
+int lockon_mode=0;
 
 //Others Functions
 void Display_Help(char *prog_name)
@@ -605,6 +606,8 @@ void Game_Header_Infos(void)
         SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
         memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
         trim((unsigned char *)dump_name, 0);
+
+		if(memcmp((unsigned char *)game_name,"SONIC & KNUCKLES",16) == 0) lockon_mode=1;
 
         SDL_Log(" International: %.*s\n", 48, game_name);
         SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
