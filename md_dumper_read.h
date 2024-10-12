@@ -37,7 +37,16 @@ int Read_ROM_Auto(void)
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
 				{
 				SDL_Log("Sonic 2 Cartridge found\n");
-				game_size=3072*1024;
+				
+				usb_buffer_out[0] = 0x45; //WRITE LOCK ON
+                usb_buffer_out[1] = (0x509878) & 0xFF ;
+                usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
+                usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
+                usb_buffer_out[4]=0;
+                usb_buffer_out[5]=0x01; 
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+				
+				game_size=3328*1024;
 				}
 			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
 				{
