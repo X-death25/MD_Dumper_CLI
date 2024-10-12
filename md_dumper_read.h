@@ -98,7 +98,7 @@ int Read_ROM_Auto(void)
 		
 		if(sk2needed==1)
 			{
-			myfile = fopen("dump_s2k_raw.bin","wb");
+			myfile = fopen("dump_s2k_raw.bin","wb"); 
 			fwrite(BufferROM, 1,game_size, myfile);
 			fclose(myfile);
 			
