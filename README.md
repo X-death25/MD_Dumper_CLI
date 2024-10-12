@@ -34,7 +34,7 @@ Write mode :
 
 ### GUI Mode
 ```
--gui  : Using GUI Window 
+-gui|-gui_fr  : Using GUI Window (ENG|FR)
 ```
 
 ## Notes
