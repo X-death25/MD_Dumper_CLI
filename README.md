@@ -6,6 +6,10 @@ It allows you to dump Mega Drive cartridges and Master System cartridges (tested
 
 <img src="https://github.com/X-death25/MD_Dumper_CLI/blob/main/github_gfx/01.png" data-canonical-src="https://github.com/X-death25/MD_Dumper_CLI/blob/main/github_gfx/01.png" width="49%" /> <img src="https://github.com/X-death25/MD_Dumper_CLI/blob/main/github_gfx/card.jpg" data-canonical-src="https://github.com/X-death25/MD_Dumper_CLI/blob/main/github_gfx/card.jpg" width="49%" />
 
+## Informations
+
+- Sonic & Knuckles Lock-on support is added for Auto Mode : with Sonic 2 as upper cartridge, you will need to add a file called "sk2chip.bin" with the executable to get a functionnal dump.
+
 ## Commands
 
 ### CLI Mode
