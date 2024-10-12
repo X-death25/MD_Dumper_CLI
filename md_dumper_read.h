@@ -108,8 +108,8 @@ int Read_ROM_Auto(void)
 			fp2 = fopen("sk2chip.bin","r");
 			fp3 = fopen("dump_smd.bin","w");
 			
-			while( ( ch = fgetc(fp1) ) != EOF ) fputc(ch,fp3);
-			while( ( ch = fgetc(fp2) ) != EOF ) fputc(ch,fp3);
+			for(int pos=0;pos<3072*1024;pos++) { ch = fgetc(fp1); fputc(ch,fp3); }
+			for(int pos=0;pos<256*1024;pos++) { ch = fgetc(fp2); fputc(ch,fp3); }
 			
 			fclose(fp1);    
 			fclose(fp2);    
