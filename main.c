@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     }
 
     //Using GUI Mode ?
+    printf("%d\n",strcmp(argv[1], "-gui") == 0 || strcmp(argv[1], "-gui_fr") == 0);
     if (strcmp(argv[1], "-gui") == 0 || strcmp(argv[1], "-gui_fr") == 0)
     {
         use_gui=1;
