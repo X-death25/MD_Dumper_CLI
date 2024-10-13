@@ -574,7 +574,7 @@ int Detect_Device(void)
     if ( sms_mode == 0 )
     {
         SDL_Log("Dumper started in 16 bit mode \n");
-        Hardwaretype = 0 ;
+        //Hardwaretype = 0 ;
     }
     if ( sms_mode == 1 )
     {
