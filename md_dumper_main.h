@@ -823,8 +823,7 @@ void Game_Header_Infos(void)
             buffer_header[i]=0x00;
         }
         i = 0;
-
-        printf("\nTry to read SMS - GG cartridge...\n");
+		SDL_Log("\nTry to read SMS - GG cartridge...\n");
         address = 0x7FF0;
 
         i=0;
@@ -845,17 +844,17 @@ void Game_Header_Infos(void)
 
         if(memcmp((unsigned char *)buffer_header,"TMR SEGA",8) == 0)
         {
-            printf("Valid cartridge detected !\n\n");
+			SDL_Log("Valid cartridge detected !\n\n");
 
             for(i=0; i<(256/16); i++)
             {
-                printf("\n");
-                printf(" %03lX", 0x100+(i*16));
+				SDL_Log("\n");
+				SDL_Log("%03lX", 0x100+(i*16));
                 for(j=0; j<16; j++)
                 {
-                    printf(" %02X", buffer_header[j+(i*16)]);
+				   SDL_Log(" %02X", buffer_header[j+(i*16)]);
                 }
-                printf(" %.*s", 16, buffer_header +(i*16));
+				SDL_Log(" %.*s", 16, buffer_header +(i*16));
             }
             i=0;
 
@@ -927,64 +926,64 @@ void Game_Header_Infos(void)
             }
 
 
-            printf("\n\n --- HEADER --- \n");
+            SDL_Log("\n\n --- HEADER --- \n");
 
-            printf("Game Name: %.*s\n",48, (char *)txt_csv_game_name2);
+            SDL_Log("Game Name: %.*s\n",48, (char *)txt_csv_game_name2);
             if(memcmp((unsigned char *)txt_csv_game_type2,"GG ",3) == 0)
             {
-                printf("Game Type : GAME GEAR \n");
+                SDL_Log("Game Type : GAME GEAR \n");
             }
             if(memcmp((unsigned char *)txt_csv_game_type2,"SMS",3) == 0)
             {
-                printf("Game Type : MASTER SYSTEM / MARK3\n");
+                SDL_Log("Game Type : MASTER SYSTEM / MARK3\n");
                 gg_mode=0;
             }
 
             game_size = buffer_header[15] & 0xF;
             if (game_size == 0x00)
             {
-                printf("Game Size (Header) : 256 Ko");
+                SDL_Log("Game Size (Header) : 256 Ko");
                 game_size = 256*1024;
             }
             if (game_size == 0x01)
             {
-                printf("Game Size (Header) : 512 Ko");
+                SDL_Log("Game Size (Header) : 512 Ko");
                 game_size = 512*1024;
             }
             if (game_size == 0x0c)
             {
-                printf("Game Size (Header) : 32 Ko");
+                SDL_Log("Game Size (Header) : 32 Ko");
                 game_size = 32*1024;
             }
             if (game_size == 0x0e)
             {
-                printf("Game Size (Header) : 64 Ko");
+                SDL_Log("Game Size (Header) : 64 Ko");
                 game_size = 64*1024;
             }
             if (game_size == 0x0f)
             {
-                printf("Game Size (Header) : 128 Ko");
+                SDL_Log("Game Size (Header) : 128 Ko");
                 game_size = 128*1024;
             }
 
             // Real Cartridge Size
 
-            printf("\nGame Size (Real): %.*s Ko\n",4, (char *)txt_csv_game_size2);
+            SDL_Log("\nGame Size (Real): %.*s Ko\n",4, (char *)txt_csv_game_size2);
 
             // Region Header
 
             if ( buffer_header[15] >> 6 == 0x01 )
             {
-                printf("Game Region (Header) : Export");
+                SDL_Log("Game Region (Header) : Export");
             }
             if ( buffer_header[15] >> 4 == 0x03 )
             {
-                printf("Game Region (Header) : Japan");
+                SDL_Log("Game Region (Header) : Japan");
             }
 
             // Region REAL
 
-            printf("\nGame Region (Real) : %.*s\n",40, (char *)txt_csv_region2);
+            SDL_Log("\nGame Region (Real) : %.*s\n",40, (char *)txt_csv_region2);
 
 
         }
