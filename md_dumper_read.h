@@ -79,6 +79,7 @@ int Read_ROM_Auto(void)
 	if ( sms_mode == 0 ) //Read in 16 bits mode
     {
 		address=0;
+        game_size *= 1024;
 		usb_buffer_out[0] = READ_MD;
 		usb_buffer_out[1]=address & 0xFF;
 		usb_buffer_out[2]=(address & 0xFF00)>>8;
