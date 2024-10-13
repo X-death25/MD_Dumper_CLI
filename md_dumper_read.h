@@ -63,11 +63,7 @@ int Read_ROM_Auto(void)
 				game_size=2048*1024;
 				}
 			}
-		/*else
-			{
-			game_size *= 1024;		//game_size=4096*1024;
-			}*/
-		
+			
 		//SDL_Log("\n");
 		SDL_Log("Rom Size : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
@@ -79,7 +75,7 @@ int Read_ROM_Auto(void)
 	if ( sms_mode == 0 ) //Read in 16 bits mode
     {
 		address=0;
-        game_size *= 1024;
+        game_size *= 1024; // affect header game_size
 		usb_buffer_out[0] = READ_MD;
 		usb_buffer_out[1]=address & 0xFF;
 		usb_buffer_out[2]=(address & 0xFF00)>>8;
