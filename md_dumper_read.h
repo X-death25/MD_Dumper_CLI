@@ -63,12 +63,12 @@ int Read_ROM_Auto(void)
 				game_size=2048*1024;
 				}
 			}
-		else
+		/*else
 			{
 			game_size *= 1024;		//game_size=4096*1024;
-			}
+			}*/
 		
-		SDL_Log("\n");
+		//SDL_Log("\n");
 		SDL_Log("Rom Size : %ld Ko \n",game_size/1024);
 		BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
