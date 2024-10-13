@@ -863,7 +863,8 @@ void Game_Header_Infos(void)
             buffer_header[i]=0x00;
         }
         i = 0;
-		SDL_Log("\nTry to read SMS - GG cartridge...\n");
+        SDL_Log("\n");
+		SDL_Log("Try to read SMS - GG cartridge...\n");
         address = 0x7FF0;
 
         i=0;
@@ -884,7 +885,8 @@ void Game_Header_Infos(void)
 
         if(memcmp((unsigned char *)buffer_header,"TMR SEGA",8) == 0)
         {
-			SDL_Log("Valid cartridge detected !\n\n");
+			SDL_Log("Valid cartridge detected !\n");
+			SDL_Log("\n");
 
             // Calculate Checksum of first bank
 
@@ -938,23 +940,21 @@ void Game_Header_Infos(void)
                     txt_csv_game_name2[48] = '\0'; // Null-terminate the output string
 
                     // Copy Cartridge Type :
-
                     strncpy(txt_csv_game_type2,smsgg_text_values[i]+23,3);
                     txt_csv_game_type2[3] = '\0'; // Null-terminate the output string
 
                     // Copy Cartridge Size :
-
                     strncpy(txt_csv_game_size2,smsgg_text_values[i]+18,4);
 
                     // Copy Cartridge Region :
-
                     strncpy(txt_csv_region2,smsgg_text_values[i]+76,20);
                     txt_csv_region2[20] = '\0'; // Null-terminate the output string
                 }
             }
 
-
-            SDL_Log("\n\n --- HEADER --- \n");
+			SDL_Log("\n");
+			SDL_Log("\n");
+            SDL_Log(" --- HEADER --- \n");
 
             SDL_Log("Game Name: %.*s\n",48, (char *)txt_csv_game_name2);
             if(memcmp((unsigned char *)txt_csv_game_type2,"GG ",3) == 0)
@@ -995,8 +995,10 @@ void Game_Header_Infos(void)
             }
 
             // Real Cartridge Size
-
-            SDL_Log("\nGame Size (Real): %.*s Ko\n",4, (char *)txt_csv_game_size2);
+			SDL_Log("\n");
+            SDL_Log("Game Size (Real): %.*s Ko\n",4, (char *)txt_csv_game_size2);
+            game_size=strtol(txt_csv_game_size2, NULL, 10);
+			game_size=game_size*1024;
 
             // Region Header
 
@@ -1010,8 +1012,8 @@ void Game_Header_Infos(void)
             }
 
             // Region REAL
-
-            SDL_Log("\nGame Region (Real) : %.*s\n",40, (char *)txt_csv_region2);
+			SDL_Log("\n");
+            SDL_Log("Game Region (Real) : %.*s\n",40, (char *)txt_csv_region2);
 
 
         }
