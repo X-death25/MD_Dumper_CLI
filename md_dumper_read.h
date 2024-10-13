@@ -69,6 +69,7 @@ int Read_ROM_Auto(void)
 	if ( sms_mode == 0 ) //Read in 16 bits mode
     {
         SDL_Log("Rom Size : %ld Ko \n",game_size);
+        game_size = game_size*1024;
         BufferROM = (unsigned char*)malloc(game_size);
 		// Cleaning ROM Buffer
 		for (i=0; i<game_size; i++)
