@@ -34,9 +34,20 @@ int main(int argc, char *argv[])
     }
 
     //Using GUI Mode ?
-    if (strcmp(argv[1], "-gui") == 0)
-    {
-        use_gui=1;
+    int lang=0;
+    if(strcmp(argv[1], "-gui") == 0)
+		{
+		use_gui=1;
+		lang=0;
+		}
+	else if(strcmp(argv[1], "-gui_fr") == 0)
+		{
+		use_gui=1;
+		lang=1;
+		}
+    
+    if (use_gui==1)
+    {  
         int gui_scale=2;
         int quit = 0;
         SDL_Event event;
@@ -46,21 +57,46 @@ int main(int argc, char *argv[])
         SDL_Init(SDL_INIT_VIDEO);
         SDL_Window * window = SDL_CreateWindow("MD Dumper version 1.0 alpha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 424*gui_scale, 240*gui_scale, 0);
         SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
-
+		
+		SDL_Surface * image1;
+		SDL_Surface * image2;
+		SDL_Surface * image3;
+		SDL_Surface * image4;
+		SDL_Surface * image5;
+		
         //Create Background Texture
-#if defined(_WIN32)
-        SDL_Surface * image1 = IMG_Load(".\\images\\opts_background_read_default.png");
-        SDL_Surface * image2 = IMG_Load(".\\images\\opts_background_read_ram_manual.png");
-		SDL_Surface * image3 = IMG_Load(".\\images\\opts_background_read_rom_manual.png");
-		SDL_Surface * image4 = IMG_Load(".\\images\\opts_background_write_default.png");
-		SDL_Surface * image5 = IMG_Load(".\\images\\opts_background_write_ram.png");
-#else
-        SDL_Surface * image1 = IMG_Load("./images/opts_background_read_default.png");
-        SDL_Surface * image2 = IMG_Load("./images/opts_background_read_ram_manual.png");
-		SDL_Surface * image3 = IMG_Load("./images/opts_background_read_rom_manual.png");
-		SDL_Surface * image4 = IMG_Load("./images/opts_background_write_default.png");
-		SDL_Surface * image5 = IMG_Load("./images/opts_background_write_ram.png");
-#endif
+        if(lang==1)
+			{
+			#if defined(_WIN32)
+				image1 = IMG_Load(".\\images\\opts_background_read_default_FR.png");
+				image2 = IMG_Load(".\\images\\opts_background_read_ram_manual_FR.png");
+				image3 = IMG_Load(".\\images\\opts_background_read_rom_manual_FR.png");
+				image4 = IMG_Load(".\\images\\opts_background_write_default_FR.png");
+				image5 = IMG_Load(".\\images\\opts_background_write_ram_FR.png");
+			#else
+				image1 = IMG_Load("./images/opts_background_read_default_FR.png");
+				image2 = IMG_Load("./images/opts_background_read_ram_manual_FR.png");
+				image3 = IMG_Load("./images/opts_background_read_rom_manual_FR.png");
+				image4 = IMG_Load("./images/opts_background_write_default_FR.png");
+				image5 = IMG_Load("./images/opts_background_write_ram_FR.png");
+			#endif
+			}
+		else
+			{
+			#if defined(_WIN32)
+				image1 = IMG_Load(".\\images\\opts_background_read_default.png");
+				image2 = IMG_Load(".\\images\\opts_background_read_ram_manual.png");
+				image3 = IMG_Load(".\\images\\opts_background_read_rom_manual.png");
+				image4 = IMG_Load(".\\images\\opts_background_write_default.png");
+				image5 = IMG_Load(".\\images\\opts_background_write_ram.png");
+			#else
+				image1 = IMG_Load("./images/opts_background_read_default.png");
+				image2 = IMG_Load("./images/opts_background_read_ram_manual.png");
+				image3 = IMG_Load("./images/opts_background_read_rom_manual.png");
+				image4 = IMG_Load("./images/opts_background_write_default.png");
+				image5 = IMG_Load("./images/opts_background_write_ram.png");
+			#endif			
+			}
 
         while (quit==0)
         {

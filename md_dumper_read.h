@@ -6,39 +6,125 @@ int Read_ROM_Auto(void)
         SDL_Log("Sending command Dump ROM \n");
         SDL_Log("Dumping please wait ...\n");
         timer_start();
-        address=0;
-        game_size *= 1024;		//game_size=4096*1024;
-        SDL_Log("\n");
-        SDL_Log("Rom Size : %ld Ko \n",game_size/1024);
-        BufferROM = (unsigned char*)malloc(game_size);
-        // Cleaning ROM Buffer
-        for (i=0; i<game_size; i++)
-        {
-            BufferROM[i]=0x00;
-        }
+        
+        int sk2needed=0;
+        
+        if(lockon_mode==1)
+			{
+			SDL_Log("\n");
+			SDL_Log("Extra Hardware : Sonic and Knuckles Lock-On\n");
+			
+			address=(0x200100)/2;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+			
+			libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
+            
+            memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
+            trim((unsigned char *)dump_name, 0);
+            if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
+				{
+				SDL_Log("Sonic 1 Cartridge found\n");
+				game_size=2560*1024;
+				}
+            else if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
+				{
+				SDL_Log("Tanglewood Cartridge found\n");
+				game_size=4096*1024;
+				}
+			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
+				{
+				SDL_Log("Sonic 2 Cartridge found\n");
+				
+				game_size=3072*1024;
+				sk2needed=1;
+				
+				usb_buffer_out[0] = 0x45; //WRITE LOCK ON
+                usb_buffer_out[1] = (0x509878) & 0xFF ;
+                usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
+                usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
+                usb_buffer_out[4]=0;
+                usb_buffer_out[5]=0x01; 
+                
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+				}
+			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
+				{
+				SDL_Log("Sonic 3 Cartridge found\n");
+				game_size=4096*1024;
+				}
+			else
+				{
+				SDL_Log("No special cartridge : Dumping only Sonic & Knuckles\n");
+				game_size=2048*1024;
+				}
+			}
+		else
+			{
+			game_size *= 1024;		//game_size=4096*1024;
+			}
+		
+		SDL_Log("\n");
+		SDL_Log("Rom Size : %ld Ko \n",game_size/1024);
+		BufferROM = (unsigned char*)malloc(game_size);
+		// Cleaning ROM Buffer
+		for (i=0; i<game_size; i++)
+		{
+			BufferROM[i]=0x00;
+		}
+		address=0;
+		usb_buffer_out[0] = READ_MD;
+		usb_buffer_out[1]=address & 0xFF;
+		usb_buffer_out[2]=(address & 0xFF00)>>8;
+		usb_buffer_out[3]=(address & 0xFF0000)>>16;
+		usb_buffer_out[4]=1;
 
-        usb_buffer_out[0] = READ_MD;
-        usb_buffer_out[1]=address & 0xFF;
-        usb_buffer_out[2]=(address & 0xFF00)>>8;
-        usb_buffer_out[3]=(address & 0xFF0000)>>16;
-        usb_buffer_out[4]=1;
-
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-        SDL_Log("ROM dump in progress...\n");
-        res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
-        if (res != 0)
-        {
-            SDL_Log("Error \n");
-            return 1;
-        }
-        SDL_Log("\n");
-        SDL_Log("Dump ROM completed !\n");
-        timer_end();
-        timer_show();
-        myfile = fopen("dump_smd.bin","wb");
-        fwrite(BufferROM, 1,game_size, myfile);
-        fclose(myfile);
-        return 0;
+		libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+		SDL_Log("ROM dump in progress...\n");
+		res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+		if (res != 0)
+		{
+			SDL_Log("Error \n");
+			return 1;
+		}
+		SDL_Log("\n");
+		SDL_Log("Dump ROM completed !\n");
+		timer_end();
+		timer_show();
+		
+		if(sk2needed==1)
+			{
+			myfile = fopen("dump_s2k_raw.bin","wb"); 
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
+			
+			FILE *fp1, *fp2, *fp3; 
+			char ch;
+			fp1 = fopen("dump_s2k_raw.bin","r");
+			fp2 = fopen("sk2chip.bin","r");
+			fp3 = fopen("dump_smd.bin","w");
+			
+			for(int pos=0;pos<3072*1024;pos++) { ch = fgetc(fp1); fputc(ch,fp3); }
+			for(int pos=0;pos<256*1024;pos++) { ch = fgetc(fp2); fputc(ch,fp3); }
+			
+			fclose(fp1);    
+			fclose(fp2);    
+			fclose(fp3);
+			
+			remove("dump_s2k_raw.bin");
+			}
+		else
+			{
+			myfile = fopen("dump_smd.bin","wb");
+			fwrite(BufferROM, 1,game_size, myfile);
+			fclose(myfile);
+			}
+		
+		return 0;
 }
 
 int Read_ROM_Manual(void)
