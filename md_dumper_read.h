@@ -1,137 +1,240 @@
 int Read_ROM_Auto(void)
 {
-        SDL_Log("\n");
-        SDL_Log("Read Mode : Read ROM in automatic mode\n");
+    SDL_Log("\n");
+    SDL_Log("Read Mode : Read ROM in automatic mode\n");
 
-        // First Search if game is in special csv gamelist
+    // First Search if game is in special csv gamelist
 
-        // Search checksum cartridge in Custom Hardware games csv table
-        i=0;
-        for (i = 0; i < chksm_text_values_count ; i++)
+    // Search checksum cartridge in Custom Hardware games csv table
+    i=0;
+    for (i = 0; i < chksm_text_values_count ; i++)
+    {
+        strncpy(txt_csv_chksm,chksm_text_values[i],4);
+        //SDL_Log(" txt chksm value : %s \n",txt_csv_chksm);
+        csv_chksm = (unsigned short)strtol(txt_csv_chksm, NULL, 16);
+
+        if ( checksum_header == csv_chksm  )
         {
-            strncpy(txt_csv_chksm,chksm_text_values[i],4);
-            //SDL_Log(" txt chksm value : %s \n",txt_csv_chksm);
-            csv_chksm = (unsigned short)strtol(txt_csv_chksm, NULL, 16);
+            Index_chksm = i;
+            SDL_Log("\n");
+            SDL_Log("Found game in extra CSV Gamelist  \n");
+            SDL_Log("Position in csv table %d \n",i);
+            strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
+            txt_csv_game_size[4] = '\0'; // Null-terminate the output string
+            //SDL_Log(" txt game size : %s \n",txt_csv_game_size);
+            csv_game_size = (unsigned char)strtol(txt_csv_game_size, NULL, 10);
+            //SDL_Log(" CSV Game Size  %d \n",csv_game_size);
+            game_size=1024*csv_game_size;
+            SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);
 
-            if ( checksum_header == csv_chksm  )
-            {
-                Index_chksm = i;
-                SDL_Log("\n");
-                SDL_Log("Found game in extra CSV Gamelist  \n");
-                SDL_Log("Position in csv table %d \n",i);
-                strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
-                txt_csv_game_size[4] = '\0'; // Null-terminate the output string
-                //SDL_Log(" txt game size : %s \n",txt_csv_game_size);
-                csv_game_size = (unsigned char)strtol(txt_csv_game_size, NULL, 10);
-                //SDL_Log(" CSV Game Size  %d \n",csv_game_size);
-                game_size=1024*csv_game_size;
-                SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);
-				
-				//Return Hardware type
-				strncpy(txt_mapper_number,chksm_text_values[i]+10,2);
-				txt_mapper_number[1] = '\0'; // Null-terminate the output string
-				//SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
-				Hardwaretype = (unsigned char)strtol(txt_mapper_number, NULL, 10);
-				SDL_Log(" Hardware type  %d \n",Hardwaretype);
-            }
+            //Return Hardware type
+            strncpy(txt_mapper_number,chksm_text_values[i]+10,2);
+            txt_mapper_number[1] = '\0'; // Null-terminate the output string
+            //SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
+            Hardwaretype = (unsigned char)strtol(txt_mapper_number, NULL, 10);
+            SDL_Log(" Hardware type  %d \n",Hardwaretype);
         }
+    }
 
-        SDL_Log("Sending command Dump ROM \n");
-        SDL_Log("Dumping please wait ...\n");
-		
-	if ( sms_mode == 0 && Hardwaretype == 0 ) // Dump Megadrive cartridge in no mapper mode
+    SDL_Log("Sending command Dump ROM \n");
+    SDL_Log("Dumping please wait ...\n");
+
+    if ( sms_mode == 0 && Hardwaretype == 0 ) // Dump Megadrive cartridge in no mapper mode
     {
         SDL_Log("Rom Size : %ld Ko \n",game_size);
         game_size = game_size*1024;
         BufferROM = (unsigned char*)malloc(game_size);
-		// Cleaning ROM Buffer
-		for (i=0; i<game_size; i++)
-		{
-			BufferROM[i]=0x00;
-		}
+        // Cleaning ROM Buffer
+        for (i=0; i<game_size; i++)
+        {
+            BufferROM[i]=0x00;
+        }
 
-		address=0;
-		usb_buffer_out[0] = READ_MD;
-		usb_buffer_out[1]=address & 0xFF;
-		usb_buffer_out[2]=(address & 0xFF00)>>8;
-		usb_buffer_out[3]=(address & 0xFF0000)>>16;
-		usb_buffer_out[4]=1;
+        address=0;
+        usb_buffer_out[0] = READ_MD;
+        usb_buffer_out[1]=address & 0xFF;
+        usb_buffer_out[2]=(address & 0xFF00)>>8;
+        usb_buffer_out[3]=(address & 0xFF0000)>>16;
+        usb_buffer_out[4]=1;
 
-		libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-		SDL_Log("ROM dump in progress...\n");
-		res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
-		if (res != 0)
-		{
-			SDL_Log("Error \n");
-			return 1;
-		}
-		SDL_Log("\n");
-		SDL_Log("Dump ROM completed !\n");
-		timer_end();
-		timer_show();
-		myfile = fopen("dump_smd.bin","wb");
-		fwrite(BufferROM, 1,game_size, myfile);
-		fclose(myfile);
-	}
-	
-	if ( sms_mode == 0 && Hardwaretype == 3 ) // Automatic Dump Megadrive cartridge in Lock-on mapper mode
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+        SDL_Log("ROM dump in progress...\n");
+        res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+        if (res != 0)
+        {
+            SDL_Log("Error \n");
+            return 1;
+        }
+        SDL_Log("\n");
+        SDL_Log("Dump ROM completed !\n");
+        timer_end();
+        timer_show();
+        myfile = fopen("dump_smd.bin","wb");
+        fwrite(BufferROM, 1,game_size, myfile);
+        fclose(myfile);
+    }
+
+    if ( sms_mode == 0 && Hardwaretype == 3 ) // Automatic Dump Megadrive cartridge in Lock-on mapper mode
     {
-		    SDL_Log("Extra Hardware detected dump in mode : Sega Lock-ON \n");;
-            SDL_Log("Lower Cartridge is : ");
-            SDL_Log("%.*s\n", 48, (char *)game_name);
-            SDL_Log("Upper Cartridge is : ");
-			
-			address=(0x200100)/2;
+        SDL_Log("Extra Hardware detected dump in mode : Sega Lock-ON \n");;
+        SDL_Log("Lower Cartridge is : ");
+        SDL_Log("%.*s\n", 48, (char *)game_name);
+        SDL_Log("Upper Cartridge is : ");
+
+        address=(0x200100)/2;
+        usb_buffer_out[0] = READ_MD;
+        usb_buffer_out[1] = address&0xFF ;
+        usb_buffer_out[2] = (address&0xFF00)>>8;
+        usb_buffer_out[3]=(address & 0xFF0000)>>16;
+        usb_buffer_out[4] = 0; // Slow Mode
+
+        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+        libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
+
+        memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
+        trim((unsigned char *)dump_name, 0);
+        SDL_Log("%.*s\n",32, (char *)dump_name);
+        //trim((unsigned char *)dump_name, 0);
+        if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
+        {
+            //SDL_Log("%.*s\n",32, (char *)game_name);
+            game_size=2560*1024;
+
+            BufferROM = (unsigned char*)malloc(game_size);
+            address = 0;
             usb_buffer_out[0] = READ_MD;
-            usb_buffer_out[1] = address&0xFF ;
-            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
             usb_buffer_out[3]=(address & 0xFF0000)>>16;
-            usb_buffer_out[4] = 0; // Slow Mode
+            usb_buffer_out[4]=1;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+            SDL_Log("Starting Dump ...\n");
+            res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+            if (res != 0)
+            {
+                SDL_Log("Error \n");
+                return 1;
+            }
+            SDL_Log("Dump ROM completed !\n");
+            myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog.bin","wb");
+            fwrite(BufferROM, 1,game_size, myfile);
+            fclose(myfile);
+        }
+
+        if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
+        {
+            //SDL_Log("TANGLEWOOD (R)                  ");
+            game_size=4096*1024;
+            BufferROM = (unsigned char*)malloc(game_size);
+            address = 0;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=1;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+            SDL_Log("Starting Dump ...\n");
+            res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+            if (res != 0)
+            {
+                SDL_Log("Error \n");
+                return 1;
+            }
+            SDL_Log("Dump ROM completed !\n");
+            myfile = fopen("Sonic & Knuckles + TANGLEWOOD.bin","wb");
+            fwrite(BufferROM, 1,game_size, myfile);
+            fclose(myfile);
+        }
+
+        if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
+        {
+            //printf("%.*s\n",32, (char *)game_name);
+            game_size=3328*1024;
+            BufferROM = (unsigned char*)malloc(game_size);
+
+            // Dump the SK + S2 part of the ROM
+            address = 0;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=1;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+            SDL_Log("Starting Dump ...\n");
+            res = libusb_bulk_transfer(handle, 0x82,BufferROM,3072*1024, &numBytes, 0);
+            if (res != 0)
+            {
+                SDL_Log("Error \n");
+                return 1;
+            }
+
+            // Prepare Lock-On system to map S2 patch at $300000-$3FFFFF:
+
+            address = 0xA130F1/2; // bank 6
+            usb_buffer_out[0] = MAPPER_SSF2;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=0;
+            usb_buffer_out[5]=1;
 
             libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
-			
-			memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
-            trim((unsigned char *)dump_name, 0);
-			//SDL_Log("%.*s\n",32, (char *)dump_name);
-            //trim((unsigned char *)dump_name, 0);
-            if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
+
+            // Do a simple read maybe needed for init bank or slow down the dumper :D
+
+            address = 0; 
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=0;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 0);
+
+            // Restart the dump
+
+            address = (3072*1024)/2;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=1;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            res = libusb_bulk_transfer(handle, 0x82,BufferROM+3072*1024,256*1024, &numBytes, 60000);
+            if (res != 0)
             {
-                SDL_Log("%.*s\n",32, (char *)game_name);
-                game_size=2560*1024;
-
-                BufferROM = (unsigned char*)malloc(game_size);
-                address = 0;
-                usb_buffer_out[0] = READ_MD;
-                usb_buffer_out[1]=address & 0xFF;
-                usb_buffer_out[2]=(address & 0xFF00)>>8;
-                usb_buffer_out[3]=(address & 0xFF0000)>>16;
-                usb_buffer_out[4]=1;
-
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
-                SDL_Log("Starting Dump ...\n");
-                res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
-                if (res != 0)
-                {
-                    SDL_Log("Error \n");
-                    return 1;
-                }
-                SDL_Log("Dump ROM completed !\n");
-                myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog.bin","wb");
-                fwrite(BufferROM, 1,game_size, myfile);
-                fclose(myfile);
+                SDL_Log("Error \n");
+                return 1;
             }
+
+
+            SDL_Log("Dump ROM completed !\n");
+            myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog2.bin","wb");
+            fwrite(BufferROM, 1,3328*1024, myfile);
+            fclose(myfile);
+        }
 	}
-		
-	
-	
-	if ( sms_mode == 1 ) //Read in 8 bits mode
-    {
-		    int i=0;
-			address=0;
-			if (gg_mode == 0 ) { SDL_Log("Master System Mode : ROM dump in progress...\n");}
-			if (gg_mode == 1 ) { SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");}
-            
+
+
+
+        if ( sms_mode == 1 ) //Read in 8 bits mode
+        {
+            int i=0;
+            address=0;
+            if (gg_mode == 0 )
+            {
+                SDL_Log("Master System Mode : ROM dump in progress...\n");
+            }
+            if (gg_mode == 1 )
+            {
+                SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");
+            }
+
             while (i<game_size)
             {
                 usb_buffer_out[0] = READ_SMS;
@@ -149,18 +252,24 @@ int Read_ROM_Auto(void)
             SDL_Log("Dump ROM completed !\n");
             timer_end();
             timer_show();
-            if (gg_mode == 0 ) { myfile = fopen("dump_rom.sms","wb");}
-			if (gg_mode == 1 ) { myfile = fopen("dump_rom.gg","wb");}
+            if (gg_mode == 0 )
+            {
+                myfile = fopen("dump_rom.sms","wb");
+            }
+            if (gg_mode == 1 )
+            {
+                myfile = fopen("dump_rom.gg","wb");
+            }
             fwrite(BufferROM, 1,game_size, myfile);
-            fclose(myfile);			
-	}
-			
-		
-		return 0;
-}
+            fclose(myfile);
+        }
 
-int Read_ROM_Manual(void)
-{
+
+        return 0;
+    }
+
+    int Read_ROM_Manual(void)
+    {
         SDL_Log("\n");
         SDL_Log("Read Mode : Read ROM in manual mode\n");
 
@@ -168,36 +277,36 @@ int Read_ROM_Manual(void)
         SDL_Log("Dumping please wait ...\n");
         timer_start();
         switch(dump_rom_size_opts)
-			{
-			case 0:
-				game_size = 32 * 1024;
-				break;
-			case 1:
-				game_size = 64 * 1024;
-				break;
-			case 2:
-				game_size = 128 * 1024;
-				break;
-			case 3:
-				game_size = 256 * 1024;
-				break;
-			case 4:
-				game_size = 512 * 1024;
-				break;
-			case 5:
-				game_size = 1024 * 1024;
-				break;
-			case 6:
-				game_size = 2048 * 1024;
-				break;
-			case 7:
-				game_size = 4096 * 1024;
-				break;
-			case 8:
-				game_size = 8192 * 1024;
-				break;
-			}
-        
+        {
+        case 0:
+            game_size = 32 * 1024;
+            break;
+        case 1:
+            game_size = 64 * 1024;
+            break;
+        case 2:
+            game_size = 128 * 1024;
+            break;
+        case 3:
+            game_size = 256 * 1024;
+            break;
+        case 4:
+            game_size = 512 * 1024;
+            break;
+        case 5:
+            game_size = 1024 * 1024;
+            break;
+        case 6:
+            game_size = 2048 * 1024;
+            break;
+        case 7:
+            game_size = 4096 * 1024;
+            break;
+        case 8:
+            game_size = 8192 * 1024;
+            break;
+        }
+
         SDL_Log("\n");
         SDL_Log("Rom Size (Manual Mode) : %ld Ko \n",game_size/1024);
         BufferROM = (unsigned char*)malloc(game_size);
@@ -207,10 +316,10 @@ int Read_ROM_Manual(void)
             BufferROM[i]=0x00;
         }
 
-		if(dump_cart_mode_opts==0)						//Game Gear Mode
+        if(dump_cart_mode_opts==0)						//Game Gear Mode
         {
-			SDL_Log("Game Gear Mode : ROM dump in progress...\n");
-		}
+            SDL_Log("Game Gear Mode : ROM dump in progress...\n");
+        }
         if(dump_cart_mode_opts==1)						//Mega Drive Mode
         {
             address = 0;
@@ -263,10 +372,10 @@ int Read_ROM_Manual(void)
             fclose(myfile);
         }
         return 0;
-}
+    }
 
-int Read_ROM_Bankswitch(void)
-{
+    int Read_ROM_Bankswitch(void)
+    {
         SDL_Log("\n");
         SDL_Log("Read Mode : Read ROM in mode : Bankswitch SSF2 \n");
         i=0;
@@ -450,13 +559,13 @@ int Read_ROM_Bankswitch(void)
         fwrite(BufferROM,1,game_size, myfile);
         fclose(myfile);
         return 0;
-}
+    }
 
-int Read_RAM_Auto(void)
-{
+    int Read_RAM_Auto(void)
+    {
         SDL_Log("Read Mode Auto: Read Save Data\n");
         save_size *= 1024;
-       // if (save_size < 8*1024){save_size=8*1024;}  // SRAM chip can't be low as 8 Ko 
+        // if (save_size < 8*1024){save_size=8*1024;}  // SRAM chip can't be low as 8 Ko
 
         BufferROM = (unsigned char*)malloc(save_size); // raw buffer
         BufferSAVE = (unsigned char*)malloc((save_size*2)); // raw in 16bit format
@@ -500,16 +609,16 @@ int Read_RAM_Auto(void)
         timer_end();
         timer_show();
         return 0;
-}
+    }
 
-int Read_RAM_Bankswitch(void)
-{
+    int Read_RAM_Bankswitch(void)
+    {
         SDL_Log("Read Mode Bankswitch: Read Save Data\n");
         SDL_Log("TODO !...\n");
-}
+    }
 
-int Read_RAM_Manual(void)
-{
+    int Read_RAM_Manual(void)
+    {
         SDL_Log("Read Mode Manual : Read Save Data\n");
         SDL_Log("Reading in progress...\n");
         SDL_Log("%ld",dump_sram_size_opts);
@@ -563,4 +672,4 @@ int Read_RAM_Manual(void)
         timer_end();
         timer_show();
         return 0;
-}
+    }
