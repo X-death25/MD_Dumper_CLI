@@ -321,6 +321,34 @@ void cb6(int c, void *data)
     current_col3 = 0; // Réinitialiser le compteur de colonnes à la fin de chaque ligne
 }
 
+
+unsigned int crc32(unsigned int seed, const void* data, int data_size)
+{
+    unsigned int crc = ~seed;
+    static unsigned int crc32_lut[256] = { 0 };
+    if(!crc32_lut[1])
+    {
+        const unsigned int polynomial = 0xEDB88320;
+        unsigned int i, j;
+        for (i = 0; i < 256; i++)
+        {
+            unsigned int crc = i;
+            for (j = 0; j < 8; j++)
+                crc = (crc >> 1) ^ ((unsigned int)(-(int)(crc & 1)) & polynomial);
+            crc32_lut[i] = crc;
+        }
+    }
+
+    {
+        const unsigned char* data8 = (const unsigned char*)data;
+        int n;
+        for (n = 0; n < data_size; n++)
+            crc = (crc >> 8) ^ crc32_lut[(crc & 0xFF) ^ data8[n]];
+    }
+    return ~crc;
+}
+
+
 //Timer functions according to Operating Systems
 #if defined(_WIN32)		//Windows
 clock_t microsec_start;
