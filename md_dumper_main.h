@@ -648,7 +648,7 @@ int Open_CSV_Files(void)
 
     if (csv_init(&p3, options) != 0)
     {
-        printf("\n\n ERROR Failed to init CSV Parser for SMS-GG crc ...\n");
+        SDL_Log("\n\n ERROR Failed to init CSV Parser for SMS-GG crc ...\n");
         exit(EXIT_FAILURE);
     }
     csv_set_quote(&p3,';');
@@ -657,7 +657,7 @@ int Open_CSV_Files(void)
     FILE *fp3 = fopen("sms-gg_crc.csv", "r");
     if (!fp)
     {
-        printf("\n\n ERROR Can't find flashlist.csv ...\n");
+        SDL_Log("\n\n ERROR Can't find flashlist.csv ...\n");
         return EXIT_FAILURE;
     }
 
@@ -667,7 +667,7 @@ int Open_CSV_Files(void)
     {
         if (csv_parse(&p3, buffer3, bytes_read3, cb5, cb6, NULL) != bytes_read3)
         {
-            printf("\n\n ERROR while parsing file ...\n");
+            SDL_Log("\n\n ERROR while parsing file ...\n");
             return EXIT_FAILURE;
         }
     }
@@ -676,9 +676,9 @@ int Open_CSV_Files(void)
     csv_free(&p);
     fclose(fp);
 
-    printf("CSV SMS-GG CRC file opened sucessfully\n");
+    SDL_Log("CSV SMS-GG CRC file opened sucessfully\n");
 // Afficher le nombre de cellules non vides en colonne A
-    printf("Add : %ld SMS/GG Games into MD Dumper Database \n", non_empty_cells_in_col_A3);
+    SDL_Log("Add : %ld SMS/GG Games into MD Dumper Database \n", non_empty_cells_in_col_A3);
 
     return 0;
 }
