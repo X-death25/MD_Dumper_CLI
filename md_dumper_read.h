@@ -392,7 +392,30 @@ int Read_ROM_Auto(void)
 
         if(dump_cart_mode_opts==0)						//Game Gear Mode
         {
-            SDL_Log("Game Gear Mode : ROM dump in progress...\n");
+            int i=0;
+            address=0;
+            SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");
+			
+            while (i<game_size)
+            {
+                usb_buffer_out[0] = READ_SMS;
+                usb_buffer_out[1] = address&0xFF ;
+                usb_buffer_out[2] = (address&0xFF00)>>8;
+                usb_buffer_out[3] = (address & 0xFF0000)>>16;
+                usb_buffer_out[4] = 0; // Slow Mode
+                usb_buffer_out[5] = 0;
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                libusb_bulk_transfer(handle, 0x82,(BufferROM+i),64, &numBytes, 60000);
+                address +=64;
+                i+=64;
+            }
+            SDL_Log("\n");
+            SDL_Log("Dump ROM completed !\n");
+            timer_end();
+            timer_show();
+            myfile = fopen("dump_rom.gg","wb");
+            fwrite(BufferROM, 1,game_size, myfile);
+            fclose(myfile);
         }
         if(dump_cart_mode_opts==1)						//Mega Drive Mode
         {
