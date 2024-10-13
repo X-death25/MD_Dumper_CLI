@@ -18,26 +18,23 @@ int Read_ROM_Auto(void)
             Index_chksm = i;
             SDL_Log("\n");
             SDL_Log("Found game in extra CSV Gamelist  \n");
-            SDL_Log("Position in csv table %d \n",i);
+            //SDL_Log("Position in csv table %d \n",i);
             strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
             txt_csv_game_size[4] = '\0'; // Null-terminate the output string
             //SDL_Log(" txt game size : %s \n",txt_csv_game_size);
             csv_game_size = (unsigned char)strtol(txt_csv_game_size, NULL, 10);
             //SDL_Log(" CSV Game Size  %d \n",csv_game_size);
             game_size=1024*csv_game_size;
-            SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);
+            //SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);
 
             //Return Hardware type
             strncpy(txt_mapper_number,chksm_text_values[i]+10,2);
             txt_mapper_number[1] = '\0'; // Null-terminate the output string
             //SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
             Hardwaretype = (unsigned char)strtol(txt_mapper_number, NULL, 10);
-            SDL_Log(" Hardware type  %d \n",Hardwaretype);
+            //SDL_Log(" Hardware type  %d \n",Hardwaretype);
         }
     }
-
-    SDL_Log("Sending command Dump ROM \n");
-    SDL_Log("Dumping please wait ...\n");
 
     if ( sms_mode == 0 && Hardwaretype == 0 ) // Dump Megadrive cartridge in no mapper mode
     {
@@ -218,7 +215,73 @@ int Read_ROM_Auto(void)
             fwrite(BufferROM, 1,3328*1024, myfile);
             fclose(myfile);
         }
+		
+		 if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
+            {
+                //printf("%.*s\n",32, (char *)game_name);
+                game_size=4096*1024;
+                BufferROM = (unsigned char*)malloc(game_size);
+
+                // Be sure to have Lock-ON disabled
+
+                usb_buffer_out[0] = WRITE_LOCK_ON;
+                usb_buffer_out[1] = (0x509878) & 0xFF ;
+                usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
+                usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
+                usb_buffer_out[4]=0;
+                usb_buffer_out[5]=0x00; // value
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+
+                address = 0;
+                usb_buffer_out[0] = READ_MD;
+                usb_buffer_out[1]=address & 0xFF;
+                usb_buffer_out[2]=(address & 0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4]=1;
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+                SDL_Log("Starting Dump S&K + Sonic 3 ...\n");
+                res = libusb_bulk_transfer(handle, 0x82,BufferROM,1024*4096, &numBytes, 0);
+                if (res != 0)
+                {
+                    SDL_Log("Error \n");
+                    return 1;
+                }
+
+                SDL_Log("Dump ROM completed !\n");
+                myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog3.bin","wb");
+                fwrite(BufferROM, 1,game_size, myfile);
+                fclose(myfile);
+            }
+            else
+            {
+                //SDL_Log("No Cartridge");
+                game_size=2048*1024;
+                BufferROM = (unsigned char*)malloc(game_size);
+                address = 0;
+                usb_buffer_out[0] = READ_MD;
+                usb_buffer_out[1]=address & 0xFF;
+                usb_buffer_out[2]=(address & 0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4]=1;
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+                SDL_Log("\nStarting Dump of Sonic & Knuckles\n");
+                res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+                if (res != 0)
+                {
+                    SDL_Log("Error \n");
+                    return 1;
+                }
+                SDL_Log("Dump ROM completed !\n");
+                myfile = fopen("Sonic & Knuckles.bin","wb");
+                fwrite(BufferROM, 1,game_size, myfile);
+                fclose(myfile);
+            }
 	}
+
+  
 
 
 
