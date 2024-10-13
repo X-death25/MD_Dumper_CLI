@@ -118,7 +118,6 @@ int Read_ROM_Auto(void)
                 myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog.bin","wb");
                 fwrite(BufferROM, 1,game_size, myfile);
                 fclose(myfile);
-                break;
             }
 	}
 		
