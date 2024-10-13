@@ -70,8 +70,7 @@ int Read_ROM_Auto(void)
         fwrite(BufferROM, 1,game_size, myfile);
         fclose(myfile);
     }
-
-    if ( sms_mode == 0 && Hardwaretype == 3 ) // Automatic Dump Megadrive cartridge in Lock-on mapper mode
+    else if ( sms_mode == 0 && Hardwaretype == 3 ) // Automatic Dump Megadrive cartridge in Lock-on mapper mode
     {
         SDL_Log("Extra Hardware detected dump in mode : Sega Lock-ON \n");;
         SDL_Log("Lower Cartridge is : ");
@@ -118,8 +117,7 @@ int Read_ROM_Auto(void)
             fwrite(BufferROM, 1,game_size, myfile);
             fclose(myfile);
         }
-
-        if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
+        else if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
         {
             //SDL_Log("TANGLEWOOD (R)                  ");
             game_size=4096*1024;
@@ -144,8 +142,7 @@ int Read_ROM_Auto(void)
             fwrite(BufferROM, 1,game_size, myfile);
             fclose(myfile);
         }
-
-        if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
+        else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
         {
             //printf("%.*s\n",32, (char *)game_name);
             game_size=3328*1024;
@@ -216,7 +213,7 @@ int Read_ROM_Auto(void)
             fclose(myfile);
         }
 		
-		 if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
+		else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
             {
                 //printf("%.*s\n",32, (char *)game_name);
                 game_size=4096*1024;
@@ -269,7 +266,7 @@ int Read_ROM_Auto(void)
                 fwrite(BufferROM, 1,game_size, myfile);
                 fclose(myfile);
             }
-            else
+		else
             {
                 //SDL_Log("No Cartridge");
                 game_size=2048*1024;
@@ -294,13 +291,9 @@ int Read_ROM_Auto(void)
                 fwrite(BufferROM, 1,game_size, myfile);
                 fclose(myfile);
             }
-	}
+		}
 
-  
-
-
-
-        if ( sms_mode == 1 ) //Read in 8 bits mode
+        else if ( sms_mode == 1 ) //Read in 8 bits mode
         {
             int i=0;
             address=0;
