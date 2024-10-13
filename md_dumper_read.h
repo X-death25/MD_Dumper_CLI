@@ -2,7 +2,8 @@ int Read_ROM_Auto(void)
 {
     SDL_Log("\n");
     SDL_Log("Read Mode : Read ROM in automatic mode\n");
-
+	timer_start();
+	
     // First Search if game is in special csv gamelist
 
     // Search checksum cartridge in Custom Hardware games csv table
@@ -297,15 +298,17 @@ int Read_ROM_Auto(void)
         {
             int i=0;
             address=0;
+            BufferROM = (unsigned char*)malloc(game_size);
+            
             if (gg_mode == 0 )
             {
                 SDL_Log("Master System Mode : ROM dump in progress...\n");
             }
-            if (gg_mode == 1 )
+            else if (gg_mode == 1 )
             {
                 SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");
             }
-
+			
             while (i<game_size)
             {
                 usb_buffer_out[0] = READ_SMS;
@@ -327,7 +330,7 @@ int Read_ROM_Auto(void)
             {
                 myfile = fopen("dump_rom.sms","wb");
             }
-            if (gg_mode == 1 )
+            else if (gg_mode == 1 )
             {
                 myfile = fopen("dump_rom.gg","wb");
             }
