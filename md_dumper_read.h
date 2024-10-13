@@ -38,7 +38,6 @@ int Read_ROM_Auto(void)
 
         SDL_Log("Sending command Dump ROM \n");
         SDL_Log("Dumping please wait ...\n");
-        timer_start();
 		
 	if ( sms_mode == 0 && Hardwaretype == 0 ) // Dump Megadrive cartridge in no mapper mode
     {
@@ -121,8 +120,9 @@ int Read_ROM_Auto(void)
                 fclose(myfile);
                 break;
             }
-		
 	}
+		
+	
 	
 	if ( sms_mode == 1 ) //Read in 8 bits mode
     {
