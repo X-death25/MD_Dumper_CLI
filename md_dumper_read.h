@@ -93,6 +93,8 @@ int Read_ROM_Auto(void)
 			
 			memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
             trim((unsigned char *)dump_name, 0);
+			SDL_Log("%.*s\n",32, (char *)dump_name,);
+            //trim((unsigned char *)dump_name, 0);
             if(memcmp((unsigned char *)dump_name,"SONIC THE HEDGEHOG",18) == 0)
             {
                 SDL_Log("%.*s\n",32, (char *)game_name);
