@@ -193,6 +193,18 @@ unsigned char manufacturer_id=0;
 const char * wheel[] = { "-","\\","|","/"}; //erase wheel
 int lockon_mode=0;
 
+//*****************************************************
+// Hardware TYPES
+// 0 = No Mapper
+// 1 = Sega Virtual Processor SVP Samsung DSP SSP1601
+// 2 = Sega 315-5779 Mapper Super Street Fighter 2
+// 3 = Sega Lock-on ( Sonic & Knuckles )
+// 4 = Extended SSF2 Mapper ( Overdrive 2 / DOA )
+// 5 = WaterMelon T-5740 Mapper Pier Solar
+//*****************************************************
+
+unsigned char Hardwaretype=0;
+
 //Others Functions
 void Display_Help(char *prog_name)
 {

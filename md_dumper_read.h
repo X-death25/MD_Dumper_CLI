@@ -3,6 +3,37 @@ int Read_ROM_Auto(void)
         SDL_Log("\n");
         SDL_Log("Read Mode : Read ROM in automatic mode\n");
 
+        // Search if game is in special csv gamelist
+
+        // Search checksum cartridge in Custom Hardware games csv table
+        i=0;
+        for (i = 0; i < chksm_text_values_count ; i++)
+        {
+            strncpy(txt_csv_chksm,chksm_text_values[i],4);
+            //SDL_Log(" txt chksm value : %s \n",txt_csv_chksm);
+            csv_chksm = (unsigned short)strtol(txt_csv_chksm, NULL, 16);
+
+            if ( checksum_header == csv_chksm  )
+            {
+                Index_chksm = i;
+                SDL_Log("\n");
+                SDL_Log("Found game in extra CSV Gamelist  \n");
+                SDL_Log("Position in csv table %d \n",i);
+                strncpy(txt_csv_game_size,chksm_text_values[i]+5,4);
+                txt_csv_game_size[4] = '\0'; // Null-terminate the output string
+                //SDL_Log(" txt game size : %s \n",txt_csv_game_size);
+                csv_game_size = (unsigned char)strtol(txt_csv_game_size, NULL, 10);
+                //SDL_Log(" CSV Game Size  %d \n",csv_game_size);
+                game_size=1024*csv_game_size;
+                SDL_Log("ROM Size from CSV is %ld Ko \n",game_size);
+				
+				//Return Hardware type
+				strncpy(txt_mapper_number,chksm_text_values[i]+10,2);
+				txt_mapper_number[1] = '\0'; // Null-terminate the output string
+				SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
+            }
+        }
+
         SDL_Log("Sending command Dump ROM \n");
         SDL_Log("Dumping please wait ...\n");
         timer_start();
