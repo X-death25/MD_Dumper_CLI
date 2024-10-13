@@ -105,6 +105,7 @@ int Read_ROM_Auto(void)
 	if ( sms_mode == 1 ) //Read in 8 bits mode
     {
 		    int i=0;
+			address=0;
 			if (gg_mode == 0 ) { SDL_Log("Master System Mode : ROM dump in progress...\n");}
 			if (gg_mode == 1 ) { SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");}
             
