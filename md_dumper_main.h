@@ -552,7 +552,7 @@ int Detect_Device(void)
     {
         SDL_Log("Dumper started in 8 bit mode \n");
     }
-    printf("\n");
+    SDL_Log("\n");
 
 
     return 0;
