@@ -30,7 +30,7 @@ int Read_ROM_Auto(void)
 				//Return Hardware type
 				strncpy(txt_mapper_number,chksm_text_values[i]+10,2);
 				txt_mapper_number[1] = '\0'; // Null-terminate the output string
-				SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
+				//SDL_Log(" CSV Mapper Type  %s \n",txt_mapper_number);
 				Hardwaretype = (unsigned char)strtol(txt_mapper_number, NULL, 10);
 				SDL_Log(" Hardware type  %d \n",Hardwaretype);
             }
@@ -38,68 +38,8 @@ int Read_ROM_Auto(void)
 
         SDL_Log("Sending command Dump ROM \n");
         SDL_Log("Dumping please wait ...\n");
-        timer_start();
-        
-       /* int sk2needed=0;
-        
-        if(lockon_mode==1)
-			{
-			SDL_Log("\n");
-			SDL_Log("Extra Hardware : Sonic and Knuckles Lock-On\n");
-			
-			address=(0x200100)/2;
-            usb_buffer_out[0] = READ_MD;
-            usb_buffer_out[1] = address&0xFF ;
-            usb_buffer_out[2] = (address&0xFF00)>>8;
-            usb_buffer_out[3]=(address & 0xFF0000)>>16;
-            usb_buffer_out[4] = 0; // Slow Mode
-			
-			libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
-            
-            memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
-            trim((unsigned char *)dump_name, 0);
-            if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
-				{
-				SDL_Log("Sonic 1 Cartridge found\n");
-				game_size=2560*1024;
-				}
-            else if(memcmp((unsigned char *)dump_name,"                                ",32) == 0) // Tanglewood use fake header
-				{
-				SDL_Log("Tanglewood Cartridge found\n");
-				game_size=4096*1024;
-				}
-			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 2",32) == 0)
-				{
-				SDL_Log("Sonic 2 Cartridge found\n");
-				
-				game_size=3072*1024;
-				sk2needed=1;
-				
-				usb_buffer_out[0] = 0x45; //WRITE LOCK ON
-                usb_buffer_out[1] = (0x509878) & 0xFF ;
-                usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
-                usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
-                usb_buffer_out[4]=0;
-                usb_buffer_out[5]=0x01; 
-                
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-				}
-			else if(memcmp((unsigned char *)dump_name,"SONIC THE             HEDGEHOG 3",32) == 0)
-				{
-				SDL_Log("Sonic 3 Cartridge found\n");
-				game_size=4096*1024;
-				}
-			else
-				{
-				SDL_Log("No special cartridge : Dumping only Sonic & Knuckles\n");
-				game_size=2048*1024;
-				}
-			}*/
-			
-		//SDL_Log("\n");
 		
-	if ( sms_mode == 0 ) //Read in 16 bits mode
+	if ( sms_mode == 0 && Hardwaretype == 0 ) // Dump Megadrive cartridge in no mapper mode
     {
         SDL_Log("Rom Size : %ld Ko \n",game_size);
         game_size = game_size*1024;
@@ -133,6 +73,56 @@ int Read_ROM_Auto(void)
 		fwrite(BufferROM, 1,game_size, myfile);
 		fclose(myfile);
 	}
+	
+	if ( sms_mode == 0 && Hardwaretype == 3 ) // Automatic Dump Megadrive cartridge in Lock-on mapper mode
+    {
+		    SDL_Log("Extra Hardware detected dump in mode : Sega Lock-ON \n");;
+            SDL_Log("Lower Cartridge is : ");
+            SDL_Log("%.*s\n", 48, (char *)game_name);
+            SDL_Log("Upper Cartridge is : ");
+			
+			address=(0x200100)/2;
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,usb_buffer_in,64, &numBytes, 60000);
+			
+			memcpy((unsigned char *)dump_name, (unsigned char *)usb_buffer_in+32,32);
+            trim((unsigned char *)dump_name, 0);
+            if(memcmp((unsigned char *)dump_name,"SONIC THE               HEDGEHOG",32) == 0)
+            {
+                SDL_Log("%.*s\n",32, (char *)game_name);
+                game_size=2560*1024;
+
+                BufferROM = (unsigned char*)malloc(game_size);
+                address = 0;
+                usb_buffer_out[0] = READ_MD;
+                usb_buffer_out[1]=address & 0xFF;
+                usb_buffer_out[2]=(address & 0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4]=1;
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+                SDL_Log("Starting Dump ...\n");
+                res = libusb_bulk_transfer(handle, 0x82,BufferROM,game_size, &numBytes, 0);
+                if (res != 0)
+                {
+                    SDL_Log("Error \n");
+                    return 1;
+                }
+                SDL_Log("Dump ROM completed !\n");
+                myfile = fopen("Sonic & Knuckles + Sonic The Hedgehog.bin","wb");
+                fwrite(BufferROM, 1,game_size, myfile);
+                fclose(myfile);
+                break;
+            }
+	}
+		
+	
 	
 	if ( sms_mode == 1 ) //Read in 8 bits mode
     {
