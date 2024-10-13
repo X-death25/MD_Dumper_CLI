@@ -874,18 +874,6 @@ void Game_Header_Infos(void)
         {
 			SDL_Log("Valid cartridge detected !\n\n");
 
-            for(i=0; i<(256/16); i++)
-            {
-				SDL_Log("\n");
-				SDL_Log(" %03lX", 0x100+(i*16));
-                for(j=0; j<16; j++)
-                {
-				   SDL_Log(" %02X", buffer_header[j+(i*16)]);
-                }
-				SDL_Log(" %.*s", 16, buffer_header +(i*16));
-            }
-            i=0;
-
             // Calculate Checksum of first bank
 
             //printf("\nRead First BANK...\n");

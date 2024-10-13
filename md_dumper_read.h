@@ -76,6 +76,8 @@ int Read_ROM_Auto(void)
 		{
 			BufferROM[i]=0x00;
 		}
+	if ( sms_mode == 0 ) //Read in 16 bits mode
+    {
 		address=0;
 		usb_buffer_out[0] = READ_MD;
 		usb_buffer_out[1]=address & 0xFF;
@@ -95,34 +97,40 @@ int Read_ROM_Auto(void)
 		SDL_Log("Dump ROM completed !\n");
 		timer_end();
 		timer_show();
-		
-		if(sk2needed==1)
-			{
-			myfile = fopen("dump_s2k_raw.bin","wb"); 
-			fwrite(BufferROM, 1,game_size, myfile);
-			fclose(myfile);
+		myfile = fopen("dump_smd.bin","wb");
+		fwrite(BufferROM, 1,game_size, myfile);
+		fclose(myfile);
+	}
+	
+	if ( sms_mode == 1 ) //Read in 8 bits mode
+    {
+		    int i=0;
+			if (gg_mode == 0 ) { SDL_Log("Master System Mode : ROM dump in progress...\n");}
+			if (gg_mode == 1 ) { SDL_Log("GAME GEAR Mode : ROM dump in progress...\n");}
+            
+            while (i<game_size)
+            {
+                usb_buffer_out[0] = READ_SMS;
+                usb_buffer_out[1] = address&0xFF ;
+                usb_buffer_out[2] = (address&0xFF00)>>8;
+                usb_buffer_out[3] = (address & 0xFF0000)>>16;
+                usb_buffer_out[4] = 0; // Slow Mode
+                usb_buffer_out[5] = 0;
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                libusb_bulk_transfer(handle, 0x82,(BufferROM+i),64, &numBytes, 60000);
+                address +=64;
+                i+=64;
+            }
+            SDL_Log("\n");
+            SDL_Log("Dump ROM completed !\n");
+            timer_end();
+            timer_show();
+            if (gg_mode == 0 ) { myfile = fopen("dump_rom.sms","wb");}
+			if (gg_mode == 1 ) { myfile = fopen("dump_rom.gg","wb");}
+            fwrite(BufferROM, 1,game_size, myfile);
+            fclose(myfile);			
+	}
 			
-			FILE *fp1, *fp2, *fp3; 
-			char ch;
-			fp1 = fopen("dump_s2k_raw.bin","r");
-			fp2 = fopen("sk2chip.bin","r");
-			fp3 = fopen("dump_smd.bin","w");
-			
-			for(int pos=0;pos<3072*1024;pos++) { ch = fgetc(fp1); fputc(ch,fp3); }
-			for(int pos=0;pos<256*1024;pos++) { ch = fgetc(fp2); fputc(ch,fp3); }
-			
-			fclose(fp1);    
-			fclose(fp2);    
-			fclose(fp3);
-			
-			remove("dump_s2k_raw.bin");
-			}
-		else
-			{
-			myfile = fopen("dump_smd.bin","wb");
-			fwrite(BufferROM, 1,game_size, myfile);
-			fclose(myfile);
-			}
 		
 		return 0;
 }
