@@ -75,6 +75,38 @@ unsigned char csv_save_type=0;
 char txt_save_size[2];
 unsigned char csv_save_size=0;
 
+// csv SMS-GG CRC specific Variable
+
+#define MAX_NON_EMPTY_CELLS2 2500 // Ajustez cette valeur selon vos besoins
+#define TEXT_SIZE3 97 // taille de toute la chaine
+#define BUFFER_SIZE3 4096
+
+FILE *fp3;
+struct csv_parser p3;
+char buffer3[BUFFER_SIZE3];
+
+int current_row3 = 0;
+int current_col3 = 0;
+int non_empty_cells_in_col_A3 = 0; // Compteur de cellules non vides en colonne A
+char smsgg_text_values[1500][TEXT_SIZE3+ 1];
+int smsgg_text_values_count = 0;
+unsigned int HeaderCRC=0;
+unsigned char *SMS_Header = NULL;
+unsigned char gg_mode=1; // 1 for GG 0 for SMS
+
+// Tableau pour stocker les différentes valeurs du fichier csv sms-gg-crc
+
+char txt_csv_chksm1[8];
+unsigned long csv_chksm1=0;
+unsigned char txt_csv_chksm2[8];
+unsigned long csv_chksm2=0;
+unsigned char txt_csv_game_size2[4+1];
+unsigned char csv_game_size2=0;
+unsigned char txt_csv_game_type2[3+1];
+unsigned char csv_game_type2=0;
+unsigned char txt_csv_game_name2[48+1];
+unsigned char txt_csv_region2[20+1];
+
 //CSV Flashlist specific Variables
 
 #define CHIPID_TEXT_SIZE 48 // taille de toute la chaine
@@ -123,6 +155,7 @@ unsigned long k=0;
 unsigned char *buffer_header = NULL;
 unsigned char *buffer_rom = NULL;
 unsigned char md_dumper_type=0;
+unsigned char sms_mode=0;
 unsigned char dump_name[32];
 unsigned char region[5];
 char *game_region = NULL;
@@ -252,7 +285,41 @@ void cb4(int c, void *data)
     current_col2 = 0; // Réinitialiser le compteur de colonnes à la fin de chaque ligne
 }
 
+// SMS-GG
 
+void cb5(void *s, size_t len, void *data)
+{
+    int target_row = 0; // Index basé sur 0 (deuxième ligne a l'index 1)
+    int col_A = 0;     // Index basé sur 0 (première colonne a l'index 0)
+    int col_C = 1;     // Index basé sur 0 (troisième colonne a l'index 2)
+
+    /* if (current_row == target_row && current_col == col_A) {
+         // Copier la donnée dans la variable cell_A2
+         strncpy(cell_A2, (char *)s, len);
+         cell_A2[len] = '\0'; // Ajouter le caractère de fin de chaîne
+     }*/
+
+    // Compter les cellules non vides en colonne A et stocker les valeurs sous forme de texte
+    if (current_row3 > 0 && current_col3 == col_A && len > 0)   // Ignorer la première ligne
+    {
+        non_empty_cells_in_col_A3++;
+        if (smsgg_text_values_count < MAX_NON_EMPTY_CELLS2)
+        {
+            // Assurer que la chaîne est de taille TEXT_SIZE
+            strncpy(smsgg_text_values[smsgg_text_values_count], (char *)s, TEXT_SIZE3);
+            smsgg_text_values[smsgg_text_values_count][TEXT_SIZE3] = '\0'; // Ajouter le caractère de fin de chaîne
+            smsgg_text_values_count++;
+        }
+    }
+}
+
+
+// Fonction de rappel pour traiter la fin de chaque ligne
+void cb6(int c, void *data)
+{
+    current_row3++;
+    current_col3 = 0; // Réinitialiser le compteur de colonnes à la fin de chaque ligne
+}
 
 //Timer functions according to Operating Systems
 #if defined(_WIN32)		//Windows
@@ -474,12 +541,26 @@ int Detect_Device(void)
         SDL_Log("MD Dumper type : Marv17 aligned tqfp48  \n");
     }
     SDL_Log("Hardware Firmware version : %d.%d\n", usb_buffer_in[20],usb_buffer_in[21]);
-return 0;
+
+    sms_mode = usb_buffer_in[25];
+    if ( sms_mode == 0 )
+    {
+        SDL_Log("Dumper started in 16 bit mode \n");
+        Hardwaretype = 0 ;
+    }
+    if ( sms_mode == 1 )
+    {
+        SDL_Log("Dumper started in 8 bit mode \n");
+    }
+    printf("\n");
+
+
+    return 0;
 }
 
 int Open_CSV_Files(void)
 {
-if (csv_init(&p, options) != 0)
+    if (csv_init(&p, options) != 0)
     {
         SDL_Log("\n");
         SDL_Log("\n");
@@ -562,132 +643,350 @@ if (csv_init(&p, options) != 0)
     SDL_Log("CSV Flashlist file opened sucessfully\n");
     // Afficher le nombre de cellules non vides en colonne A
     SDL_Log("Add : %d Flash ID into MD Dumper Database \n", non_empty_cells_in_col_A2);
+
+    // open csv sms-gg crc
+
+    if (csv_init(&p3, options) != 0)
+    {
+        printf("\n\n ERROR Failed to init CSV Parser for SMS-GG crc ...\n");
+        exit(EXIT_FAILURE);
+    }
+    csv_set_quote(&p3,';');
+
+
+    FILE *fp3 = fopen("sms-gg_crc.csv", "r");
+    if (!fp)
+    {
+        printf("\n\n ERROR Can't find flashlist.csv ...\n");
+        return EXIT_FAILURE;
+    }
+
+    char buffer3[BUFFER_SIZE3];
+    size_t bytes_read3;
+    while ((bytes_read3 = fread(buffer3, 1, BUFFER_SIZE3, fp)) > 0)
+    {
+        if (csv_parse(&p3, buffer3, bytes_read3, cb5, cb6, NULL) != bytes_read3)
+        {
+            printf("\n\n ERROR while parsing file ...\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    csv_fini(&p, cb5, cb6, NULL);
+    csv_free(&p);
+    fclose(fp);
+
+    printf("CSV SMS-GG CRC file opened sucessfully\n");
+// Afficher le nombre de cellules non vides en colonne A
+    printf("Add : %ld SMS/GG Games into MD Dumper Database \n", non_empty_cells_in_col_A3);
+
     return 0;
 }
 
 void Game_Header_Infos(void)
 {
-//First try to read ROM MD Header
 
-    buffer_header = (unsigned char *)malloc(0x200);
-    i = 0;
-    address = 0x80;
-
-    // Cleaning header Buffer
-    for (i=0; i<512; i++)
+    if ( sms_mode == 0 ) //Read in 16 bits mode
     {
-        buffer_header[i]=0x00;
+
+
+        buffer_header = (unsigned char *)malloc(0x200);
+        i = 0;
+        address = 0x80;
+
+        // Cleaning header Buffer
+        for (i=0; i<512; i++)
+        {
+            buffer_header[i]=0x00;
+        }
+
+        i = 0;
+
+        while (i<8)
+        {
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
+            address+=32;
+            i++;
+        }
+
+        if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
+        {
+            SDL_Log("\n");
+            SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
+            SDL_Log("\n");
+            SDL_Log(" --- HEADER ---\n");
+            memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
+            trim((unsigned char *)dump_name, 0);
+            SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
+            memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
+            trim((unsigned char *)dump_name, 0);
+
+            if(memcmp((unsigned char *)game_name,"SONIC & KNUCKLES",16) == 0)
+                lockon_mode=1;
+
+            SDL_Log(" International: %.*s\n", 48, game_name);
+            SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
+            SDL_Log(" Version: %.*s\n", 14, buffer_header+0x80);
+            memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
+            for(i=0; i<4; i++)
+            {
+                if(region[i]==0x20)
+                {
+                    game_region = (char *)malloc(i);
+                    memcpy((unsigned char *)game_region, (unsigned char *)buffer_header +0xF0, i);
+                    game_region[i] = '\0';
+                    break;
+                }
+            }
+
+            if(game_region[0]=='0')
+            {
+                game_region = (char *)malloc(4);
+                memcpy((char *)game_region, (char *)unk, 3);
+                game_region[3] = '\0';
+            }
+
+            SDL_Log(" Region: %s\n", game_region);
+
+            checksum_header = (buffer_header[0x8E]<<8) | buffer_header[0x8F];
+            SDL_Log(" Checksum: %X\n", checksum_header);
+
+            game_size = 1 + ((buffer_header[0xA4]<<24) | (buffer_header[0xA5]<<16) | (buffer_header[0xA6]<<8) | buffer_header[0xA7])/1024;
+            SDL_Log(" Game size: %dKB\n", game_size);
+
+            if((buffer_header[0xB0] + buffer_header[0xB1])!=0x93)
+            {
+                SDL_Log(" Extra Memory : No\n");
+            }
+            else
+            {
+                SDL_Log(" Extra Memory : Yes ");
+                switch(buffer_header[0xB2])
+                {
+                case 0xF0:
+                    SDL_Log(" 8bit backup SRAM (even addressing)\n");
+                    break;
+                case 0xF8:
+                    SDL_Log(" 8bit backup SRAM (odd addressing)\n");
+                    break;
+                case 0xB8:
+                    SDL_Log(" 8bit volatile SRAM (odd addressing)\n");
+                    break;
+                case 0xB0:
+                    SDL_Log(" 8bit volatile SRAM (even addressing)\n");
+                    break;
+                case 0xE0:
+                    SDL_Log(" 16bit backup SRAM\n");
+                    break;
+                case 0xA0:
+                    SDL_Log(" 16bit volatile SRAM\n");
+                    break;
+                case 0xE8:
+                    SDL_Log(" Serial EEPROM\n");
+                    break;
+                }
+                if ( buffer_header[0xB2] != 0xE0 | buffer_header[0xB2] != 0xA0 ) // 8 bit SRAM
+                {
+                    save_size2 = (buffer_header[0xB8]<<24) | (buffer_header[0xB9]<<16) | (buffer_header[0xBA] << 8) | buffer_header[0xBB];
+                    save_size1 = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
+
+                    save_size = save_size2 - save_size1;
+                    save_size = (save_size/1024); // Kb format
+                    save_size=(save_size/2) + 1; // 8bit size
+                }
+                save_address = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
+                SDL_Log(" Save size: %dKb\n", save_size);
+                SDL_Log(" Save address: %lX\n", save_address);
+
+                if(usb_buffer_in[0xB2]==0xE8) // EEPROM Game
+                {
+                    SDL_Log(" No information on this game!\n");
+                }
+            }
+        }
     }
-
-    i = 0;
-
-    while (i<8)
+    if ( sms_mode == 1 ) //Read in 8 bits mode
     {
-        usb_buffer_out[0] = READ_MD;
-        usb_buffer_out[1] = address&0xFF ;
-        usb_buffer_out[2] = (address&0xFF00)>>8;
-        usb_buffer_out[3]=(address & 0xFF0000)>>16;
-        usb_buffer_out[4] = 0; // Slow Mode
 
-        libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
-        libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
-        address+=32;
-        i++;
+        buffer_header = (unsigned char *)malloc(0x200);
+        i = 0;
+        // Cleaning header Buffer
+        for (i=0; i<512; i++)
+        {
+            buffer_header[i]=0x00;
+        }
+        i = 0;
+
+        printf("\nTry to read SMS - GG cartridge...\n");
+        address = 0x7FF0;
+
+        i=0;
+        while (i<8)
+        {
+
+            usb_buffer_out[0] = READ_SMS;
+            usb_buffer_out[1] = address&0xFF ;
+            usb_buffer_out[2] = (address&0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4] = 0; // Slow Mode
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x82,buffer_header+(64*i),64, &numBytes, 60000);
+            address+=64;
+            i++;
+        }
+
+        if(memcmp((unsigned char *)buffer_header,"TMR SEGA",8) == 0)
+        {
+            printf("Valid cartridge detected !\n\n");
+
+            for(i=0; i<(256/16); i++)
+            {
+                printf("\n");
+                printf(" %03lX", 0x100+(i*16));
+                for(j=0; j<16; j++)
+                {
+                    printf(" %02X", buffer_header[j+(i*16)]);
+                }
+                printf(" %.*s", 16, buffer_header +(i*16));
+            }
+            i=0;
+
+            // Calculate Checksum of first bank
+
+            //printf("\nRead First BANK...\n");
+            // Read first 32 Ko of the ROM
+
+            i=0;
+            SMS_Header = (unsigned char *)malloc(32*1024);
+
+            // Cleaning Bank Buffer
+            for (i=0; i<32*1024; i++)
+            {
+                SMS_Header[i]=0x00;
+            }
+
+            i=0;
+            address=0;
+            while (i<32*1024)
+            {
+
+                usb_buffer_out[0] = READ_SMS;
+                usb_buffer_out[1] = address&0xFF ;
+                usb_buffer_out[2] = (address&0xFF00)>>8;
+                usb_buffer_out[3]=(address & 0xFF0000)>>16;
+                usb_buffer_out[4] = 0; // Slow Mode
+
+                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+                libusb_bulk_transfer(handle, 0x82,SMS_Header+i,64, &numBytes, 60000);
+                address+=64;
+                i=i+64;
+            }
+            //printf("Calculate CRC..\n");
+            HeaderCRC = crc32(0,SMS_Header,32*1024);
+            //  printf("BANK0 CRC value is : 0x%08X\n",HeaderCRC);
+
+            // Search valid CRC in SMS-GG CRC csv table
+
+            // Search checksum cartridge in Custom Hardware games csv table
+            i=0;
+            for (i = 0; i < non_empty_cells_in_col_A3 ; i++)
+            {
+                strncpy(txt_csv_chksm1,smsgg_text_values[i],8);
+                //printf(" \n txt chksm value : %s \n",txt_csv_chksm1);
+                csv_chksm1 = (unsigned long)strtoul(txt_csv_chksm1, NULL, 16);
+                //printf("CRC value is : 0x%08X\n",csv_chksm1 );
+
+                if ( csv_chksm1 == HeaderCRC )
+                {
+
+                    strncpy(txt_csv_game_name2,smsgg_text_values[i]+27,48);
+                    txt_csv_game_name2[48] = '\0'; // Null-terminate the output string
+
+                    // Copy Cartridge Type :
+
+                    strncpy(txt_csv_game_type2,smsgg_text_values[i]+23,3);
+                    txt_csv_game_type2[3] = '\0'; // Null-terminate the output string
+
+                    // Copy Cartridge Size :
+
+                    strncpy(txt_csv_game_size2,smsgg_text_values[i]+18,4);
+
+                    // Copy Cartridge Region :
+
+                    strncpy(txt_csv_region2,smsgg_text_values[i]+76,20);
+                    txt_csv_region2[20] = '\0'; // Null-terminate the output string
+                }
+            }
+
+
+            printf("\n\n --- HEADER --- \n");
+
+            printf("Game Name: %.*s\n",48, (char *)txt_csv_game_name2);
+            if(memcmp((unsigned char *)txt_csv_game_type2,"GG ",3) == 0)
+            {
+                printf("Game Type : GAME GEAR \n");
+            }
+            if(memcmp((unsigned char *)txt_csv_game_type2,"SMS",3) == 0)
+            {
+                printf("Game Type : MASTER SYSTEM / MARK3\n");
+                gg_mode=0;
+            }
+
+            game_size = buffer_header[15] & 0xF;
+            if (game_size == 0x00)
+            {
+                printf("Game Size (Header) : 256 Ko");
+                game_size = 256*1024;
+            }
+            if (game_size == 0x01)
+            {
+                printf("Game Size (Header) : 512 Ko");
+                game_size = 512*1024;
+            }
+            if (game_size == 0x0c)
+            {
+                printf("Game Size (Header) : 32 Ko");
+                game_size = 32*1024;
+            }
+            if (game_size == 0x0e)
+            {
+                printf("Game Size (Header) : 64 Ko");
+                game_size = 64*1024;
+            }
+            if (game_size == 0x0f)
+            {
+                printf("Game Size (Header) : 128 Ko");
+                game_size = 128*1024;
+            }
+
+            // Real Cartridge Size
+
+            printf("\nGame Size (Real): %.*s Ko\n",4, (char *)txt_csv_game_size2);
+
+            // Region Header
+
+            if ( buffer_header[15] >> 6 == 0x01 )
+            {
+                printf("Game Region (Header) : Export");
+            }
+            if ( buffer_header[15] >> 4 == 0x03 )
+            {
+                printf("Game Region (Header) : Japan");
+            }
+
+            // Region REAL
+
+            printf("\nGame Region (Real) : %.*s\n",40, (char *)txt_csv_region2);
+
+
+        }
+
     }
-
-    if(memcmp((unsigned char *)buffer_header,"SEGA",4) == 0)
-    {
-        SDL_Log("\n");
-        SDL_Log("Megadrive/Genesis/32X cartridge detected!\n");
-        SDL_Log("\n");
-        SDL_Log(" --- HEADER ---\n");
-        memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+32, 48);
-        trim((unsigned char *)dump_name, 0);
-        SDL_Log(" Domestic: %.*s\n", 48, (char *)game_name);
-        memcpy((unsigned char *)dump_name, (unsigned char *)buffer_header+80, 48);
-        trim((unsigned char *)dump_name, 0);
-
-		if(memcmp((unsigned char *)game_name,"SONIC & KNUCKLES",16) == 0) lockon_mode=1;
-
-        SDL_Log(" International: %.*s\n", 48, game_name);
-        SDL_Log(" Release date: %.*s\n", 16, buffer_header+0x10);
-        SDL_Log(" Version: %.*s\n", 14, buffer_header+0x80);
-        memcpy((unsigned char *)region, (unsigned char *)buffer_header +0xF0, 4);
-        for(i=0; i<4; i++)
-        {
-            if(region[i]==0x20)
-            {
-                game_region = (char *)malloc(i);
-                memcpy((unsigned char *)game_region, (unsigned char *)buffer_header +0xF0, i);
-                game_region[i] = '\0';
-                break;
-            }
-        }
-
-        if(game_region[0]=='0')
-        {
-            game_region = (char *)malloc(4);
-            memcpy((char *)game_region, (char *)unk, 3);
-            game_region[3] = '\0';
-        }
-
-        SDL_Log(" Region: %s\n", game_region);
-
-        checksum_header = (buffer_header[0x8E]<<8) | buffer_header[0x8F];
-        SDL_Log(" Checksum: %X\n", checksum_header);
-
-        game_size = 1 + ((buffer_header[0xA4]<<24) | (buffer_header[0xA5]<<16) | (buffer_header[0xA6]<<8) | buffer_header[0xA7])/1024;
-        SDL_Log(" Game size: %dKB\n", game_size);
-
-        if((buffer_header[0xB0] + buffer_header[0xB1])!=0x93)
-        {
-            SDL_Log(" Extra Memory : No\n");
-        }
-        else
-        {
-            SDL_Log(" Extra Memory : Yes ");
-            switch(buffer_header[0xB2])
-            {
-            case 0xF0:
-                SDL_Log(" 8bit backup SRAM (even addressing)\n");
-                break;
-            case 0xF8:
-                SDL_Log(" 8bit backup SRAM (odd addressing)\n");
-                break;
-            case 0xB8:
-                SDL_Log(" 8bit volatile SRAM (odd addressing)\n");
-                break;
-            case 0xB0:
-                SDL_Log(" 8bit volatile SRAM (even addressing)\n");
-                break;
-            case 0xE0:
-                SDL_Log(" 16bit backup SRAM\n");
-                break;
-            case 0xA0:
-                SDL_Log(" 16bit volatile SRAM\n");
-                break;
-            case 0xE8:
-                SDL_Log(" Serial EEPROM\n");
-                break;
-            }
-            if ( buffer_header[0xB2] != 0xE0 | buffer_header[0xB2] != 0xA0 ) // 8 bit SRAM
-            {
-                save_size2 = (buffer_header[0xB8]<<24) | (buffer_header[0xB9]<<16) | (buffer_header[0xBA] << 8) | buffer_header[0xBB];
-                save_size1 = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
-
-                save_size = save_size2 - save_size1;
-                save_size = (save_size/1024); // Kb format
-                save_size=(save_size/2) + 1; // 8bit size
-            }
-            save_address = (buffer_header[0xB4]<<24) | (buffer_header[0xB5]<<16) | (buffer_header[0xB6] << 8) | buffer_header[0xB7];
-            SDL_Log(" Save size: %dKb\n", save_size);
-            SDL_Log(" Save address: %lX\n", save_address);
-
-            if(usb_buffer_in[0xB2]==0xE8) // EEPROM Game
-            {
-                SDL_Log(" No information on this game!\n");
-            }
-        }
-    }
-  
-}
