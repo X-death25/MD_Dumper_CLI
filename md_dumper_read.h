@@ -7,7 +7,7 @@ int Read_ROM_Auto(void)
         SDL_Log("Dumping please wait ...\n");
         timer_start();
         
-        int sk2needed=0;
+       /* int sk2needed=0;
         
         if(lockon_mode==1)
 			{
@@ -62,7 +62,7 @@ int Read_ROM_Auto(void)
 				SDL_Log("No special cartridge : Dumping only Sonic & Knuckles\n");
 				game_size=2048*1024;
 				}
-			}
+			}*/
 			
 		//SDL_Log("\n");
 		
