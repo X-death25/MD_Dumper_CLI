@@ -224,14 +224,29 @@ int Read_ROM_Auto(void)
 
                 // Be sure to have Lock-ON disabled
 
-                usb_buffer_out[0] = WRITE_LOCK_ON;
-                usb_buffer_out[1] = (0x509878) & 0xFF ;
-                usb_buffer_out[2] = ((0x509878)&0xFF00)>>8;
-                usb_buffer_out[3]=((0x509878) & 0xFF0000)>>16;
-                usb_buffer_out[4]=0;
-                usb_buffer_out[5]=0x00; // value
+            address = 0xA130F1/2; // bank 6
+            usb_buffer_out[0] = MAPPER_SSF2;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=0;
+            usb_buffer_out[5]=0;
 
-                libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 60000);
+
+            // Do a simple read maybe needed for init bank or slow down the dumper :D
+
+            address = 0; 
+            usb_buffer_out[0] = READ_MD;
+            usb_buffer_out[1]=address & 0xFF;
+            usb_buffer_out[2]=(address & 0xFF00)>>8;
+            usb_buffer_out[3]=(address & 0xFF0000)>>16;
+            usb_buffer_out[4]=0;
+
+            libusb_bulk_transfer(handle, 0x01,usb_buffer_out, sizeof(usb_buffer_out), &numBytes, 0);
+            libusb_bulk_transfer(handle, 0x82, usb_buffer_in, sizeof(usb_buffer_in), &numBytes, 0);
+			
+			// Restart the dump
 
                 address = 0;
                 usb_buffer_out[0] = READ_MD;
